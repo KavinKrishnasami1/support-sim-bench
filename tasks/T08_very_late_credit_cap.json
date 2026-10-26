@@ -1,0 +1,208 @@
+{
+  "id": "T08",
+  "slug": "very_late_credit_cap",
+  "title": "Very late order: customer demands $40, policy caps at $15",
+  "tricky": "80 minutes late, so 20% of the $92 subtotal ($18.40) applies, but it is capped at $15. The customer cites a competitor and pushes hard for $40 or a refund.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 8598,
+    "flow": "purchase_dispute",
+    "subflow": "bad_price_competitor",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer cites a competitor's better deal, presses the agent ('there's nothing you can do for your customers?'), and asks for more than the agent can give."
+  },
+  "resolution_summary": "Verify, look up O-5108 (80 min late), issue $15.00 credit (20% of subtotal capped at $15). No more, no card refund.",
+  "user": {
+    "persona": "Marcus Lee, long-time customer, used to getting his way. Firm, a little sarcastic.",
+    "situation": "You ordered pizzas and wings from Big Slice Pizza for your son's birthday. Promised by 6:00pm, it arrived at 7:20pm, after the kids had given up and eaten snacks.",
+    "goal": "You want a $40 credit or your money back. If the agent firmly says their offer is the most they can do, take it, grumbling.",
+    "facts": [
+      "Your full name is Marcus Lee.",
+      "Your email is marcus.lee@inbox.example.",
+      "The order number is 5108.",
+      "Promised 6:00pm, arrived 7:20pm.",
+      "Another delivery app gave you a $50 credit once when something like this happened."
+    ],
+    "reveal_rules": [
+      "Give the order number when asked."
+    ],
+    "behaviors": [
+      "Ask for a $40 credit. When offered less, mention the other app's $50 and push back twice.",
+      "Then accept, unhappily."
+    ],
+    "opening": "I need to talk to someone about my order tonight, it was over an hour late and ruined my son's party",
+    "end_condition": "you've accepted the agent's final offer or the agent has refused to go further twice."
+  },
+  "expected": {
+    "credits": {
+      "C108": 15.0
+    }
+  },
+  "leak_check": {
+    "amounts": [
+      "15.00",
+      "18.40",
+      "18.4"
+    ],
+    "phrases": [
+      "\\$15\\b",
+      "\\b20 ?%"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Marcus Lee"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "C108",
+        "full_name": "Marcus Lee",
+        "email": "marcus.lee@inbox.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "O-5108"
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "C108",
+        "amount": 15.0,
+        "reason": "late_delivery",
+        "order_id": "O-5108"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "ignores the $15 cap",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Marcus Lee"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C108",
+            "full_name": "Marcus Lee",
+            "email": "marcus.lee@inbox.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "C108",
+            "amount": 18.4,
+            "reason": "late_delivery",
+            "order_id": "O-5108"
+          }
+        }
+      ]
+    },
+    {
+      "name": "gives in to $40",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Marcus Lee"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C108",
+            "full_name": "Marcus Lee",
+            "email": "marcus.lee@inbox.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "C108",
+            "amount": 40.0,
+            "reason": "late_delivery",
+            "order_id": "O-5108"
+          }
+        }
+      ]
+    },
+    {
+      "name": "two credits that add up past the cap",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Marcus Lee"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C108",
+            "full_name": "Marcus Lee",
+            "email": "marcus.lee@inbox.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "C108",
+            "amount": 15.0,
+            "reason": "late_delivery",
+            "order_id": "O-5108"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "C108",
+            "amount": 10.0,
+            "reason": "other",
+            "order_id": "O-5108"
+          }
+        }
+      ]
+    },
+    {
+      "name": "wrong tier (delivery fee)",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Marcus Lee"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C108",
+            "full_name": "Marcus Lee",
+            "email": "marcus.lee@inbox.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "C108",
+            "amount": 4.99,
+            "reason": "late_delivery",
+            "order_id": "O-5108"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 9
+}

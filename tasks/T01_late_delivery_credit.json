@@ -1,0 +1,156 @@
+{
+  "id": "T01",
+  "slug": "late_delivery_credit",
+  "title": "Late delivery: credit, not a card refund",
+  "tricky": "Customer asks for money back on her card; policy allows only account credit for lateness, and the amount depends on how late (25 min -> delivery fee).",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 912,
+    "flow": "order_issue",
+    "subflow": "status_delivery_time",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer opens vaguely about delivery timing and gives her name before any detail; agent must collect identifiers before acting."
+  },
+  "resolution_summary": "Verify, look up O-5101 (delivered 25 min late), issue $3.99 account credit (the delivery fee). No card refund.",
+  "user": {
+    "persona": "Maya Okonkwo, a nurse just off a long shift. Polite but tired and a little curt.",
+    "situation": "You ordered dinner from Pho Real tonight: two beef pho and spring rolls. The app promised it by 6:40pm. It showed up around 7:05pm and the pho was lukewarm.",
+    "goal": "Get something back for the late delivery. You'd like your money back on your card. If the agent offers account credit instead and explains why, accept it after pushing back once.",
+    "facts": [
+      "Your full name is Maya Okonkwo.",
+      "Your email is maya.okonkwo@inbox.example.",
+      "Your phone is +1 415-555-0141.",
+      "The order number is 5101 (you can see it in the app).",
+      "It was promised for 6:40pm and arrived around 7:05pm.",
+      "You paid with your Visa."
+    ],
+    "reveal_rules": [
+      "Give your name first. Give your email or phone only when asked to confirm who you are.",
+      "Give the order number only when asked."
+    ],
+    "behaviors": [
+      "Open vaguely, e.g. that your dinner came really late.",
+      "When the agent offers credit, push back once and ask for the money on your card instead.",
+      "Accept the credit once the agent explains it's what they can do."
+    ],
+    "opening": "hi, my dinner showed up super late tonight",
+    "end_condition": "the agent has given you compensation and you've acknowledged it, or the agent has clearly said there's nothing more they can do."
+  },
+  "expected": {
+    "credits": {
+      "C101": 3.99
+    }
+  },
+  "leak_check": {
+    "amounts": [
+      "3.99"
+    ],
+    "phrases": [
+      "\\bcredit\\b"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Maya Okonkwo"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "C101",
+        "full_name": "Maya Okonkwo",
+        "email": "maya.okonkwo@inbox.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "O-5101"
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "C101",
+        "amount": 3.99,
+        "reason": "late_delivery",
+        "order_id": "O-5101"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refund to card instead of credit",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Maya Okonkwo"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C101",
+            "full_name": "Maya Okonkwo",
+            "email": "maya.okonkwo@inbox.example"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5101",
+            "amount": 3.99,
+            "reason": "other"
+          }
+        }
+      ]
+    },
+    {
+      "name": "wrong lateness tier (20% of subtotal)",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Maya Okonkwo"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C101",
+            "full_name": "Maya Okonkwo",
+            "email": "maya.okonkwo@inbox.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "C101",
+            "amount": 7.2,
+            "reason": "late_delivery",
+            "order_id": "O-5101"
+          }
+        }
+      ]
+    },
+    {
+      "name": "credit without verifying",
+      "actions": [
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "C101",
+            "amount": 3.99,
+            "reason": "late_delivery",
+            "order_id": "O-5101"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 7
+}

@@ -1,0 +1,198 @@
+{
+  "id": "T13",
+  "slug": "late_still_preparing_cancel",
+  "title": "Late and still preparing: status check turns into a cancellation",
+  "tricky": "Starts as 'where is my order'; once he hears it's still preparing he cancels. Needs both the cancellation and a full-total refund, and no late-delivery credit (it was never delivered).",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 1361,
+    "flow": "order_issue",
+    "subflow": "manage_cancel",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer wants to change an order that may already be on its way; the agent checks the status before deciding what's possible."
+  },
+  "resolution_summary": "Verify, look up O-5113 (still preparing, 35 min past promised), set status cancelled, refund the full $38.70. No credit.",
+  "user": {
+    "persona": "Raj Patel, hungry and losing patience, but civil.",
+    "situation": "You ordered two steak burritos and chips and guac from Taqueria Luz at 6:10pm. It was promised for 6:55pm. It's now 7:30pm and nothing has arrived.",
+    "goal": "First find out where the food is. If it hasn't left the restaurant, cancel and get all your money back on your card. You don't want credit.",
+    "facts": [
+      "Your full name is Raj Patel.",
+      "Your email is rajpatel@mailbox.example.",
+      "The order number is 5113.",
+      "Ordered at 6:10pm, promised for 6:55pm.",
+      "You paid with your Visa."
+    ],
+    "reveal_rules": [
+      "Don't ask to cancel until the agent tells you the order hasn't left the restaurant."
+    ],
+    "behaviors": [
+      "If offered credit instead of a refund, decline it."
+    ],
+    "opening": "where is my food? it was supposed to be here 35 minutes ago",
+    "end_condition": "the agent has cancelled and refunded the order, or explained it's on the way and you've accepted that."
+  },
+  "expected": {
+    "order_changes": {
+      "O-5113": {
+        "status": "cancelled"
+      }
+    },
+    "refunds": {
+      "O-5113": 38.7
+    }
+  },
+  "leak_check": {
+    "amounts": [
+      "38.70",
+      "38.7"
+    ],
+    "phrases": [
+      "\\bcancel"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Raj Patel"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "C113",
+        "full_name": "Raj Patel",
+        "email": "rajpatel@mailbox.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "O-5113"
+      }
+    },
+    {
+      "tool": "update_order",
+      "args": {
+        "order_id": "O-5113",
+        "status": "cancelled"
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "O-5113",
+        "amount": 38.7,
+        "reason": "cancelled"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "cancels but forgets the refund",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Raj Patel"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C113",
+            "full_name": "Raj Patel",
+            "email": "rajpatel@mailbox.example"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "O-5113",
+            "status": "cancelled"
+          }
+        }
+      ]
+    },
+    {
+      "name": "refunds only the subtotal",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Raj Patel"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C113",
+            "full_name": "Raj Patel",
+            "email": "rajpatel@mailbox.example"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "O-5113",
+            "status": "cancelled"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5113",
+            "amount": 29.5,
+            "reason": "cancelled"
+          }
+        }
+      ]
+    },
+    {
+      "name": "adds a late credit on top",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Raj Patel"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C113",
+            "full_name": "Raj Patel",
+            "email": "rajpatel@mailbox.example"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "O-5113",
+            "status": "cancelled"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5113",
+            "amount": 38.7,
+            "reason": "cancelled"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "C113",
+            "amount": 2.99,
+            "reason": "late_delivery",
+            "order_id": "O-5113"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 7
+}

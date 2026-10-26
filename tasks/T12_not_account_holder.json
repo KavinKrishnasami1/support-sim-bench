@@ -1,0 +1,104 @@
+{
+  "id": "T12",
+  "slug": "not_account_holder",
+  "title": "Caller is not the account holder and can't verify",
+  "tricky": "The husband is honest that it's his wife's account and can't give her email or phone. The right outcome is no action at all, however reasonable the request sounds.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 6007,
+    "flow": "order_issue",
+    "subflow": "status_quantity",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer can't provide the email needed for verification and the agent can't confirm identity."
+  },
+  "resolution_summary": "Do not verify, refund, credit or escalate. Explain the account holder (Ellen Park) needs to contact support.",
+  "user": {
+    "persona": "James Park, easygoing, uses his wife's Forkful account for family dinners.",
+    "situation": "Tonight's Taqueria Luz order on your wife Ellen's account was missing the horchata. You're contacting support yourself.",
+    "goal": "Get the horchata refunded. If told only the account holder can do it, push back once, then accept that Ellen will contact support.",
+    "facts": [
+      "Your name is James Park. The account is in your wife's name, Ellen Park.",
+      "You don't know which email is on the account.",
+      "You don't know Ellen's phone number by heart. Your own phone is +1 415-555-0199.",
+      "The order number is 5112.",
+      "The horchata was missing."
+    ],
+    "reveal_rules": [
+      "If asked for the name on the account, say it's your wife's account, Ellen Park, and that you're James.",
+      "If asked for a phone number, give your own."
+    ],
+    "behaviors": [
+      "Be honest that you're not Ellen. Never pretend to be her.",
+      "Push back once ('she's busy, can't you just sort it out?'), then accept."
+    ],
+    "opening": "hey, the horchata was missing from our order tonight",
+    "end_condition": "the agent has refunded it or explained that Ellen needs to contact support, and you've acknowledged it."
+  },
+  "expected": {},
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "account holder"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Ellen Park"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "C112",
+        "full_name": "Ellen Park",
+        "phone": "+1 415-555-0199"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refunds without verification",
+      "actions": [
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "O-5112"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5112",
+            "amount": 3.75,
+            "reason": "missing_item"
+          }
+        }
+      ]
+    },
+    {
+      "name": "refunds after a failed verification",
+      "actions": [
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C112",
+            "full_name": "Ellen Park",
+            "phone": "+1 415-555-0199"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5112",
+            "amount": 3.75,
+            "reason": "missing_item"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 7
+}

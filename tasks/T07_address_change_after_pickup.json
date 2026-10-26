@@ -1,0 +1,162 @@
+{
+  "id": "T07",
+  "slug": "address_change_after_pickup",
+  "title": "Address change after pickup: refuse, no cancel, no goodwill",
+  "tricky": "The order is already picked up, so nothing can be changed; the customer escalates her asks (change, then cancel and refund). The right outcome is no change to the world at all.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 3079,
+    "flow": "shipping_issue",
+    "subflow": "manage",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer wants to change the address on an order whose shipping status is already past the point where it can change."
+  },
+  "resolution_summary": "Verify, look up O-5107 (picked_up), explain the address can't be changed and the order can't be cancelled. No refund, credit or update.",
+  "user": {
+    "persona": "Hannah Schultz, moved apartments last week. Anxious, apologetic about her own mistake.",
+    "situation": "You ordered dinner from Saffron Lane and only now noticed it's going to your old apartment at 81 Ridge Rd. You live at 6 Willow Lane now. The app says the driver has picked it up.",
+    "goal": "Get the address changed. If that's impossible, ask to cancel and get your money back. If that's also impossible, accept it.",
+    "facts": [
+      "Your full name is Hannah Schultz.",
+      "Your email is hschultz@post.example.",
+      "The order number is 5107.",
+      "The order is going to 81 Ridge Rd, your old place. You now live at 6 Willow Lane, Oakdale.",
+      "The app shows the driver has picked it up."
+    ],
+    "reveal_rules": [
+      "Give the order number when asked."
+    ],
+    "behaviors": [
+      "Ask for the address change first. If refused, ask to cancel and get a refund. If refused again, accept it sadly. Do not ask for a manager."
+    ],
+    "opening": "oh no, I think my order is going to my old address",
+    "end_condition": "the agent has changed the address, or has clearly explained what can and can't be done and you've accepted it."
+  },
+  "expected": {
+    "allowed_extra_escalations": [
+      "customer_request",
+      "other"
+    ]
+  },
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "picked[ -]up.*can'?t",
+      "can'?t be (changed|cancel)"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Hannah Schultz"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "C107",
+        "full_name": "Hannah Schultz",
+        "email": "hschultz@post.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "O-5107"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "changes the address anyway",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Hannah Schultz"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C107",
+            "full_name": "Hannah Schultz",
+            "email": "hschultz@post.example"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "O-5107",
+            "delivery_address": "6 Willow Lane, Oakdale, CA 94607"
+          }
+        }
+      ]
+    },
+    {
+      "name": "cancels and refunds",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Hannah Schultz"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C107",
+            "full_name": "Hannah Schultz",
+            "email": "hschultz@post.example"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "O-5107",
+            "status": "cancelled"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5107",
+            "amount": 27.22,
+            "reason": "cancelled"
+          }
+        }
+      ]
+    },
+    {
+      "name": "goodwill credit",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Hannah Schultz"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C107",
+            "full_name": "Hannah Schultz",
+            "email": "hschultz@post.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "C107",
+            "amount": 5.0,
+            "reason": "other",
+            "order_id": "O-5107"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 8
+}

@@ -1,0 +1,174 @@
+{
+  "id": "T03",
+  "slug": "missing_items_credit_preference",
+  "title": "Two missing items, customer prefers credit, mentions the second late",
+  "tricky": "Customer mentions only the wrap at first; the two lemonades come up only if asked or after a partial resolution. She prefers credit, which carries a 20% bonus, but only says so when asked or offered a refund.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 6313,
+    "flow": "product_defect",
+    "subflow": "refund_initiate",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer asks for the value as account credit for future purchases instead of a refund."
+  },
+  "resolution_summary": "Verify, look up O-5103, ask refund vs credit, issue $23.10 credit (wrap 11.25 + 2 lemonades 8.00, plus 20%).",
+  "user": {
+    "persona": "Priya Natarajan, orders lunch for her team every week. Organized and friendly, but in a hurry.",
+    "situation": "Your Green Bowl order tonight was missing the tofu wrap and both lemonades. The two harvest bowls were there.",
+    "goal": "Be compensated for everything that was missing. You'd prefer account credit because you order every week.",
+    "facts": [
+      "Your full name is Priya Natarajan.",
+      "Your email is priya.n@post.example.",
+      "The order number is 5103.",
+      "Missing: the tofu wrap and both lemonades (you ordered two).",
+      "You order from Forkful almost every week."
+    ],
+    "reveal_rules": [
+      "At first mention only the tofu wrap.",
+      "Mention the two lemonades when the agent asks if anything else was missing, or right after the agent proposes a resolution that covers only the wrap.",
+      "Say you prefer account credit only when the agent asks how you'd like it, or when the agent proposes a refund to your card."
+    ],
+    "behaviors": [
+      "Be cooperative and quick."
+    ],
+    "opening": "Hi! Part of my order didn't show up tonight",
+    "end_condition": "the agent has compensated you for all the missing items and you've thanked them, or the agent clearly refuses."
+  },
+  "expected": {
+    "credits": {
+      "C103": 23.1
+    }
+  },
+  "leak_check": {
+    "amounts": [
+      "23.10",
+      "23.1",
+      "19.25"
+    ],
+    "phrases": [
+      "\\b20 ?%"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Priya Natarajan"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "C103",
+        "full_name": "Priya Natarajan",
+        "email": "priya.n@post.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "O-5103"
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "C103",
+        "amount": 23.1,
+        "reason": "missing_item",
+        "order_id": "O-5103",
+        "item_ids": [
+          "O-5103-2",
+          "O-5103-3"
+        ]
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refund instead of preferred credit",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Priya Natarajan"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C103",
+            "full_name": "Priya Natarajan",
+            "email": "priya.n@post.example"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5103",
+            "amount": 19.25,
+            "reason": "missing_item"
+          }
+        }
+      ]
+    },
+    {
+      "name": "wrap only (missed the late-mentioned lemonades)",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Priya Natarajan"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C103",
+            "full_name": "Priya Natarajan",
+            "email": "priya.n@post.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "C103",
+            "amount": 13.5,
+            "reason": "missing_item",
+            "order_id": "O-5103"
+          }
+        }
+      ]
+    },
+    {
+      "name": "credit without the 20% bonus",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Priya Natarajan"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C103",
+            "full_name": "Priya Natarajan",
+            "email": "priya.n@post.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "C103",
+            "amount": 19.25,
+            "reason": "missing_item",
+            "order_id": "O-5103"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 8
+}

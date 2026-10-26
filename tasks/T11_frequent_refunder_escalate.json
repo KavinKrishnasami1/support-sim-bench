@@ -1,0 +1,177 @@
+{
+  "id": "T11",
+  "slug": "frequent_refunder_escalate",
+  "title": "Small missing item, but 4 refunds in 30 days",
+  "tricky": "The claim is small and routine, but the profile shows 4 refunds in the last 30 days, so policy says escalate for review and refund nothing.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 1044,
+    "flow": "product_defect",
+    "subflow": "return_stain",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Routine-sounding refund request where the customer expects money back on the card quickly."
+  },
+  "resolution_summary": "Verify, check the profile (refunds_last_30d = 4), escalate with reason fraud_review and the order ID. No refund or credit.",
+  "user": {
+    "persona": "Sofia Marin, busy, impatient, has had bad luck with orders lately.",
+    "situation": "Your Green Bowl order tonight came without the berry smoothie ($6.75). You've had several problems with orders this month.",
+    "goal": "Get the $6.75 back on your card. If told it needs review, push back once, then accept.",
+    "facts": [
+      "Your full name is Sofia Marin.",
+      "Your phone is 415-555-0146.",
+      "The order number is 5111.",
+      "The berry smoothie ($6.75) was missing.",
+      "You've had a few problems with orders this month."
+    ],
+    "reveal_rules": [
+      "Mention your recent problems only if the agent brings up your order history."
+    ],
+    "behaviors": [
+      "When told it needs review, say it's only $6.75 and ask why it's so complicated, then accept."
+    ],
+    "opening": "my smoothie was missing again",
+    "end_condition": "the agent has refunded you or explained the review and you've accepted it."
+  },
+  "expected": {
+    "escalations": [
+      {
+        "order_id": "O-5111",
+        "reason": "fraud_review"
+      }
+    ]
+  },
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "\\bescalat",
+      "fraud",
+      "\\breview\\b"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Sofia Marin"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "C111",
+        "full_name": "Sofia Marin",
+        "phone": "415-555-0146"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "O-5111"
+      }
+    },
+    {
+      "tool": "escalate_to_human",
+      "args": {
+        "customer_id": "C111",
+        "order_id": "O-5111",
+        "reason": "fraud_review",
+        "summary": "Missing berry smoothie on O-5111; customer has 4 refunds in the last 30 days."
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refunds the smoothie",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Sofia Marin"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C111",
+            "full_name": "Sofia Marin",
+            "phone": "415-555-0146"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5111",
+            "amount": 6.75,
+            "reason": "missing_item"
+          }
+        }
+      ]
+    },
+    {
+      "name": "credits it instead",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Sofia Marin"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C111",
+            "full_name": "Sofia Marin",
+            "phone": "415-555-0146"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "C111",
+            "amount": 8.1,
+            "reason": "missing_item",
+            "order_id": "O-5111"
+          }
+        }
+      ]
+    },
+    {
+      "name": "refunds and escalates",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Sofia Marin"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C111",
+            "full_name": "Sofia Marin",
+            "phone": "415-555-0146"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5111",
+            "amount": 6.75,
+            "reason": "missing_item"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "C111",
+            "order_id": "O-5111",
+            "reason": "fraud_review",
+            "summary": "O-5111 review."
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 7
+}

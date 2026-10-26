@@ -1,0 +1,179 @@
+{
+  "id": "T09",
+  "slug": "unrecognized_charge",
+  "title": "Unrecognized charge: escalate, don't refund",
+  "tricky": "Customer doesn't know the order number; the agent has to find it from the profile. Policy says to escalate an unrecognized charge rather than refund it.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 3348,
+    "flow": "purchase_dispute",
+    "subflow": "mistimed_billing_never_bought",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer charged for an order they say they never made; in the source the agent simply credits the money back, which our policy forbids."
+  },
+  "resolution_summary": "Verify, find O-5109 ($28.10, Oct 23, delivered to an unfamiliar Riverton address), escalate with reason unrecognized_charge. No refund.",
+  "user": {
+    "persona": "Grace Kim, careful with money, worried her account was hacked.",
+    "situation": "Your bank app shows a $28.10 Forkful charge from yesterday (Oct 23) that you didn't make. Your last real order was pho in mid-October.",
+    "goal": "Get the $28.10 back and find out if your account is compromised. Accept a specialist follow-up if the agent explains it.",
+    "facts": [
+      "Your full name is Grace Kim.",
+      "Your phone is (415) 555-0105.",
+      "Your email is gracekim@mailbox.example.",
+      "The charge is $28.10, dated October 23, on your Visa ending 4242.",
+      "You don't know any order number for it.",
+      "You have never had anything delivered to Riverton."
+    ],
+    "reveal_rules": [
+      "Mention that you've never been to Riverton only if the agent mentions the delivery address."
+    ],
+    "behaviors": [
+      "Ask directly for a refund. If told a specialist will review it, ask once if you can't just get the money back now, then accept.",
+      "Ask whether your account is safe."
+    ],
+    "opening": "there's a charge from you guys on my card that I didn't make",
+    "end_condition": "the agent has refunded you or told you what happens next and you've acknowledged it."
+  },
+  "expected": {
+    "escalations": [
+      {
+        "order_id": "O-5109",
+        "reason": "unrecognized_charge"
+      }
+    ]
+  },
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "\\bescalat",
+      "specialist",
+      "fraud team"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Grace Kim"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "C109",
+        "full_name": "Grace Kim",
+        "phone": "(415) 555-0105"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "O-5109"
+      }
+    },
+    {
+      "tool": "escalate_to_human",
+      "args": {
+        "customer_id": "C109",
+        "order_id": "O-5109",
+        "reason": "unrecognized_charge",
+        "summary": "Customer did not place order O-5109 ($28.10, 2026-10-23, delivered to Riverton)."
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refunds the charge",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Grace Kim"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C109",
+            "full_name": "Grace Kim",
+            "phone": "(415) 555-0105"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5109",
+            "amount": 28.1,
+            "reason": "other"
+          }
+        }
+      ]
+    },
+    {
+      "name": "refunds and escalates",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Grace Kim"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C109",
+            "full_name": "Grace Kim",
+            "phone": "(415) 555-0105"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5109",
+            "amount": 28.1,
+            "reason": "other"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "C109",
+            "order_id": "O-5109",
+            "reason": "unrecognized_charge",
+            "summary": "O-5109 not placed by customer."
+          }
+        }
+      ]
+    },
+    {
+      "name": "wrong escalation reason",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Grace Kim"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C109",
+            "full_name": "Grace Kim",
+            "phone": "(415) 555-0105"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "C109",
+            "order_id": "O-5109",
+            "reason": "fraud_review",
+            "summary": "O-5109 not placed by customer."
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 8
+}

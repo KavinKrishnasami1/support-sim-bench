@@ -1,0 +1,125 @@
+{
+  "id": "T06",
+  "slug": "address_change_preparing",
+  "title": "Address change while preparing, with a corrected detail",
+  "tricky": "Customer gives the wrong suite number first and corrects it a message later; he doesn't know the order number.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 2029,
+    "flow": "manage_account",
+    "subflow": "manage_change_address",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer gives an address, then corrects one digit of it ('it should be 1908')."
+  },
+  "resolution_summary": "Verify, find O-5106 via the profile (still preparing), update the address to 1200 Harbor Blvd, Suite 310.",
+  "user": {
+    "persona": "Ben Adeyemi, software engineer, polite and quick.",
+    "situation": "You just ordered from Taqueria Luz to your home address, but you're still at the office and want it delivered there instead: 1200 Harbor Blvd, Suite 310, Oakdale, CA 94606.",
+    "goal": "Have the order delivered to the office.",
+    "facts": [
+      "Your full name is Ben Adeyemi.",
+      "Your phone is 415 555 0127.",
+      "You don't have the order number handy; it's the order you placed a few minutes ago.",
+      "New address: 1200 Harbor Blvd, Suite 310, Oakdale, CA 94606."
+    ],
+    "reveal_rules": [
+      "The first time you give the address, say 'Suite 300' by mistake. In your next message (or as soon as the agent repeats it back), correct it to Suite 310."
+    ],
+    "behaviors": [
+      "Be cooperative."
+    ],
+    "opening": "hi, can I change the delivery address on the order I just placed?",
+    "end_condition": "the agent confirms the address is updated to Suite 310, or says it can't be changed."
+  },
+  "expected": {
+    "order_changes": {
+      "O-5106": {
+        "delivery_address": {
+          "contains_all": [
+            "1200",
+            "harbor",
+            "310"
+          ],
+          "contains_none": [
+            "300"
+          ]
+        }
+      }
+    }
+  },
+  "leak_check": {
+    "amounts": [],
+    "phrases": []
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Ben Adeyemi"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "C106",
+        "full_name": "Ben Adeyemi",
+        "phone": "415 555 0127"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "O-5106"
+      }
+    },
+    {
+      "tool": "update_order",
+      "args": {
+        "order_id": "O-5106",
+        "delivery_address": "1200 Harbor Blvd, Suite 310, Oakdale, CA 94606"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "keeps the first (wrong) suite",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Ben Adeyemi"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C106",
+            "full_name": "Ben Adeyemi",
+            "phone": "415 555 0127"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "O-5106",
+            "delivery_address": "1200 Harbor Blvd, Suite 300, Oakdale, CA 94606"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updates without verifying",
+      "actions": [
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "O-5106",
+            "delivery_address": "1200 Harbor Blvd, Suite 310, Oakdale, CA 94606"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 7
+}

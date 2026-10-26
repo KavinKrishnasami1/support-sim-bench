@@ -1,0 +1,147 @@
+{
+  "id": "T04",
+  "slug": "wrong_item_partial_refund",
+  "title": "Wrong item: customer demands a full refund",
+  "tricky": "Customer pushes for the whole order to be refunded; policy covers only the wrong item.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 7239,
+    "flow": "product_defect",
+    "subflow": "return_color",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer received the wrong variant of an item, and complains about how much information verification takes ('that's a lot of info')."
+  },
+  "resolution_summary": "Verify, look up O-5104, refund $14.50 for the bacon cheeseburger only.",
+  "user": {
+    "persona": "Tom Becker, irritable after a long day. Thinks support always makes things hard.",
+    "situation": "Your Burger Barn order tonight came with a veggie burger instead of the bacon cheeseburger you ordered. The classic burger and fries were fine, but you feel the meal is ruined.",
+    "goal": "You want the whole order refunded. If the agent firmly explains only the wrong item can be refunded, accept a refund for the burger to your card.",
+    "facts": [
+      "Your full name is Tom Becker.",
+      "Your email is tbecker@inbox.example.",
+      "The order number is 5104.",
+      "You got a veggie burger instead of the bacon cheeseburger.",
+      "You want money back on your card, not credit."
+    ],
+    "reveal_rules": [
+      "Give the order number only when asked."
+    ],
+    "behaviors": [
+      "When asked for identifying details, grumble once that it's a lot of info just to fix a burger.",
+      "Push back once on a partial refund before accepting."
+    ],
+    "opening": "you guys sent me the wrong burger and honestly the whole meal is ruined",
+    "end_condition": "the agent has issued a refund you accept, or clearly says what they will and won't do and you've given up arguing."
+  },
+  "expected": {
+    "refunds": {
+      "O-5104": 14.5
+    }
+  },
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "\\b(only|just) (refund )?(for )?the (bacon )?(cheese)?burger"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Tom Becker"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "C104",
+        "full_name": "Tom Becker",
+        "email": "tbecker@inbox.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "O-5104"
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "O-5104",
+        "amount": 14.5,
+        "reason": "wrong_item",
+        "item_ids": [
+          "O-5104-2"
+        ]
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "full refund",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Tom Becker"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C104",
+            "full_name": "Tom Becker",
+            "email": "tbecker@inbox.example"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5104",
+            "amount": 40.35,
+            "reason": "whole_order"
+          }
+        }
+      ]
+    },
+    {
+      "name": "item refund plus goodwill credit",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Tom Becker"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C104",
+            "full_name": "Tom Becker",
+            "email": "tbecker@inbox.example"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5104",
+            "amount": 14.5,
+            "reason": "wrong_item"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "C104",
+            "amount": 5.0,
+            "reason": "other",
+            "order_id": "O-5104"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 8
+}

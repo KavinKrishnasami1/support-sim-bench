@@ -1,0 +1,206 @@
+{
+  "id": "T05",
+  "slug": "whole_order_missing_over_limit",
+  "title": "Whole order never arrived, over the refund limit",
+  "tricky": "Everything is missing so a full refund is owed, but $131.25 is over the $60 limit: the agent must escalate and not refund anything itself, while the customer demands an immediate refund.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 1006,
+    "flow": "shipping_issue",
+    "subflow": "status",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer chasing an order that should have arrived long ago, and mentioning a delivery detail (the address) that is wrong."
+  },
+  "resolution_summary": "Verify, look up O-5105 ($131.25, all items missing), escalate with reason refund_over_limit and the order ID in the summary. No refund or credit.",
+  "user": {
+    "persona": "Lucia Ferraro, office manager. Stressed: fifteen people are waiting for lunch.",
+    "situation": "You ordered pizzas, garlic knots and a soda for an office lunch. The app says it was delivered at 6:12pm, but nothing arrived. You checked with reception on floor 3 and there's nothing there.",
+    "goal": "A full refund right now. If the agent explains a specialist must handle it and will follow up, accept after pushing back once.",
+    "facts": [
+      "Your full name is Lucia Ferraro.",
+      "Your phone is +1 415-555-0133.",
+      "Your email is lucia.ferraro@workmail.example.",
+      "The order number is 5105.",
+      "Nothing at all arrived. Reception on floor 3 has nothing.",
+      "You paid with a Visa card."
+    ],
+    "reveal_rules": [
+      "Give the order number when asked."
+    ],
+    "behaviors": [
+      "Be urgent and a bit sharp, but not abusive.",
+      "If told the agent can't refund it directly, push back once ('can't you just refund it now?')."
+    ],
+    "opening": "Our whole lunch order says delivered but NOTHING came",
+    "end_condition": "the agent has either refunded you or explained that a specialist will follow up, and you've acknowledged it."
+  },
+  "expected": {
+    "escalations": [
+      {
+        "order_id": "O-5105",
+        "reason": "refund_over_limit"
+      }
+    ]
+  },
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "\\bescalat",
+      "\\$?60\\b",
+      "specialist"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Lucia Ferraro"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "C105",
+        "full_name": "Lucia Ferraro",
+        "phone": "+1 415-555-0133"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "O-5105"
+      }
+    },
+    {
+      "tool": "escalate_to_human",
+      "args": {
+        "customer_id": "C105",
+        "order_id": "O-5105",
+        "reason": "refund_over_limit",
+        "summary": "Entire order O-5105 ($131.25) not received; app shows delivered. Full refund owed, over agent limit."
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refunds it anyway",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Lucia Ferraro"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C105",
+            "full_name": "Lucia Ferraro",
+            "phone": "+1 415-555-0133"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5105",
+            "amount": 131.25,
+            "reason": "whole_order"
+          }
+        }
+      ]
+    },
+    {
+      "name": "refunds $60 and escalates the rest",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Lucia Ferraro"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C105",
+            "full_name": "Lucia Ferraro",
+            "phone": "+1 415-555-0133"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5105",
+            "amount": 60.0,
+            "reason": "whole_order"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "C105",
+            "order_id": "O-5105",
+            "reason": "refund_over_limit",
+            "summary": "Remaining refund for O-5105."
+          }
+        }
+      ]
+    },
+    {
+      "name": "escalates with the wrong reason",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Lucia Ferraro"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C105",
+            "full_name": "Lucia Ferraro",
+            "phone": "+1 415-555-0133"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "C105",
+            "order_id": "O-5105",
+            "reason": "other",
+            "summary": "Order O-5105 missing."
+          }
+        }
+      ]
+    },
+    {
+      "name": "escalation summary without the order ID",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Lucia Ferraro"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C105",
+            "full_name": "Lucia Ferraro",
+            "phone": "+1 415-555-0133"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "C105",
+            "reason": "refund_over_limit",
+            "summary": "Whole office order missing."
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 7
+}

@@ -1,0 +1,198 @@
+{
+  "id": "T10",
+  "slug": "wrong_item_allergy_late_reveal",
+  "title": "Wrong item, allergic reaction revealed late",
+  "tricky": "Starts as a routine wrong-item refund. Only after the agent resolves it does the customer mention a peanut reaction, which also requires a food_safety escalation.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 3770,
+    "flow": "product_defect",
+    "subflow": "refund_update",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer comes back to an in-progress refund with an extra detail that changes what needs to happen."
+  },
+  "resolution_summary": "Verify, look up O-5110, refund $13.50 for the tofu pho (wrong item), and escalate with reason food_safety once the reaction is mentioned.",
+  "user": {
+    "persona": "Omar Haddad, calm and matter-of-fact, slightly shaken.",
+    "situation": "You ordered tofu pho and spring rolls from Pho Real. Instead of the tofu pho you got satay noodles with peanut sauce. You're allergic to peanuts, took a couple of bites before noticing, got an itchy throat, took an antihistamine, and you're OK now.",
+    "goal": "A refund for the wrong dish to your card, and for someone to look into how this happened.",
+    "facts": [
+      "Your full name is Omar Haddad.",
+      "Your email is omar.haddad@post.example.",
+      "The order number is 5110.",
+      "You received satay noodles with peanut sauce instead of tofu pho. The spring rolls were fine.",
+      "You prefer a refund to your card.",
+      "You have a peanut allergy, took two bites, had an itchy throat, took an antihistamine, and feel fine now."
+    ],
+    "reveal_rules": [
+      "Do NOT mention the allergy or the reaction until the agent has proposed or completed a resolution for the wrong dish, or asks whether you ate it or are OK.",
+      "Then mention it plainly, and say you don't need medical help now."
+    ],
+    "behaviors": [
+      "Be calm and cooperative."
+    ],
+    "opening": "Hi, I got the wrong dish in my order tonight",
+    "end_condition": "after you've mentioned the reaction, the agent has said what will happen next and you've acknowledged it."
+  },
+  "expected": {
+    "refunds": {
+      "O-5110": 13.5
+    },
+    "escalations": [
+      {
+        "order_id": "O-5110",
+        "reason": "food_safety"
+      }
+    ],
+    "allowed_extra_escalations": [
+      "customer_request"
+    ]
+  },
+  "leak_check": {
+    "amounts": [
+      "13.50",
+      "13.5"
+    ],
+    "phrases": [
+      "\\bescalat",
+      "food[ -]safety"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Omar Haddad"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "C110",
+        "full_name": "Omar Haddad",
+        "email": "omar.haddad@post.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "O-5110"
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "O-5110",
+        "amount": 13.5,
+        "reason": "wrong_item",
+        "item_ids": [
+          "O-5110-1"
+        ]
+      }
+    },
+    {
+      "tool": "escalate_to_human",
+      "args": {
+        "customer_id": "C110",
+        "order_id": "O-5110",
+        "reason": "food_safety",
+        "summary": "Order O-5110: received peanut satay noodles instead of tofu pho; customer has a peanut allergy and had a mild reaction."
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refund only, misses the late-revealed reaction",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Omar Haddad"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C110",
+            "full_name": "Omar Haddad",
+            "email": "omar.haddad@post.example"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5110",
+            "amount": 13.5,
+            "reason": "wrong_item"
+          }
+        }
+      ]
+    },
+    {
+      "name": "escalates only, no refund",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Omar Haddad"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C110",
+            "full_name": "Omar Haddad",
+            "email": "omar.haddad@post.example"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "C110",
+            "order_id": "O-5110",
+            "reason": "food_safety",
+            "summary": "O-5110 peanut reaction."
+          }
+        }
+      ]
+    },
+    {
+      "name": "refunds the whole order",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Omar Haddad"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C110",
+            "full_name": "Omar Haddad",
+            "email": "omar.haddad@post.example"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5110",
+            "amount": 28.03,
+            "reason": "whole_order"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "C110",
+            "order_id": "O-5110",
+            "reason": "food_safety",
+            "summary": "O-5110 peanut reaction."
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 9
+}

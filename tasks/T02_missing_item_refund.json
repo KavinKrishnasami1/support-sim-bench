@@ -1,0 +1,169 @@
+{
+  "id": "T02",
+  "slug": "missing_item_refund",
+  "title": "Missing item: refund just that item",
+  "tricky": "Customer only knows his phone, not the email on file, and has an older order with the same item.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 9888,
+    "flow": "shipping_issue",
+    "subflow": "missing",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer opens with a general 'question about my order', explains only when asked, and sends identifiers one message at a time."
+  },
+  "resolution_summary": "Verify by phone, look up O-5102, refund $4.50 for the garlic naan to the card.",
+  "user": {
+    "persona": "Daniel Reyes, a grad student. Friendly, types in lowercase, short messages.",
+    "situation": "You got your Saffron Lane order tonight (chicken tikka masala, garlic naan, mango lassi) but the garlic naan wasn't in the bag.",
+    "goal": "Get your money back for the naan, on your card. If offered credit, say you'd rather have it back on your card.",
+    "facts": [
+      "Your full name is Daniel Reyes.",
+      "Your phone is 415-555-0172.",
+      "You're not sure which email is on the account (maybe an old one), so you can't give it.",
+      "The order number is 5102.",
+      "The garlic naan was missing; everything else was there.",
+      "You paid by card."
+    ],
+    "reveal_rules": [
+      "Say only that your order was incomplete at first; name the missing naan when asked what was missing.",
+      "Give the order number only when asked."
+    ],
+    "behaviors": [
+      "If asked for your email, say you're not sure which one is on the account and offer your phone.",
+      "If asked whether you want a refund or credit, choose the refund to your card."
+    ],
+    "opening": "hey, question about my order from tonight",
+    "end_condition": "the agent confirms a refund for the naan, or clearly refuses."
+  },
+  "expected": {
+    "refunds": {
+      "O-5102": 4.5
+    }
+  },
+  "leak_check": {
+    "amounts": [
+      "4.50",
+      "4.5"
+    ],
+    "phrases": []
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Daniel Reyes"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "C102",
+        "full_name": "Daniel Reyes",
+        "phone": "415-555-0172"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "O-5102"
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "O-5102",
+        "amount": 4.5,
+        "reason": "missing_item",
+        "item_ids": [
+          "O-5102-2"
+        ]
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refund whole order",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Daniel Reyes"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C102",
+            "full_name": "Daniel Reyes",
+            "phone": "415-555-0172"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5102",
+            "amount": 35.69,
+            "reason": "whole_order"
+          }
+        }
+      ]
+    },
+    {
+      "name": "credit instead of the refund he asked for",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Daniel Reyes"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C102",
+            "full_name": "Daniel Reyes",
+            "phone": "415-555-0172"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "C102",
+            "amount": 5.4,
+            "reason": "missing_item",
+            "order_id": "O-5102"
+          }
+        }
+      ]
+    },
+    {
+      "name": "refund on the older order",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Daniel Reyes"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "C102",
+            "full_name": "Daniel Reyes",
+            "phone": "415-555-0172"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "O-5079",
+            "amount": 4.5,
+            "reason": "missing_item"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 7
+}
