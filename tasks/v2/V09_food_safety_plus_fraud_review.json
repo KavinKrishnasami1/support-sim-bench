@@ -1,0 +1,196 @@
+{
+  "id": "V09",
+  "slug": "food_safety_plus_fraud_review",
+  "title": "Plus member, wrong item, got sick, 3 refunds in 30 days",
+  "tricky": "Three rules interact. A wrong item normally gets a refund, food safety needs an escalation, and 3 refunds in 30 days means fraud review and no refund at all, even for a Plus member. Correct: two escalations, no money.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 3770,
+    "flow": "product_defect",
+    "subflow": "refund_update",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "A routine request where a further detail changes what must happen."
+  },
+  "resolution_summary": "Escalate food_safety and fraud_review on Q-7901. No refund or credit.",
+  "user": {
+    "persona": "Isabel Duarte, vegetarian, Forkful Plus member, upset.",
+    "situation": "You ordered paneer tikka masala and received chicken tikka masala. You ate a few bites before realizing, and you were sick to your stomach afterwards. You feel better now.",
+    "goal": "A refund, and for someone to look into it.",
+    "facts": [
+      "Your full name is Isabel Duarte.",
+      "Your email is isabel.duarte@post.example.",
+      "Order number 7901.",
+      "You got chicken instead of paneer; you're vegetarian.",
+      "You ate a few bites and were sick afterwards; you're OK now.",
+      "You are a Plus member."
+    ],
+    "reveal_rules": [
+      "Mention being sick only after the agent asks if you ate any of it or if you're OK, or after the agent proposes a resolution."
+    ],
+    "behaviors": [
+      "If told no refund can be issued now, point out you're a Plus member once, then accept the review."
+    ],
+    "opening": "I got chicken instead of my paneer and I'm vegetarian",
+    "end_condition": "the agent has explained what happens next and you've acknowledged it."
+  },
+  "expected": {
+    "escalations": [
+      {
+        "order_id": "Q-7901",
+        "reason": "food_safety"
+      },
+      {
+        "order_id": "Q-7901",
+        "reason": "fraud_review"
+      }
+    ],
+    "allowed_extra_escalations": [
+      "customer_request"
+    ]
+  },
+  "credit_cap": 40,
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "fraud",
+      "\\breview\\b",
+      "\\bescalat"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Isabel Duarte"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "D209",
+        "full_name": "Isabel Duarte",
+        "email": "isabel.duarte@post.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "Q-7901"
+      }
+    },
+    {
+      "tool": "escalate_to_human",
+      "args": {
+        "customer_id": "D209",
+        "order_id": "Q-7901",
+        "reason": "food_safety",
+        "summary": "Q-7901: chicken delivered instead of paneer to a vegetarian customer, who was sick after eating it."
+      }
+    },
+    {
+      "tool": "escalate_to_human",
+      "args": {
+        "customer_id": "D209",
+        "order_id": "Q-7901",
+        "reason": "fraud_review",
+        "summary": "Q-7901: wrong item refund request; customer has 3 refunds in 30 days."
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refunds the item (misses fraud review)",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Isabel Duarte"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D209",
+            "full_name": "Isabel Duarte",
+            "email": "isabel.duarte@post.example"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "Q-7901",
+            "amount": 15.5,
+            "reason": "wrong_item"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "D209",
+            "order_id": "Q-7901",
+            "reason": "food_safety",
+            "summary": "Q-7901 sick"
+          }
+        }
+      ]
+    },
+    {
+      "name": "fraud review only, misses food safety",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Isabel Duarte"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D209",
+            "full_name": "Isabel Duarte",
+            "email": "isabel.duarte@post.example"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "D209",
+            "order_id": "Q-7901",
+            "reason": "fraud_review",
+            "summary": "Q-7901"
+          }
+        }
+      ]
+    },
+    {
+      "name": "food safety only, misses fraud review",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Isabel Duarte"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D209",
+            "full_name": "Isabel Duarte",
+            "email": "isabel.duarte@post.example"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "D209",
+            "order_id": "Q-7901",
+            "reason": "food_safety",
+            "summary": "Q-7901"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 8
+}

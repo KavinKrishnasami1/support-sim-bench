@@ -1,0 +1,190 @@
+{
+  "id": "V06",
+  "slug": "promo_split_refund",
+  "title": "Missing item on a promo order: split refund",
+  "tricky": "The order used a $10 promo on a $50 subtotal. The missing pho ($15) refunds $12.00 to the card and $3.00 as credit. The promo only appears in the payment record.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 6313,
+    "flow": "product_defect",
+    "subflow": "refund_initiate",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Refund where the method of repayment matters."
+  },
+  "resolution_summary": "One of two beef pho missing ($15). Card refund $12.00 (15 - 10×15/50) plus $3.00 credit.",
+  "user": {
+    "persona": "Owen Fitzgerald, first-time Forkful user (used a welcome code). Friendly.",
+    "situation": "Your Pho Real order had two beef pho, spring rolls and a banh mi. Only one pho came.",
+    "goal": "Your money back on your card for the missing pho.",
+    "facts": [
+      "Your full name is Owen Fitzgerald.",
+      "Your phone is 415-555-0236.",
+      "Order number 7601.",
+      "One of the two beef pho was missing.",
+      "You used a welcome promo code (you don't remember how much)."
+    ],
+    "reveal_rules": [
+      "Mention the promo code only if the agent asks about it or mentions a discount."
+    ],
+    "behaviors": [
+      "If asked, you prefer a refund to your card. Accept a split if the agent explains it."
+    ],
+    "opening": "only got one of my two phos",
+    "end_condition": "the agent has compensated you and you've acknowledged it, or clearly refused."
+  },
+  "expected": {
+    "refunds": {
+      "Q-7601": 12.0
+    },
+    "credits": {
+      "D206": 3.0
+    }
+  },
+  "credit_cap_exempt": 3.0,
+  "leak_check": {
+    "amounts": [
+      "12.00",
+      "3.00"
+    ],
+    "phrases": []
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Owen Fitzgerald"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "D206",
+        "full_name": "Owen Fitzgerald",
+        "phone": "415-555-0236"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "Q-7601"
+      }
+    },
+    {
+      "tool": "get_payment",
+      "args": {
+        "order_id": "Q-7601"
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "Q-7601",
+        "amount": 12.0,
+        "reason": "missing_item"
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "D206",
+        "amount": 3.0,
+        "reason": "other",
+        "order_id": "Q-7601"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refunds full item price, ignoring the promo",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Owen Fitzgerald"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D206",
+            "full_name": "Owen Fitzgerald",
+            "phone": "415-555-0236"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "Q-7601",
+            "amount": 15.0,
+            "reason": "missing_item"
+          }
+        }
+      ]
+    },
+    {
+      "name": "card share only, forgets the promo credit",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Owen Fitzgerald"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D206",
+            "full_name": "Owen Fitzgerald",
+            "phone": "415-555-0236"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "Q-7601",
+            "amount": 12.0,
+            "reason": "missing_item"
+          }
+        }
+      ]
+    },
+    {
+      "name": "refunds both phos",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Owen Fitzgerald"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D206",
+            "full_name": "Owen Fitzgerald",
+            "phone": "415-555-0236"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "Q-7601",
+            "amount": 24.0,
+            "reason": "missing_item"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "D206",
+            "amount": 6.0,
+            "reason": "other",
+            "order_id": "Q-7601"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 8
+}

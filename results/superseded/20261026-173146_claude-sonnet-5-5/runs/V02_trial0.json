@@ -1,0 +1,525 @@
+{
+ "task_id": "V02",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 22.7,
+ "events": [
+  {
+   "role": "customer",
+   "text": "my burgers came super late and the app lied about it being delivered"
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry about that. I'll look into it. First I need to verify your identity. Please give me the full name on your account, plus either the email address or the phone number on it."
+  },
+  {
+   "role": "customer",
+   "text": "Leo Brandt. Phone is 415-555-0232."
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "full_name": "Leo Brandt",
+    "phone": "415-555-0232"
+   },
+   "result": {
+    "customer_id": "D202",
+    "name": "Leo Brandt",
+    "email": "leo.brandt@mailbox.example",
+    "phone": "+1 415-555-0232",
+    "default_address": "870 Hill Rd, Oakdale, CA 94602",
+    "plus_member": false,
+    "refunds_last_30d": 0,
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "Q-7201",
+      "restaurant": "Burger Barn",
+      "placed_at": "2026-10-24T18:15:00-07:00",
+      "status": "delivered",
+      "total": 36.59
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "customer_id": "D202",
+    "full_name": "Leo Brandt",
+    "phone": "415-555-0232"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "D202"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "Q-7201"
+   },
+   "result": {
+    "order_id": "Q-7201",
+    "customer_id": "D202",
+    "restaurant_id": "R6",
+    "restaurant": "Burger Barn",
+    "items": [
+     {
+      "item_id": "Q-7201-1",
+      "name": "Classic burger",
+      "qty": 2,
+      "unit_price": 12.0
+     },
+     {
+      "item_id": "Q-7201-2",
+      "name": "Fries",
+      "qty": 1,
+      "unit_price": 4.0
+     }
+    ],
+    "subtotal": 28.0,
+    "promo_discount": 0.0,
+    "delivery_fee": 3.49,
+    "service_fee": 2.1,
+    "tip": 3.0,
+    "total": 36.59,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:15:00-07:00",
+    "promised_at": "2026-10-24T19:00:00-07:00",
+    "picked_up_at": "2026-10-24T18:40:00-07:00",
+    "delivered_at": "2026-10-24T18:58:00-07:00",
+    "delivery_address": "870 Hill Rd, Oakdale, CA 94602",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "Q-7201"
+   },
+   "result": {
+    "order_id": "Q-7201",
+    "promised_at": "2026-10-24T19:00:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:16:00-07:00",
+      "type": "courier_assigned"
+     },
+     {
+      "time": "2026-10-24T18:40:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:58:00-07:00",
+      "type": "marked_delivered",
+      "note": "Courier app marked delivered 2.1 miles from the address"
+     },
+     {
+      "time": "2026-10-24T19:45:00-07:00",
+      "type": "arrived"
+     },
+     {
+      "time": "2026-10-24T19:47:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "Q-7201"
+   },
+   "result": {
+    "order_id": "Q-7201",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 36.59,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "subtotal": 28.0,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_ticket_history",
+   "args": {
+    "customer_id": "D202"
+   },
+   "result": {
+    "customer_id": "D202",
+    "tickets": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "issue_credit",
+   "args": {
+    "customer_id": "D202",
+    "amount": 5.6,
+    "reason": "late_delivery",
+    "order_id": "Q-7201"
+   },
+   "result": {
+    "customer_id": "D202",
+    "credited": 5.6,
+    "new_balance": 5.6
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "Thanks, Leo. You're verified, and you're right on both points.\n\n- **The app's \"delivered\" status was wrong.** The courier's app marked the order delivered at 6:58 PM, but the courier was still 2.1 miles from your address. The courier actually reached you and handed the order over in person at 7:47 PM.\n- **The order was 47 minutes late.** It was promised for 7:00 PM.\n\nBecause it was 45 or more minutes late, I've added **$5.60 in account credit**. That's 20% of your $28.00 food subtotal. It's in your balance now and you can use it on a future order.\n\nLate deliveries are compensated with account credit only, so I can't refund the card for this. If anything was missing or wrong in the order, tell me and I'll look into that too."
+  },
+  {
+   "role": "customer",
+   "text": "Ok, thanks. Credit is better than nothing, I suppose. The order was fine, nothing missing. Still, the app said it was delivered at 7 and I was standing at the door for 45 minutes. A credit for a burger I ate cold doesn't make up for that."
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry, Leo. Waiting at the door for 45 minutes while the app said the order had arrived is frustrating, and the burgers arriving cold made it worse.\n\nThe late-delivery policy sets the compensation for this, and I've already applied it in full. I can't add more credit or refund the card. Nothing else in the order qualifies, since nothing was missing or wrong.\n\nIf you'd like a person to review your case, I can pass it to a specialist, who will follow up within 24 hours. Would you like me to do that?"
+  },
+  {
+   "role": "customer",
+   "text": "Yeah, go ahead and pass it on. I'd rather someone look at the fact that the app said delivered at 7 when the courier was still two miles away. Can you tell me the case number so I have it?"
+  },
+  {
+   "role": "tool",
+   "name": "escalate_to_human",
+   "args": {
+    "customer_id": "D202",
+    "reason": "customer_request",
+    "order_id": "Q-7201",
+    "summary": "Customer Leo Brandt's order Q-7201 was handed off at 7:47 PM, 47 min after the 7:00 PM promise. The courier app marked it delivered at 6:58 PM while 2.1 miles from the address. Standard late credit of $5.60 (20% of subtotal) already issued. Customer is unhappy with the outcome and asks for a person to review the false delivered status. No items missing or wrong."
+   },
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've passed your case to a specialist. Your reference number is **ESC-700**. They'll follow up within 24 hours. I can't say what the outcome will be.\n\nThe summary I sent includes the false 6:58 PM \"delivered\" status, the courier being 2.1 miles away at that point, and the 47-minute delay. It also notes that the $5.60 credit is already on your account.\n\nIs there anything else I can help with?"
+  },
+  {
+   "role": "customer",
+   "text": "Nope, that's it. Thanks for passing it on. I'll wait to hear from them, though I'm not holding my breath."
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "get_customer",
+   "args": {
+    "full_name": "Leo Brandt",
+    "phone": "415-555-0232"
+   },
+   "verified_before": [],
+   "result": {
+    "customer_id": "D202",
+    "name": "Leo Brandt",
+    "email": "leo.brandt@mailbox.example",
+    "phone": "+1 415-555-0232",
+    "default_address": "870 Hill Rd, Oakdale, CA 94602",
+    "plus_member": false,
+    "refunds_last_30d": 0,
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "Q-7201",
+      "restaurant": "Burger Barn",
+      "placed_at": "2026-10-24T18:15:00-07:00",
+      "status": "delivered",
+      "total": 36.59
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "customer_id": "D202",
+    "full_name": "Leo Brandt",
+    "phone": "415-555-0232"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "D202"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "Q-7201"
+   },
+   "verified_before": [
+    "D202"
+   ],
+   "result": {
+    "order_id": "Q-7201",
+    "customer_id": "D202",
+    "restaurant_id": "R6",
+    "restaurant": "Burger Barn",
+    "items": [
+     {
+      "item_id": "Q-7201-1",
+      "name": "Classic burger",
+      "qty": 2,
+      "unit_price": 12.0
+     },
+     {
+      "item_id": "Q-7201-2",
+      "name": "Fries",
+      "qty": 1,
+      "unit_price": 4.0
+     }
+    ],
+    "subtotal": 28.0,
+    "promo_discount": 0.0,
+    "delivery_fee": 3.49,
+    "service_fee": 2.1,
+    "tip": 3.0,
+    "total": 36.59,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:15:00-07:00",
+    "promised_at": "2026-10-24T19:00:00-07:00",
+    "picked_up_at": "2026-10-24T18:40:00-07:00",
+    "delivered_at": "2026-10-24T18:58:00-07:00",
+    "delivery_address": "870 Hill Rd, Oakdale, CA 94602",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "Q-7201"
+   },
+   "verified_before": [
+    "D202"
+   ],
+   "result": {
+    "order_id": "Q-7201",
+    "promised_at": "2026-10-24T19:00:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:16:00-07:00",
+      "type": "courier_assigned"
+     },
+     {
+      "time": "2026-10-24T18:40:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:58:00-07:00",
+      "type": "marked_delivered",
+      "note": "Courier app marked delivered 2.1 miles from the address"
+     },
+     {
+      "time": "2026-10-24T19:45:00-07:00",
+      "type": "arrived"
+     },
+     {
+      "time": "2026-10-24T19:47:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "Q-7201"
+   },
+   "verified_before": [
+    "D202"
+   ],
+   "result": {
+    "order_id": "Q-7201",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 36.59,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "subtotal": 28.0,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_ticket_history",
+   "args": {
+    "customer_id": "D202"
+   },
+   "verified_before": [
+    "D202"
+   ],
+   "result": {
+    "customer_id": "D202",
+    "tickets": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_credit",
+   "args": {
+    "customer_id": "D202",
+    "amount": 5.6,
+    "reason": "late_delivery",
+    "order_id": "Q-7201"
+   },
+   "verified_before": [
+    "D202"
+   ],
+   "result": {
+    "customer_id": "D202",
+    "credited": 5.6,
+    "new_balance": 5.6
+   },
+   "is_error": false
+  },
+  {
+   "tool": "escalate_to_human",
+   "args": {
+    "customer_id": "D202",
+    "reason": "customer_request",
+    "order_id": "Q-7201",
+    "summary": "Customer Leo Brandt's order Q-7201 was handed off at 7:47 PM, 47 min after the 7:00 PM promise. The courier app marked it delivered at 6:58 PM while 2.1 miles from the address. Standard late credit of $5.60 (20% of subtotal) already issued. Customer is unhappy with the outcome and asks for a person to review the false delivered status. No items missing or wrong."
+   },
+   "verified_before": [
+    "D202"
+   ],
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 24,
+   "output": 1620,
+   "cache_write": 6823,
+   "cache_read": 36742
+  },
+  "customer": {
+   "input": 20,
+   "output": 244,
+   "cache_write": 805,
+   "cache_read": 4645
+  }
+ },
+ "cost_usd": 0.04092,
+ "customer_turns": 5,
+ "completed": true,
+ "grade": {
+  "passed": true,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {
+     "D202": 5.6
+    },
+    "actual": {
+     "D202": 5.6
+    }
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": true,
+    "expected": [],
+    "actual": [
+     [
+      "Q-7201",
+      "customer_request"
+     ]
+    ],
+    "allowed_extra": [
+     "customer_request"
+    ]
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": {
+     "issued": 5.6,
+     "cap": 25
+    }
+   }
+  ],
+  "effects": {
+   "refunds": {},
+   "credits": {
+    "D202": 5.6
+   },
+   "order_changes": {},
+   "escalations": [
+    {
+     "order_id": "Q-7201",
+     "customer_id": "D202",
+     "reason": "customer_request"
+    }
+   ]
+  }
+ },
+ "passed": true,
+ "flags": [],
+ "trial": 0
+}

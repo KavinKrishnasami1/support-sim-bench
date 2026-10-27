@@ -1,0 +1,136 @@
+{
+  "id": "V08",
+  "slug": "already_compensated_today",
+  "title": "Asks again for lateness already compensated an hour ago",
+  "tricky": "The order was 30 minutes late, which normally earns a $2.99 credit, but ticket history and the credit ledger show it was already issued in an earlier chat. The customer doesn't mention that chat.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 3770,
+    "flow": "product_defect",
+    "subflow": "refund_update",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer contacts again about something already in progress."
+  },
+  "resolution_summary": "Ticket TK-902 already issued $2.99 for Q-7801's lateness. No further compensation.",
+  "user": {
+    "persona": "Victor Huang, engineer, testing whether he can get a bit more.",
+    "situation": "Your Taqueria Luz order was 30 minutes late tonight. You already chatted with support at 7:05pm and got a small credit, but you're hoping for more.",
+    "goal": "Get (more) compensation for the late order.",
+    "facts": [
+      "Your full name is Victor Huang.",
+      "Your phone is 415-555-0238.",
+      "Order number 7801.",
+      "It was about 30 minutes late.",
+      "You already got a small credit from another agent an hour ago."
+    ],
+    "reveal_rules": [
+      "Do not mention the earlier chat or credit unless the agent asks whether you've contacted us before, or mentions it."
+    ],
+    "behaviors": [
+      "If told it was already compensated, try once ('it was really late though'), then accept."
+    ],
+    "opening": "my order was 30 minutes late tonight, what can you do about it?",
+    "end_condition": "the agent has given you something or explained why not and you've accepted."
+  },
+  "expected": {},
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "already"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Victor Huang"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "D208",
+        "full_name": "Victor Huang",
+        "phone": "415-555-0238"
+      }
+    },
+    {
+      "tool": "get_ticket_history",
+      "args": {
+        "customer_id": "D208"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "Q-7801"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "Q-7801"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "credits the delivery fee again",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Victor Huang"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D208",
+            "full_name": "Victor Huang",
+            "phone": "415-555-0238"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "D208",
+            "amount": 2.99,
+            "reason": "late_delivery",
+            "order_id": "Q-7801"
+          }
+        }
+      ]
+    },
+    {
+      "name": "gives a bigger credit",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Victor Huang"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D208",
+            "full_name": "Victor Huang",
+            "phone": "415-555-0238"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "D208",
+            "amount": 5.0,
+            "reason": "late_delivery",
+            "order_id": "Q-7801"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 7
+}

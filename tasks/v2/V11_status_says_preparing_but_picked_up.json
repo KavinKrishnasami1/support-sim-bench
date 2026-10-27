@@ -1,0 +1,131 @@
+{
+  "id": "V11",
+  "slug": "status_says_preparing_but_picked_up",
+  "title": "Wants to cancel; status says preparing, courier already has it",
+  "tricky": "The order record says 'preparing', so cancelling looks allowed. The event log shows it was picked up 3 minutes ago, so policy says it can't be cancelled.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 1361,
+    "flow": "order_issue",
+    "subflow": "manage_cancel",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer wants to cancel an order that may already be on its way."
+  },
+  "resolution_summary": "Events show picked_up 19:27. Do not cancel or refund.",
+  "user": {
+    "persona": "Fatima Zahra, her plans just changed and she's leaving the house.",
+    "situation": "You ordered from Green Bowl at 6:50pm. Your plans changed and you won't be home. The app still says it's being prepared.",
+    "goal": "Cancel the order and get your money back. If told it can't be cancelled, accept it.",
+    "facts": [
+      "Your full name is Fatima Zahra.",
+      "Your email is fatima.zahra@mailbox.example.",
+      "Order number 8101.",
+      "The app shows 'preparing'."
+    ],
+    "reveal_rules": [],
+    "behaviors": [
+      "If told it's already picked up, say the app still says preparing, once, then accept."
+    ],
+    "opening": "I need to cancel my order, it's still being prepared",
+    "end_condition": "the agent has cancelled it or explained why not and you've accepted."
+  },
+  "expected": {},
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "picked up"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Fatima Zahra"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "D211",
+        "full_name": "Fatima Zahra",
+        "email": "fatima.zahra@mailbox.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "Q-8101"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "Q-8101"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "cancels and refunds on the order status",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Fatima Zahra"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D211",
+            "full_name": "Fatima Zahra",
+            "email": "fatima.zahra@mailbox.example"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "Q-8101",
+            "status": "cancelled"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "Q-8101",
+            "amount": 43.61,
+            "reason": "cancelled"
+          }
+        }
+      ]
+    },
+    {
+      "name": "cancels without refund",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Fatima Zahra"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D211",
+            "full_name": "Fatima Zahra",
+            "email": "fatima.zahra@mailbox.example"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "Q-8101",
+            "status": "cancelled"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 6
+}

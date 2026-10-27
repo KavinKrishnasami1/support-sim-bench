@@ -1,8 +1,17 @@
 # What was hard
 
-Notes from building a 13-task, tau-bench-style support benchmark over a weekend. Written for conversations with
-people who build agent tasks and environments. Sections 1 to 4 come from building the tasks. Section 5 comes from
-running two models on it.
+Notes from building a tau-bench-style support benchmark over a weekend: a 13-task v1 and a harder 12-task v2.
+Written for conversations with people who build agent tasks and environments. Sections 1 to 4 come from building
+the v1 tasks. Section 5 comes from the first runs on v1, and section 6 from building and running v2. Final numbers
+are in RESULTS.md.
+
+**The short version:**
+
+- Most of what first looked like model failures were benchmark bugs: in the grader, the policy, the harness or the
+  simulator.
+- Realistic complexity (conflicting records, wrong customers) didn't separate the models. Two things did: combining
+  rules, and a deciding fact sitting in a record the agent had no reason to open.
+- Three trials per task is too few to rank two good models.
 
 ## 1. Writing the policy: every rule had a hole until a task hit it
 
@@ -72,10 +81,10 @@ those chats are not ground truth: in the "charged for something I never bought" 
 back without any checks. Real transcripts are good for the customer side and for which situations occur. They are
 poor as labels for what the agent should have done; that comes from the policy.
 
-## 5. From the runs
+## 5. First runs (v1)
 
-We ran Claude Haiku 5.5 and Claude Sonnet 5.5 as agents, 13 tasks × 3 trials each, for $0.89 in total
-(details in RESULTS.md).
+We ran Claude Haiku 5.5 and Claude Sonnet 5.5 as agents, 13 tasks × 3 trials each, for $0.89 in total. The
+numbers in this section are from that first round; RESULTS.md has the final ones.
 
 **Most first-pass failures were ours.** The first grading said Haiku 77%, Sonnet 90%. Reading every failing
 transcript showed that 10 of the 13 failures were benchmark bugs:
@@ -109,7 +118,7 @@ failure mode that matters for real deployments, where the deciding fact sits in 
 obvious reason to open. Tasks that hide the deciding fact one lookup away are more discriminating than tasks that
 test whether the agent knows the rule.
 
-**A clean one-page policy is too easy for current models.** Both agents verified, chose refund versus credit,
+**A clean one-page policy is too easy for current models.** In the first round, both agents verified, chose refund versus credit,
 respected caps, refused politely, escalated correctly and did nothing when nothing was right, in nearly every run.
 To separate models, a task needs things this weekend version lacks: a longer policy with exceptions that
 interact, more tools with overlapping uses, longer conversations, facts that contradict each other across systems,
@@ -118,8 +127,8 @@ and customers who are wrong rather than merely vague.
 **The simulator has tells that a judge model misses.** The cheap simulator mostly followed its reveal rules (the
 allergy only after the refund, the wrong suite number before the right one). But it also:
 
-- thanked itself by its own name ("Thanks, Priya"), in 5 of 78 runs and across both agents, apparently after the
-  agent used that name;
+- thanked itself by its own name ("Thanks, Priya"), in 5 of the first 78 runs (8 of the final 150) and across both
+  agents, apparently after the agent used that name;
 - repeated its own instructions back ("I don't know the late-delivery policy");
 - kept chatting after its goal was met, asking the agent to reconfirm things.
 
@@ -131,3 +140,70 @@ judge alone isn't enough.
 and caching removed most of the input cost. The useful estimate is the observed cost per run from a small pilot,
 so the tool now reports that. A full 39-run pass cost $0.07 with Haiku as the agent and $0.81 with Sonnet. At these
 prices the expensive part of a benchmark like this is the human time spent reading transcripts, not the tokens.
+
+## 6. Building a harder version (v2)
+
+v2 added the levers that v1 lacked:
+
+- a courier event log that contradicts the order record, and a written rule that the log wins;
+- a payment record with promo discounts and automatic refunds;
+- support-ticket history with earlier promises;
+- Plus membership with higher limits, and a fraud review that overrides everything;
+- customers who are wrong (wrong order number, an item already refunded, a failed delivery that was their fault);
+- three issues in one chat.
+
+**The first v2 run looked hard, and most of it was us again.** Haiku scored 64% and Sonnet 75%. Reading all 22
+failures:
+
+- **12 were escalations the customer had asked for.** When the simulated customer was told "no", it often asked for
+  someone else to look at it ("can you pass my request along to someone who can?"). The policy says to escalate
+  when a customer asks for a person, but each task's expected state had no escalation. Whether the simulator asks
+  varies from run to run, so this escalation now has to be allowed, but not required, in every task. In a
+  multi-turn simulation, any policy rule triggered by something the customer says has to be handled in every task,
+  not just the ones written around it.
+- **4 were escalations the policy never asked for and never forbade.** Haiku escalated "for review" whenever a
+  customer was unhappy. The draft policy listed when to escalate but never said "only then". The policy was fixed
+  and v2 re-run.
+- **The rest were mostly real agent mistakes.** The re-run turned up one more benchmark bug: a customer said "yes,
+  go ahead with the $12 refund and the $3 credit" and ended the chat in the same message, and the harness stopped
+  before the agent could act. The agent now always answers the customer's last message.
+
+**After the fixes, most of v2's new difficulty didn't bite.** Both models read the courier log over the order record
+(a false "delivered" stamp, a "preparing" status on an order already picked up), caught the customer quoting last
+week's order number, found the automatic refund, honoured the earlier promise at the recorded $6.50 rather than the
+remembered $10, and refused to compensate a failed delivery that was the customer's fault. All of these passed every
+run in the final round. When the policy names the record to check (the courier log, the payment record, the ticket
+history), current models check it.
+
+**What separated the models was combining rules.** Sonnet scored 100%, Haiku 89%, and Haiku's losses were the two
+tasks that need rules combined:
+
+- **A two-part rule.** On a promo order, a missing item is refunded to the card minus its share of the discount, and
+  the discount share goes back as credit. Haiku computed the $12.00 card refund correctly in every failing run and
+  never issued the $3.00 credit.
+- **Rules that override each other, where one depends on a record nobody pointed at.** Wrong item normally means
+  refund; getting sick means a food-safety escalation; three refunds in 30 days means a fraud review and no money at
+  all, Plus member or not. Haiku went 0 of 3 in the final run.
+
+**The fraud misses were all "not looking".** Across the three v2 rounds, in every Haiku run that refunded despite
+the fraud rule (3 runs), it had never opened the customer profile that shows `refunds_last_30d`. In every run where
+it opened the profile (6 runs), it applied the fraud review. That's the same failure as Haiku's only v1 miss (T11).
+The policy names a source of truth for delivery, payment and history, but not for the refund count. That count sits
+on a profile the agent has no particular reason to fetch once it has the order. The agent doesn't misread the rule;
+it never sees the fact the rule depends on. Tasks where the deciding fact sits in a record the agent wouldn't
+naturally open are the most discriminating ones we found, and the closest to how real deployments fail.
+
+To build a benchmark that separates models, write tasks where two or three rules apply at once and one cancels part
+of another, and put the deciding fact for one of them in a record the agent has no obvious reason to open. Messy
+data and difficult customers matter less.
+
+**Three trials is too few.** Two complete runs of the same model on the same suite differed by 3 to 8 points, and a
+single task went from 3/3 in one run to 0/3 in the next (Haiku V09). The order of the two models flipped between v1
+and v2. Before claiming one model is more reliable than another on a task, run k ≥ 5, and look at pooled per-task
+counts, not one run's pass^3.
+
+**Every fix has to be re-checked against every earlier run.** Each grader change was re-applied to all saved runs
+(`supportsim regrade`), and each policy or harness change meant re-running. The total for ten complete runs was
+$5.00, so re-running was cheap. The time went into reading transcripts to decide whether each failure was the model
+or the benchmark. That reading, not compute, is the real cost of a trustworthy environment, and it's the part that
+is hardest to hand off.

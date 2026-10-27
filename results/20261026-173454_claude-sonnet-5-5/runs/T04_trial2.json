@@ -1,0 +1,366 @@
+{
+ "task_id": "T04",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 22.1,
+ "events": [
+  {
+   "role": "customer",
+   "text": "you guys sent me the wrong burger and honestly the whole meal is ruined"
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry about that. I'd like to help get this fixed. First I need to verify your account. Please give me your full name and either the email address or the phone number on the account."
+  },
+  {
+   "role": "customer",
+   "text": "Ugh, really? It's a lot of info just to fix a burger. Fine, it's Tom Becker, and the email is tbecker@inbox.example."
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "email": "tbecker@inbox.example",
+    "full_name": "Tom Becker"
+   },
+   "result": {
+    "customer_id": "C104",
+    "name": "Tom Becker",
+    "email": "tbecker@inbox.example",
+    "phone": "+1 415-555-0190",
+    "default_address": "902 Market Row, Oakdale, CA 94604",
+    "member_since": "2024-01-15",
+    "refunds_last_30d": 0,
+    "credit_balance": 0.0,
+    "recent_orders": [
+     {
+      "order_id": "O-5104",
+      "restaurant": "Burger Barn",
+      "placed_at": "2026-10-24T18:20:00-07:00",
+      "status": "delivered",
+      "total": 40.35
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "customer_id": "C104",
+    "full_name": "Tom Becker",
+    "email": "tbecker@inbox.example"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "C104"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "O-5104"
+   },
+   "result": {
+    "order_id": "O-5104",
+    "customer_id": "C104",
+    "restaurant_id": "R6",
+    "restaurant": "Burger Barn",
+    "items": [
+     {
+      "item_id": "O-5104-1",
+      "name": "Classic burger",
+      "qty": 1,
+      "unit_price": 12.0
+     },
+     {
+      "item_id": "O-5104-2",
+      "name": "Bacon cheeseburger",
+      "qty": 1,
+      "unit_price": 14.5
+     },
+     {
+      "item_id": "O-5104-3",
+      "name": "Large fries",
+      "qty": 1,
+      "unit_price": 5.0
+     }
+    ],
+    "subtotal": 31.5,
+    "delivery_fee": 3.49,
+    "service_fee": 2.36,
+    "tip": 3.0,
+    "total": 40.35,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:20:00-07:00",
+    "promised_at": "2026-10-24T19:05:00-07:00",
+    "picked_up_at": "2026-10-24T18:48:00-07:00",
+    "delivered_at": "2026-10-24T19:02:00-07:00",
+    "delivery_address": "902 Market Row, Oakdale, CA 94604",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "Thanks, Tom. You're verified, and I appreciate your patience. I found your Burger Barn order, which was delivered today.\n\nWhich burger was wrong: the Classic burger ($12.00) or the Bacon cheeseburger ($14.50)? What did you get instead?\n\nOnce I know which item it was, you can pick one of these:\n- **A refund** of the item's price to your Visa ending in 4242, or\n- **Account credit** of the item's price plus 20%.\n\nWhich would you prefer?"
+  },
+  {
+   "role": "customer",
+   "text": "I ordered the bacon cheeseburger, and I got a veggie burger instead. The classic burger and fries were fine, but that's the one that's wrong. I want the money back on my card, not credit."
+  },
+  {
+   "role": "tool",
+   "name": "issue_refund",
+   "args": {
+    "order_id": "O-5104",
+    "amount": 14.5,
+    "reason": "wrong_item",
+    "item_ids": [
+     "O-5104-2"
+    ]
+   },
+   "result": {
+    "refund_id": "RF-4001",
+    "order_id": "O-5104",
+    "amount": 14.5,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've refunded $14.50 for the Bacon cheeseburger to your Visa ending in 4242. It should arrive in 3\u20135 business days.\n\nI'm sorry the wrong burger spoiled your meal, Tom. Is there anything else I can help with?"
+  },
+  {
+   "role": "customer",
+   "text": "Wait, that's it? I wanted the whole order refunded. The fries and the classic burger were fine, but the whole meal's been ruined by this and I'm not paying for any of it. Can you do better than just the one burger?"
+  },
+  {
+   "role": "agent",
+   "text": "I understand you're frustrated, Tom, and I'm sorry the meal was spoiled. I can't refund the whole order, though. Our policy only lets me compensate the items that were wrong or missing. The Classic burger and fries arrived correctly, so they aren't eligible. I can only refund the whole order when every item in it was wrong or missing.\n\nThe $14.50 refund for the Bacon cheeseburger is already on its way to your card. The order also wasn't late, so there's no delivery-related compensation.\n\nIf you'd like, I can have a human specialist look at your case. They'd follow up within 24 hours, but I can't promise what they'd decide. Would you like me to do that?"
+  },
+  {
+   "role": "customer",
+   "text": "Ugh, fine. I don't want to wait a day for someone else to tell me the same thing though. The burger refund is what it is, I guess. I'll take it, but this whole thing is annoying."
+  },
+  {
+   "role": "agent",
+   "text": "I understand, Tom, and I'm sorry this was such a hassle. Your $14.50 refund is on its way to your Visa ending in 4242. If you change your mind about having a specialist look at the case, just message us again.\n\nIs there anything else I can help you with today?"
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "get_customer",
+   "args": {
+    "email": "tbecker@inbox.example",
+    "full_name": "Tom Becker"
+   },
+   "verified_before": [],
+   "result": {
+    "customer_id": "C104",
+    "name": "Tom Becker",
+    "email": "tbecker@inbox.example",
+    "phone": "+1 415-555-0190",
+    "default_address": "902 Market Row, Oakdale, CA 94604",
+    "member_since": "2024-01-15",
+    "refunds_last_30d": 0,
+    "credit_balance": 0.0,
+    "recent_orders": [
+     {
+      "order_id": "O-5104",
+      "restaurant": "Burger Barn",
+      "placed_at": "2026-10-24T18:20:00-07:00",
+      "status": "delivered",
+      "total": 40.35
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "customer_id": "C104",
+    "full_name": "Tom Becker",
+    "email": "tbecker@inbox.example"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "C104"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "O-5104"
+   },
+   "verified_before": [
+    "C104"
+   ],
+   "result": {
+    "order_id": "O-5104",
+    "customer_id": "C104",
+    "restaurant_id": "R6",
+    "restaurant": "Burger Barn",
+    "items": [
+     {
+      "item_id": "O-5104-1",
+      "name": "Classic burger",
+      "qty": 1,
+      "unit_price": 12.0
+     },
+     {
+      "item_id": "O-5104-2",
+      "name": "Bacon cheeseburger",
+      "qty": 1,
+      "unit_price": 14.5
+     },
+     {
+      "item_id": "O-5104-3",
+      "name": "Large fries",
+      "qty": 1,
+      "unit_price": 5.0
+     }
+    ],
+    "subtotal": 31.5,
+    "delivery_fee": 3.49,
+    "service_fee": 2.36,
+    "tip": 3.0,
+    "total": 40.35,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:20:00-07:00",
+    "promised_at": "2026-10-24T19:05:00-07:00",
+    "picked_up_at": "2026-10-24T18:48:00-07:00",
+    "delivered_at": "2026-10-24T19:02:00-07:00",
+    "delivery_address": "902 Market Row, Oakdale, CA 94604",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_refund",
+   "args": {
+    "order_id": "O-5104",
+    "amount": 14.5,
+    "reason": "wrong_item",
+    "item_ids": [
+     "O-5104-2"
+    ]
+   },
+   "verified_before": [
+    "C104"
+   ],
+   "result": {
+    "refund_id": "RF-4001",
+    "order_id": "O-5104",
+    "amount": 14.5,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 26,
+   "output": 989,
+   "cache_write": 1912,
+   "cache_read": 28087
+  },
+  "customer": {
+   "input": 20,
+   "output": 286,
+   "cache_write": 738,
+   "cache_read": 4636
+  }
+ },
+ "cost_usd": 0.02062,
+ "customer_turns": 5,
+ "completed": true,
+ "grade": {
+  "passed": true,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {
+     "O-5104": 14.5
+    },
+    "actual": {
+     "O-5104": 14.5
+    }
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": true,
+    "expected": [],
+    "actual": [],
+    "allowed_extra": [
+     "customer_request"
+    ]
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": {
+     "issued": 0,
+     "cap": 25
+    }
+   }
+  ],
+  "effects": {
+   "refunds": {
+    "O-5104": 14.5
+   },
+   "credits": {},
+   "order_changes": {},
+   "escalations": []
+  }
+ },
+ "passed": true,
+ "flags": [],
+ "trial": 2
+}

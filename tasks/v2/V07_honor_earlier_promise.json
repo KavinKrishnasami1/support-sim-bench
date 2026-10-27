@@ -1,0 +1,161 @@
+{
+  "id": "V07",
+  "slug": "honor_earlier_promise",
+  "title": "Chasing a credit an earlier agent promised",
+  "tricky": "Ticket history shows yesterday's agent promised $6.50 credit that was never issued. The customer misremembers it as $10. The agent must issue exactly what was promised.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 9977,
+    "flow": "manage_account",
+    "subflow": "status_credit_missing",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer says a promised credit never arrived."
+  },
+  "resolution_summary": "Check ticket history TK-881: $6.50 promised, not in credits. Issue $6.50 credit.",
+  "user": {
+    "persona": "Ruth Abara, retiree, polite and persistent.",
+    "situation": "Yesterday you contacted support because garlic knots were missing from your pizza order, and the agent promised you credit. It isn't on your account.",
+    "goal": "Get the credit you were promised. You think it was $10.",
+    "facts": [
+      "Your full name is Ruth Abara.",
+      "Your email is ruth.abara@inbox.example.",
+      "You think the promised credit was $10 (you're not sure).",
+      "You don't have the order number; it was yesterday's Big Slice Pizza order."
+    ],
+    "reveal_rules": [],
+    "behaviors": [
+      "Say you were promised $10. If the agent says the record shows a different amount, accept it."
+    ],
+    "opening": "I was promised a credit yesterday and it never showed up",
+    "end_condition": "the agent has issued a credit or clearly refused."
+  },
+  "expected": {
+    "credits": {
+      "D207": 6.5
+    }
+  },
+  "credit_cap_exempt": 6.5,
+  "leak_check": {
+    "amounts": [
+      "6.50",
+      "6.5"
+    ],
+    "phrases": []
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Ruth Abara"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "D207",
+        "full_name": "Ruth Abara",
+        "email": "ruth.abara@inbox.example"
+      }
+    },
+    {
+      "tool": "get_ticket_history",
+      "args": {
+        "customer_id": "D207"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "Q-7690"
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "D207",
+        "amount": 6.5,
+        "reason": "missing_item",
+        "order_id": "Q-7690"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "gives the $10 the customer remembers",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Ruth Abara"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D207",
+            "full_name": "Ruth Abara",
+            "email": "ruth.abara@inbox.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "D207",
+            "amount": 10.0,
+            "reason": "missing_item",
+            "order_id": "Q-7690"
+          }
+        }
+      ]
+    },
+    {
+      "name": "adds the 20% bonus to the promise",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Ruth Abara"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D207",
+            "full_name": "Ruth Abara",
+            "email": "ruth.abara@inbox.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "D207",
+            "amount": 7.8,
+            "reason": "missing_item",
+            "order_id": "Q-7690"
+          }
+        }
+      ]
+    },
+    {
+      "name": "refuses without checking history",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Ruth Abara"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D207",
+            "full_name": "Ruth Abara",
+            "email": "ruth.abara@inbox.example"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 7
+}

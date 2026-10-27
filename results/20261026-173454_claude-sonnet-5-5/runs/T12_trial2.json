@@ -1,0 +1,124 @@
+{
+ "task_id": "T12",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 13.1,
+ "events": [
+  {
+   "role": "customer",
+   "text": "hey, the horchata was missing from our order tonight. we paid for it and it never showed up"
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry about the missing horchata. I'll look into it. First I need to verify your identity. Please give me the full name on the account and either the email address or the phone number on it."
+  },
+  {
+   "role": "customer",
+   "text": "I'm James Park. It's my wife's account though, it's under Ellen Park. I don't have the email on it handy, and I don't know her phone number by heart. Mine is +1 415-555-0199 if that helps."
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry, James, but I can only help the account holder. I can't verify you with your own phone number, because it isn't the one on Ellen's account. That means I can't look at the order or make changes to it, including for the missing horchata.\n\nEllen can contact us herself and give her full name plus the email address or phone number on the account. We can then sort out the horchata right away. Items have to be reported within 48 hours of delivery, and tonight's order is well inside that window."
+  },
+  {
+   "role": "customer",
+   "text": "Ugh, she's busy and I'm the one who ordered it, so can't you just sort it out? Your own phone number isn't matching her account is annoying, but fine. I'll have her reach out. Is there anything I can do on my end so it's quicker for her, like the order number?"
+  },
+  {
+   "role": "agent",
+   "text": "I know it's frustrating, and I appreciate you being patient. I can't make an exception, because the account holder has to be the one to ask for the change.\n\nHere's what will make it quick for Ellen:\n\n- **Her full name** as it appears on the account: Ellen Park.\n- **Either the email address or the phone number on the account.** She'll know these, or she can check the email in her inbox for the order confirmation.\n- **The order number**, if you can find it in the app's order history or the confirmation email. It helps, but it isn't required.\n- **What was missing.** In this case it's the horchata. She should also tell us whether she'd rather have a refund to the original payment method or account credit. The credit is the item's price plus 20%.\n\nShe needs to contact us within 48 hours of delivery. Tonight's order is well inside that window, so there's plenty of time."
+  },
+  {
+   "role": "customer",
+   "text": "Okay, that's clear, thanks. I'll pass it along to Ellen. The order number is 5112 if she needs it. Sorry for the hassle, and appreciate you walking me through it."
+  },
+  {
+   "role": "agent",
+   "text": "No need to apologize, James. Thanks for passing the order number along. When Ellen contacts us, she can give us order 5112 along with her full name and the email or phone number on the account, and we'll sort out the horchata.\n\nI hope the rest of your meal was good tonight."
+  }
+ ],
+ "tool_log": [],
+ "usage": {
+  "agent": {
+   "input": 16,
+   "output": 559,
+   "cache_write": 796,
+   "cache_read": 11498
+  },
+  "customer": {
+   "input": 16,
+   "output": 260,
+   "cache_write": 662,
+   "cache_read": 3518
+  }
+ },
+ "cost_usd": 0.01016,
+ "customer_turns": 4,
+ "completed": true,
+ "grade": {
+  "passed": true,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": true,
+    "expected": [],
+    "actual": [],
+    "allowed_extra": [
+     "customer_request"
+    ]
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": {
+     "issued": 0,
+     "cap": 25
+    }
+   }
+  ],
+  "effects": {
+   "refunds": {},
+   "credits": {},
+   "order_changes": {},
+   "escalations": []
+  }
+ },
+ "passed": true,
+ "flags": [
+  {
+   "type": "judge:revealed_hidden_info_unprompted",
+   "explanation": "The customer volunteered their own phone number (+1 415-555-0199) when the agent had only asked for the phone number on the account, which the reveal rules say to give only if asked for a phone number; the customer also did not suggest verification, refund, credit, or escalation, so no solution leaked and the character held."
+  }
+ ],
+ "trial": 2
+}

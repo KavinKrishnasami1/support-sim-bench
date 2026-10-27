@@ -1,0 +1,255 @@
+{
+  "id": "V01",
+  "slug": "plus_three_issues_one_chat",
+  "title": "Plus member, three issues in one chat",
+  "tricky": "Three separate problems surface one after another: a 50-minute-late order (Plus late tier), a missing item on the same order, then an address change on a second order. The agent must apply the Plus limits and not stop after the first fix.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 9888,
+    "flow": "shipping_issue",
+    "subflow": "missing",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer raises a second request only after the first is handled, and expects the agent to keep track of both orders."
+  },
+  "resolution_summary": "Credit $8.90 (20% of $44.50 subtotal, Plus cap $25) for lateness on Q-7101; refund $6.50 for the samosas to the card; change Q-7102's address to 500 Grand Ave, Floor 12.",
+  "user": {
+    "persona": "Aisha Rahman, product manager, a Forkful Plus member. Organized, polite, juggling things.",
+    "situation": "Tonight's Saffron Lane dinner (butter chicken, biryani, samosas, naan) was promised for 6:30pm and only arrived around 7:20pm, and the samosas weren't in the bag. You also just placed a Pho Real order for later tonight that is going to your home, but you'll be at the office.",
+    "goal": "Get something for the late dinner, get your money back for the samosas, and get the Pho Real order sent to the office.",
+    "facts": [
+      "Your full name is Aisha Rahman.",
+      "Your email is aisha.rahman@inbox.example.",
+      "The Saffron Lane order is 7101. It arrived about 7:20pm; promised 6:30pm.",
+      "The samosas were missing from it. You'd like that money back on your card.",
+      "The Pho Real order is 7102, placed a few minutes ago.",
+      "Office address: 500 Grand Ave, Floor 12, Oakdale, CA 94601."
+    ],
+    "reveal_rules": [
+      "Start with only the lateness.",
+      "Mention the missing samosas only after the agent has dealt with the lateness or asks if there is anything else.",
+      "Bring up the Pho Real address change only after the samosas are sorted."
+    ],
+    "behaviors": [
+      "Be efficient and friendly. If asked refund or credit for the samosas, choose refund."
+    ],
+    "opening": "hi, my dinner tonight was really late",
+    "end_condition": "all three things are handled (or the agent says one can't be done) and you've thanked them."
+  },
+  "expected": {
+    "credits": {
+      "D201": 8.9
+    },
+    "refunds": {
+      "Q-7101": 6.5
+    },
+    "order_changes": {
+      "Q-7102": {
+        "delivery_address": {
+          "contains_all": [
+            "500",
+            "grand",
+            "12"
+          ]
+        }
+      }
+    }
+  },
+  "credit_cap": 40,
+  "leak_check": {
+    "amounts": [
+      "8.90",
+      "8.9"
+    ],
+    "phrases": [
+      "\\b20 ?%"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Aisha Rahman"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "D201",
+        "full_name": "Aisha Rahman",
+        "email": "aisha.rahman@inbox.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "Q-7101"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "Q-7101"
+      }
+    },
+    {
+      "tool": "get_payment",
+      "args": {
+        "order_id": "Q-7101"
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "D201",
+        "amount": 8.9,
+        "reason": "late_delivery",
+        "order_id": "Q-7101"
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "Q-7101",
+        "amount": 6.5,
+        "reason": "missing_item"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "Q-7102"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "Q-7102"
+      }
+    },
+    {
+      "tool": "update_order",
+      "args": {
+        "order_id": "Q-7102",
+        "delivery_address": "500 Grand Ave, Floor 12, Oakdale, CA 94601"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "Plus member given the $5 tier-1 credit",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Aisha Rahman"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D201",
+            "full_name": "Aisha Rahman",
+            "email": "aisha.rahman@inbox.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "D201",
+            "amount": 5.0,
+            "reason": "late_delivery",
+            "order_id": "Q-7101"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "Q-7101",
+            "amount": 6.5,
+            "reason": "missing_item"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "Q-7102",
+            "delivery_address": "500 Grand Ave, Floor 12"
+          }
+        }
+      ]
+    },
+    {
+      "name": "stops after the late credit",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Aisha Rahman"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D201",
+            "full_name": "Aisha Rahman",
+            "email": "aisha.rahman@inbox.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "D201",
+            "amount": 8.9,
+            "reason": "late_delivery",
+            "order_id": "Q-7101"
+          }
+        }
+      ]
+    },
+    {
+      "name": "changes the address on the delivered order",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Aisha Rahman"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D201",
+            "full_name": "Aisha Rahman",
+            "email": "aisha.rahman@inbox.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "D201",
+            "amount": 8.9,
+            "reason": "late_delivery",
+            "order_id": "Q-7101"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "Q-7101",
+            "amount": 6.5,
+            "reason": "missing_item"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "Q-7101",
+            "delivery_address": "500 Grand Ave, Floor 12"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 11
+}

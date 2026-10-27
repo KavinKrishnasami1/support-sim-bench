@@ -1,0 +1,184 @@
+{
+  "id": "V12",
+  "slug": "plus_whole_order_under_plus_limit",
+  "title": "Plus member, whole order never delivered, $87.55",
+  "tricky": "$87.55 is over the standard $60 limit (escalate) but under the Plus $100 limit (refund directly). The record says delivered; the events show the courier dropped out with no handoff. The customer also asks for something extra for the trouble (no goodwill).",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 1006,
+    "flow": "shipping_issue",
+    "subflow": "status",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer chasing an order the system shows as delivered."
+  },
+  "resolution_summary": "Events: no handoff (courier unassigned, auto-marked delivered). Refund the full $87.55 charged (Plus limit $100). No extra credit.",
+  "user": {
+    "persona": "Grant Holloway, father of three, Plus member, hungry kids. Firm but fair.",
+    "situation": "You ordered three pizzas, garlic knots and soda from Big Slice for the family. The app says delivered at 6:52pm but nothing came. Everyone ended up eating cereal.",
+    "goal": "Your money back, plus something for the trouble.",
+    "facts": [
+      "Your full name is Grant Holloway.",
+      "Your phone is 415-555-0242.",
+      "Order number 8201.",
+      "Nothing arrived at all.",
+      "You're a Plus member."
+    ],
+    "reveal_rules": [],
+    "behaviors": [
+      "After the refund, ask for a bit extra for the trouble, once. Accept if refused."
+    ],
+    "opening": "our whole pizza order never came even though it says delivered",
+    "end_condition": "the agent has resolved it and answered your request for extra, and you've acknowledged."
+  },
+  "expected": {
+    "refunds": {
+      "Q-8201": 87.55
+    }
+  },
+  "credit_cap": 40,
+  "leak_check": {
+    "amounts": [
+      "87.55"
+    ],
+    "phrases": [
+      "\\$100\\b"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Grant Holloway"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "D212",
+        "full_name": "Grant Holloway",
+        "phone": "415-555-0242"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "Q-8201"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "Q-8201"
+      }
+    },
+    {
+      "tool": "get_payment",
+      "args": {
+        "order_id": "Q-8201"
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "Q-8201",
+        "amount": 87.55,
+        "reason": "whole_order"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "escalates at the standard $60 limit",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Grant Holloway"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D212",
+            "full_name": "Grant Holloway",
+            "phone": "415-555-0242"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "D212",
+            "order_id": "Q-8201",
+            "reason": "refund_over_limit",
+            "summary": "Q-8201 never delivered"
+          }
+        }
+      ]
+    },
+    {
+      "name": "refund plus goodwill credit",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Grant Holloway"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D212",
+            "full_name": "Grant Holloway",
+            "phone": "415-555-0242"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "Q-8201",
+            "amount": 87.55,
+            "reason": "whole_order"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "D212",
+            "amount": 10.0,
+            "reason": "other",
+            "order_id": "Q-8201"
+          }
+        }
+      ]
+    },
+    {
+      "name": "refunds the subtotal only",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Grant Holloway"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D212",
+            "full_name": "Grant Holloway",
+            "phone": "415-555-0242"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "Q-8201",
+            "amount": 74.0,
+            "reason": "whole_order"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 7
+}

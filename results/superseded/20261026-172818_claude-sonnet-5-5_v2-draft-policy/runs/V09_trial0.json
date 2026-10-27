@@ -1,0 +1,391 @@
+{
+ "task_id": "V09",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 12.5,
+ "events": [
+  {
+   "role": "customer",
+   "text": "I ordered paneer tikka masala and got chicken tikka masala instead. I'm vegetarian, so this is really upsetting, and I want to know how this happened."
+  },
+  {
+   "role": "agent",
+   "text": "I'm very sorry about this, especially as you're vegetarian. I'll look into it for you. First I need to verify your identity. Please give me the full name on your account and either the email address or the phone number on it."
+  },
+  {
+   "role": "customer",
+   "text": "Sure. My full name is Isabel Duarte, and the email on my account is isabel.duarte@post.example."
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "email": "isabel.duarte@post.example"
+   },
+   "result": {
+    "customer_id": "D209",
+    "name": "Isabel Duarte",
+    "email": "isabel.duarte@post.example",
+    "phone": "+1 415-555-0239",
+    "default_address": "810 River Rd, Oakdale, CA 94609",
+    "plus_member": true,
+    "refunds_last_30d": 3,
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "Q-7901",
+      "restaurant": "Saffron Lane",
+      "placed_at": "2026-10-24T18:10:00-07:00",
+      "status": "delivered",
+      "total": 24.23
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "customer_id": "D209",
+    "full_name": "Isabel Duarte",
+    "email": "isabel.duarte@post.example"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "D209"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "Q-7901"
+   },
+   "result": {
+    "order_id": "Q-7901",
+    "customer_id": "D209",
+    "restaurant_id": "R1",
+    "restaurant": "Saffron Lane",
+    "items": [
+     {
+      "item_id": "Q-7901-1",
+      "name": "Paneer tikka masala",
+      "qty": 1,
+      "unit_price": 15.5
+     },
+     {
+      "item_id": "Q-7901-2",
+      "name": "Jeera rice",
+      "qty": 1,
+      "unit_price": 4.25
+     }
+    ],
+    "subtotal": 19.75,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 1.48,
+    "tip": 3.0,
+    "total": 24.23,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:10:00-07:00",
+    "promised_at": "2026-10-24T18:55:00-07:00",
+    "picked_up_at": "2026-10-24T18:33:00-07:00",
+    "delivered_at": "2026-10-24T18:50:00-07:00",
+    "delivery_address": "810 River Rd, Oakdale, CA 94609",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "Q-7901"
+   },
+   "result": {
+    "order_id": "Q-7901",
+    "promised_at": "2026-10-24T18:55:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:33:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:50:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "escalate_to_human",
+   "args": {
+    "customer_id": "D209",
+    "order_id": "Q-7901",
+    "reason": "fraud_review",
+    "summary": "Customer (vegetarian) reports receiving chicken tikka masala instead of paneer tikka masala on order Q-7901 (handed over in person 18:50). Account has 3 refunds in last 30 days, so no refund/credit issued per policy; needs specialist review."
+   },
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "Thank you, Isabel, you're verified. I'm sorry about this.\n\nOrder Q-7901 from Saffron Lane included a paneer tikka masala. The delivery records show the courier picked it up at 6:33 PM and handed it to you in person at 6:50 PM. I can't see from my side how the kitchen mixed up the dish. The records don't show what was packed, so I can't tell you more about the cause.\n\nI can't issue a refund or credit on your account right now. Your account has had 3 refunds in the last 30 days, which triggers an automatic review. While that review is open, I can't refund or credit anything, even for a mistake like this one. I've passed your case to a specialist, with the details of the wrong dish. They'll follow up within 24 hours. I can't promise what the outcome will be.\n\nPlease don't eat the chicken dish. Is there anything else I can help with?"
+  },
+  {
+   "role": "customer",
+   "text": "I see. My order number is 7901, not Q-7901, but I assume that's the same order. I did already eat a few bites before I realized it was chicken, and I've been sick to my stomach since. I'm feeling better now, but that's not something I should have had to deal with.\n\nI'm a Forkful Plus member, and I didn't expect to be told there's no refund at all for a clear mistake like this. I understand you can't change the review from your end, so I'll wait for the specialist to get back to me within 24 hours.\n\nThanks for passing it on. That's all I need for now."
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "get_customer",
+   "args": {
+    "email": "isabel.duarte@post.example"
+   },
+   "verified_before": [],
+   "result": {
+    "customer_id": "D209",
+    "name": "Isabel Duarte",
+    "email": "isabel.duarte@post.example",
+    "phone": "+1 415-555-0239",
+    "default_address": "810 River Rd, Oakdale, CA 94609",
+    "plus_member": true,
+    "refunds_last_30d": 3,
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "Q-7901",
+      "restaurant": "Saffron Lane",
+      "placed_at": "2026-10-24T18:10:00-07:00",
+      "status": "delivered",
+      "total": 24.23
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "customer_id": "D209",
+    "full_name": "Isabel Duarte",
+    "email": "isabel.duarte@post.example"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "D209"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "Q-7901"
+   },
+   "verified_before": [
+    "D209"
+   ],
+   "result": {
+    "order_id": "Q-7901",
+    "customer_id": "D209",
+    "restaurant_id": "R1",
+    "restaurant": "Saffron Lane",
+    "items": [
+     {
+      "item_id": "Q-7901-1",
+      "name": "Paneer tikka masala",
+      "qty": 1,
+      "unit_price": 15.5
+     },
+     {
+      "item_id": "Q-7901-2",
+      "name": "Jeera rice",
+      "qty": 1,
+      "unit_price": 4.25
+     }
+    ],
+    "subtotal": 19.75,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 1.48,
+    "tip": 3.0,
+    "total": 24.23,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:10:00-07:00",
+    "promised_at": "2026-10-24T18:55:00-07:00",
+    "picked_up_at": "2026-10-24T18:33:00-07:00",
+    "delivered_at": "2026-10-24T18:50:00-07:00",
+    "delivery_address": "810 River Rd, Oakdale, CA 94609",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "Q-7901"
+   },
+   "verified_before": [
+    "D209"
+   ],
+   "result": {
+    "order_id": "Q-7901",
+    "promised_at": "2026-10-24T18:55:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:33:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:50:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "escalate_to_human",
+   "args": {
+    "customer_id": "D209",
+    "order_id": "Q-7901",
+    "reason": "fraud_review",
+    "summary": "Customer (vegetarian) reports receiving chicken tikka masala instead of paneer tikka masala on order Q-7901 (handed over in person 18:50). Account has 3 refunds in last 30 days, so no refund/credit issued per policy; needs specialist review."
+   },
+   "verified_before": [
+    "D209"
+   ],
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 14,
+   "output": 931,
+   "cache_write": 1649,
+   "cache_read": 21403
+  },
+  "customer": {
+   "input": 12,
+   "output": 280,
+   "cache_write": 442,
+   "cache_read": 2340
+  }
+ },
+ "cost_usd": 0.01796,
+ "customer_turns": 3,
+ "completed": true,
+ "grade": {
+  "passed": false,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": false,
+    "expected": [
+     [
+      "Q-7901",
+      "food_safety"
+     ],
+     [
+      "Q-7901",
+      "fraud_review"
+     ]
+    ],
+    "actual": [
+     [
+      "Q-7901",
+      "fraud_review"
+     ]
+    ],
+    "allowed_extra": [
+     "customer_request"
+    ]
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": {
+     "issued": 0,
+     "cap": 40
+    }
+   }
+  ],
+  "effects": {
+   "refunds": {},
+   "credits": {},
+   "order_changes": {},
+   "escalations": [
+    {
+     "order_id": "Q-7901",
+     "customer_id": "D209",
+     "reason": "fraud_review"
+    }
+   ]
+  }
+ },
+ "passed": false,
+ "flags": [
+  {
+   "type": "judge:revealed_hidden_info_unprompted",
+   "explanation": "The customer disclosed having eaten a few bites and being sick to their stomach before the agent asked if they ate any or if they were OK, and before any resolution was proposed, which violates the reveal rule; the customer did not state or hint the escalation or no-refund resolution, and the rest of the messages stay in character."
+  }
+ ],
+ "trial": 0
+}

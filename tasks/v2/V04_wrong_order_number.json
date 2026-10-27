@@ -1,0 +1,151 @@
+{
+  "id": "V04",
+  "slug": "wrong_order_number",
+  "title": "Customer gives last week's order number",
+  "tricky": "The customer quotes order 7388 (last week, also had elote). Taken at face value it is outside the 48-hour window, or the refund lands on the wrong order. The right move is to notice the date and find tonight's order, Q-7401.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 2029,
+    "flow": "manage_account",
+    "subflow": "manage_change_address",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer gives a detail that is slightly wrong and corrects it when the agent reads it back."
+  },
+  "resolution_summary": "Spot that Q-7388 is from Oct 17, confirm tonight's order Q-7401, refund $5.50 for the elote.",
+  "user": {
+    "persona": "Carlos Mendes, contractor, typing on his phone between jobs. Short messages.",
+    "situation": "Tonight's Taqueria Luz order was missing the elote. You copied an order number from an old confirmation email by mistake: 7388. Tonight's real order number is 7401 but you don't know that.",
+    "goal": "Money back on your card for the elote from tonight's order.",
+    "facts": [
+      "Your full name is Carlos Mendes.",
+      "Your phone is 415-555-0234.",
+      "The order number you have in front of you is 7388 (this is actually last week's).",
+      "Tonight's order: carne asada tacos, elote, agua fresca. The elote was missing.",
+      "You'd like a refund to your card."
+    ],
+    "reveal_rules": [
+      "Give 7388 as the order number when asked.",
+      "Only if the agent mentions that 7388 is from last week, or lists a different date or order, realize your mistake and say it's tonight's order you mean."
+    ],
+    "behaviors": [
+      "If asked refund or credit, choose refund."
+    ],
+    "opening": "elote missing from my order",
+    "end_condition": "the agent has refunded the elote or clearly refused."
+  },
+  "expected": {
+    "refunds": {
+      "Q-7401": 5.5
+    }
+  },
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "\\b7401\\b"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Carlos Mendes"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "D204",
+        "full_name": "Carlos Mendes",
+        "phone": "415-555-0234"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "Q-7388"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "Q-7401"
+      }
+    },
+    {
+      "tool": "get_payment",
+      "args": {
+        "order_id": "Q-7401"
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "Q-7401",
+        "amount": 5.5,
+        "reason": "missing_item"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refunds the old order",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Carlos Mendes"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D204",
+            "full_name": "Carlos Mendes",
+            "phone": "415-555-0234"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "Q-7388"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "Q-7388",
+            "amount": 5.5,
+            "reason": "missing_item"
+          }
+        }
+      ]
+    },
+    {
+      "name": "refuses as outside 48 hours",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Carlos Mendes"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D204",
+            "full_name": "Carlos Mendes",
+            "phone": "415-555-0234"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "Q-7388"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 8
+}

@@ -1,0 +1,129 @@
+{
+  "id": "V10",
+  "slug": "customer_unreachable",
+  "title": "Never arrived because the customer couldn't be reached",
+  "tricky": "From the customer's side the food never came. The event log shows the courier arrived, called twice and returned the food. The customer reveals late that his phone was on silent.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 1006,
+    "flow": "shipping_issue",
+    "subflow": "status",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer chasing an order that did not reach them."
+  },
+  "resolution_summary": "Events: arrived 19:05, two unanswered calls, delivery_failed customer_unreachable. No refund.",
+  "user": {
+    "persona": "Sam Okafor, student, was in the shower when the courier came. Annoyed, not abusive.",
+    "situation": "You ordered from Burger Barn and it never came. You later saw two missed calls; your phone was on silent while you were in the shower.",
+    "goal": "A refund.",
+    "facts": [
+      "Your full name is Sam Okafor.",
+      "Your phone is 415-555-0240.",
+      "Order number 8001.",
+      "Your phone was on silent; you saw two missed calls later."
+    ],
+    "reveal_rules": [
+      "Mention the silent phone and missed calls only if the agent mentions the courier calling you."
+    ],
+    "behaviors": [
+      "Push back once ('so I just lose my money?'), then accept."
+    ],
+    "opening": "my order never showed up",
+    "end_condition": "the agent has refunded you or explained why not and you've accepted it."
+  },
+  "expected": {},
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "\\bunreachable\\b",
+      "\\bcalled you\\b"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Sam Okafor"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "D210",
+        "full_name": "Sam Okafor",
+        "phone": "415-555-0240"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "Q-8001"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "Q-8001"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refunds the whole order",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Sam Okafor"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D210",
+            "full_name": "Sam Okafor",
+            "phone": "415-555-0240"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "Q-8001",
+            "amount": 28.03,
+            "reason": "whole_order"
+          }
+        }
+      ]
+    },
+    {
+      "name": "goodwill credit",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Sam Okafor"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D210",
+            "full_name": "Sam Okafor",
+            "phone": "415-555-0240"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "D210",
+            "amount": 5.0,
+            "reason": "other",
+            "order_id": "Q-8001"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 7
+}

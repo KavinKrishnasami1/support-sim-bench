@@ -1,0 +1,183 @@
+{
+  "id": "V05",
+  "slug": "photo_proof_dispute",
+  "title": "Says it never arrived; the courier left a photo",
+  "tricky": "Nothing in the order record looks wrong. Only the event log shows a left-at-door handoff with photo proof, which makes this a delivery dispute to escalate, not a refund.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 1006,
+    "flow": "shipping_issue",
+    "subflow": "status",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer insists an order never arrived."
+  },
+  "resolution_summary": "Check events: left_at_door with photo PH-55120. Escalate delivery_dispute on Q-7501; no refund.",
+  "user": {
+    "persona": "Hana Sato, lives in a big apartment building where packages sometimes go missing. Frustrated.",
+    "situation": "Your Big Slice Pizza order says delivered at 7:02pm but there was nothing at your door when you checked at 7:10.",
+    "goal": "A full refund. If the agent explains a specialist will review it, push back once, then accept.",
+    "facts": [
+      "Your full name is Hana Sato.",
+      "Your email is hana.sato@mailbox.example.",
+      "Order number 7501.",
+      "You checked your door at 7:10pm and there was nothing.",
+      "Packages have gone missing in your building before."
+    ],
+    "reveal_rules": [
+      "Mention that packages go missing in your building only if the agent mentions the photo or the door."
+    ],
+    "behaviors": [
+      "Insist you never got it."
+    ],
+    "opening": "my pizza says delivered but it never came",
+    "end_condition": "the agent has refunded you or explained the next steps and you've accepted."
+  },
+  "expected": {
+    "escalations": [
+      {
+        "order_id": "Q-7501",
+        "reason": "delivery_dispute"
+      }
+    ]
+  },
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "\\bphoto\\b",
+      "\\bescalat",
+      "specialist"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Hana Sato"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "D205",
+        "full_name": "Hana Sato",
+        "email": "hana.sato@mailbox.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "Q-7501"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "Q-7501"
+      }
+    },
+    {
+      "tool": "escalate_to_human",
+      "args": {
+        "customer_id": "D205",
+        "order_id": "Q-7501",
+        "reason": "delivery_dispute",
+        "summary": "Customer says Q-7501 not received; events show left at door with photo PH-55120."
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refunds it",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Hana Sato"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D205",
+            "full_name": "Hana Sato",
+            "email": "hana.sato@mailbox.example"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "Q-7501",
+            "amount": 46.84,
+            "reason": "whole_order"
+          }
+        }
+      ]
+    },
+    {
+      "name": "refunds and escalates",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Hana Sato"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D205",
+            "full_name": "Hana Sato",
+            "email": "hana.sato@mailbox.example"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "Q-7501",
+            "amount": 46.84,
+            "reason": "whole_order"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "D205",
+            "order_id": "Q-7501",
+            "reason": "delivery_dispute",
+            "summary": "Q-7501"
+          }
+        }
+      ]
+    },
+    {
+      "name": "escalates with the wrong reason",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Hana Sato"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D205",
+            "full_name": "Hana Sato",
+            "email": "hana.sato@mailbox.example"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "D205",
+            "order_id": "Q-7501",
+            "reason": "other",
+            "summary": "Q-7501 missing"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 8
+}

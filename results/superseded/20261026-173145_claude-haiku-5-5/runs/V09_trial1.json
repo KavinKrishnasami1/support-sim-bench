@@ -1,0 +1,558 @@
+{
+ "task_id": "V09",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 23.5,
+ "events": [
+  {
+   "role": "customer",
+   "text": "I ordered paneer tikka masala and got chicken tikka masala instead. I'm vegetarian, so this is really upsetting, and I want to know how this happened."
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry. Getting chicken when you ordered a vegetarian dish is upsetting, and I'll look into how it happened.\n\nFirst I need to verify your identity. Please send:\n\n1. Your full name\n2. The email address or phone number on your Forkful account\n3. The order ID, if you have it"
+  },
+  {
+   "role": "customer",
+   "text": "Sure. My full name is Isabel Duarte. The email on my account is isabel.duarte@post.example. The order number is 7901."
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "full_name": "Isabel Duarte",
+    "email": "isabel.duarte@post.example",
+    "customer_id": ""
+   },
+   "result": {
+    "error": "Unknown customer_id ."
+   },
+   "is_error": true
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "7901"
+   },
+   "result": {
+    "order_id": "Q-7901",
+    "customer_id": "D209",
+    "restaurant_id": "R1",
+    "restaurant": "Saffron Lane",
+    "items": [
+     {
+      "item_id": "Q-7901-1",
+      "name": "Paneer tikka masala",
+      "qty": 1,
+      "unit_price": 15.5
+     },
+     {
+      "item_id": "Q-7901-2",
+      "name": "Jeera rice",
+      "qty": 1,
+      "unit_price": 4.25
+     }
+    ],
+    "subtotal": 19.75,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 1.48,
+    "tip": 3.0,
+    "total": 24.23,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:10:00-07:00",
+    "promised_at": "2026-10-24T18:55:00-07:00",
+    "picked_up_at": "2026-10-24T18:33:00-07:00",
+    "delivered_at": "2026-10-24T18:50:00-07:00",
+    "delivery_address": "810 River Rd, Oakdale, CA 94609",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "7901"
+   },
+   "result": {
+    "order_id": "Q-7901",
+    "promised_at": "2026-10-24T18:55:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:33:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:50:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "7901"
+   },
+   "result": {
+    "order_id": "Q-7901",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 24.23,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "subtotal": 19.75,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "full_name": "Isabel Duarte",
+    "email": "isabel.duarte@post.example",
+    "customer_id": "D209"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "D209"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "customer_id": "D209"
+   },
+   "result": {
+    "customer_id": "D209",
+    "name": "Isabel Duarte",
+    "email": "isabel.duarte@post.example",
+    "phone": "+1 415-555-0239",
+    "default_address": "810 River Rd, Oakdale, CA 94609",
+    "plus_member": true,
+    "refunds_last_30d": 3,
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "Q-7901",
+      "restaurant": "Saffron Lane",
+      "placed_at": "2026-10-24T18:10:00-07:00",
+      "status": "delivered",
+      "total": 24.23
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_ticket_history",
+   "args": {
+    "customer_id": "D209"
+   },
+   "result": {
+    "customer_id": "D209",
+    "tickets": [
+     {
+      "ticket_id": "TK-640",
+      "customer_id": "D209",
+      "created_at": "2026-10-11T12:30:00-07:00",
+      "order_id": null,
+      "summary": "Missing item; refunded.",
+      "agent_actions": [
+       "Refund issued."
+      ],
+      "promises": []
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "escalate_to_human",
+   "args": {
+    "customer_id": "D209",
+    "order_id": "Q-7901",
+    "reason": "fraud_review",
+    "summary": "Customer Isabel Duarte (verified, D209) reports order Q-7901 from Saffron Lane contained chicken tikka masala instead of paneer tikka masala (1 x $15.50); she is vegetarian. Jeera rice ($4.25) was not reported as wrong. Delivery events: picked up 18:33, in-person handoff 18:50, promised 18:55 (on time). No automatic or support refunds on the payment ($24.23 on Visa 4242). Customer has refunds_last_30d = 3, so no refund or credit was issued by the agent. Customer wants to know how this happened and needs the wrong item resolved (refund of $15.50 to card or $18.60 account credit, her choice)."
+   },
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "Thank you, Isabel. I've verified your account and pulled up order Q-7901 from Saffron Lane.\n\nHere's what the records show:\n- The order included 1 paneer tikka masala ($15.50) and 1 jeera rice ($4.25).\n- The courier picked it up at 6:33 PM and handed it off in person at 6:50 PM, five minutes before the promised time.\n- Nothing has been refunded or credited on this order yet.\n\nThe records don't show how the kitchen mixed up the dish, so I can't tell you the cause. I also can't issue a refund or credit on your account myself, because your account has had three refunds in the last 30 days. Our policy requires a specialist to review that before any further refund or credit. I've escalated your case as ESC-700, including the wrong item and your vegetarian order. A specialist will follow up within 24 hours.\n\nWhen they contact you, they can process the paneer tikka masala either as a refund of $15.50 to your Visa ending in 4242 or as $18.60 in account credit. Your order's record is complete for them to act on."
+  },
+  {
+   "role": "customer",
+   "text": "Three refunds in 30 days? I don't think that's right, and I'm not happy about it. I'm a Plus member, and this is a vegetarian order I got wrong. Can you at least check that the specialist sees I was sick after eating some of it? Also, I'd rather have the refund to my card than credit."
+  },
+  {
+   "role": "tool",
+   "name": "escalate_to_human",
+   "args": {
+    "customer_id": "D209",
+    "order_id": "Q-7901",
+    "reason": "food_safety",
+    "summary": "Customer Isabel Duarte (verified, D209) reports she became ill after eating part of order Q-7901 (Saffron Lane). The order was supposed to be paneer tikka masala but she received chicken tikka masala; she is vegetarian. Related case ESC-700 (fraud_review, wrong item). Customer asks that the specialist be told about the illness. Customer's stated preference: refund of $15.50 to the Visa ending 4242 rather than account credit. She disputes the count of three refunds in the last 30 days and asks for a review of that."
+   },
+   "result": {
+    "escalation_id": "ESC-701",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry you've been unwell, Isabel. I've added a food-safety escalation (ESC-701) to your case, so the specialist will know you became sick after eating part of the order. I've also noted that you'd prefer a refund of $15.50 to your Visa ending in 4242 rather than account credit.\n\nI understand the refund count is frustrating. Your profile shows three refunds in the last 30 days, and that's why I couldn't process anything myself. I've asked the specialist to review it along with your refund preference. I can't confirm the outcome, but they will follow up within 24 hours."
+  },
+  {
+   "role": "customer",
+   "text": "Okay, thank you for adding the food-safety note. I'm still not happy about the three refunds, since I don't remember that many, but I'll wait for the specialist. I'd like the refund to my card, so I hope that's what they do. Can you confirm that the 24 hours starts from now?"
+  },
+  {
+   "role": "agent",
+   "text": "Yes, the 24 hours starts from when each escalation was filed, which was just now for both ESC-700 and ESC-701. A specialist will contact you within that window.\n\nI've recorded your preference for a $15.50 refund to your Visa ending in 4242, but I can't promise that's the outcome. The specialist will decide how to resolve the wrong item and will review the refund count you disagree with.\n\nIs there anything else I can help you with today?"
+  },
+  {
+   "role": "customer",
+   "text": "No, that's everything for now. Thanks for adding the food-safety note. I'll wait to hear from the specialist within the 24 hours."
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "verify_identity",
+   "args": {
+    "full_name": "Isabel Duarte",
+    "email": "isabel.duarte@post.example",
+    "customer_id": ""
+   },
+   "verified_before": [],
+   "result": {
+    "error": "Unknown customer_id ."
+   },
+   "is_error": true
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "7901"
+   },
+   "verified_before": [],
+   "result": {
+    "order_id": "Q-7901",
+    "customer_id": "D209",
+    "restaurant_id": "R1",
+    "restaurant": "Saffron Lane",
+    "items": [
+     {
+      "item_id": "Q-7901-1",
+      "name": "Paneer tikka masala",
+      "qty": 1,
+      "unit_price": 15.5
+     },
+     {
+      "item_id": "Q-7901-2",
+      "name": "Jeera rice",
+      "qty": 1,
+      "unit_price": 4.25
+     }
+    ],
+    "subtotal": 19.75,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 1.48,
+    "tip": 3.0,
+    "total": 24.23,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:10:00-07:00",
+    "promised_at": "2026-10-24T18:55:00-07:00",
+    "picked_up_at": "2026-10-24T18:33:00-07:00",
+    "delivered_at": "2026-10-24T18:50:00-07:00",
+    "delivery_address": "810 River Rd, Oakdale, CA 94609",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "7901"
+   },
+   "verified_before": [],
+   "result": {
+    "order_id": "Q-7901",
+    "promised_at": "2026-10-24T18:55:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:33:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:50:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "7901"
+   },
+   "verified_before": [],
+   "result": {
+    "order_id": "Q-7901",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 24.23,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "subtotal": 19.75,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "full_name": "Isabel Duarte",
+    "email": "isabel.duarte@post.example",
+    "customer_id": "D209"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "D209"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_customer",
+   "args": {
+    "customer_id": "D209"
+   },
+   "verified_before": [
+    "D209"
+   ],
+   "result": {
+    "customer_id": "D209",
+    "name": "Isabel Duarte",
+    "email": "isabel.duarte@post.example",
+    "phone": "+1 415-555-0239",
+    "default_address": "810 River Rd, Oakdale, CA 94609",
+    "plus_member": true,
+    "refunds_last_30d": 3,
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "Q-7901",
+      "restaurant": "Saffron Lane",
+      "placed_at": "2026-10-24T18:10:00-07:00",
+      "status": "delivered",
+      "total": 24.23
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_ticket_history",
+   "args": {
+    "customer_id": "D209"
+   },
+   "verified_before": [
+    "D209"
+   ],
+   "result": {
+    "customer_id": "D209",
+    "tickets": [
+     {
+      "ticket_id": "TK-640",
+      "customer_id": "D209",
+      "created_at": "2026-10-11T12:30:00-07:00",
+      "order_id": null,
+      "summary": "Missing item; refunded.",
+      "agent_actions": [
+       "Refund issued."
+      ],
+      "promises": []
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "escalate_to_human",
+   "args": {
+    "customer_id": "D209",
+    "order_id": "Q-7901",
+    "reason": "fraud_review",
+    "summary": "Customer Isabel Duarte (verified, D209) reports order Q-7901 from Saffron Lane contained chicken tikka masala instead of paneer tikka masala (1 x $15.50); she is vegetarian. Jeera rice ($4.25) was not reported as wrong. Delivery events: picked up 18:33, in-person handoff 18:50, promised 18:55 (on time). No automatic or support refunds on the payment ($24.23 on Visa 4242). Customer has refunds_last_30d = 3, so no refund or credit was issued by the agent. Customer wants to know how this happened and needs the wrong item resolved (refund of $15.50 to card or $18.60 account credit, her choice)."
+   },
+   "verified_before": [
+    "D209"
+   ],
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "escalate_to_human",
+   "args": {
+    "customer_id": "D209",
+    "order_id": "Q-7901",
+    "reason": "food_safety",
+    "summary": "Customer Isabel Duarte (verified, D209) reports she became ill after eating part of order Q-7901 (Saffron Lane). The order was supposed to be paneer tikka masala but she received chicken tikka masala; she is vegetarian. Related case ESC-700 (fraud_review, wrong item). Customer asks that the specialist be told about the illness. Customer's stated preference: refund of $15.50 to the Visa ending 4242 rather than account credit. She disputes the count of three refunds in the last 30 days and asks for a review of that."
+   },
+   "verified_before": [
+    "D209"
+   ],
+   "result": {
+    "escalation_id": "ESC-701",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 26,
+   "output": 2703,
+   "cache_write": 4100,
+   "cache_read": 50719
+  },
+  "customer": {
+   "input": 20,
+   "output": 344,
+   "cache_write": 1069,
+   "cache_read": 5229
+  }
+ },
+ "cost_usd": 0.00273,
+ "customer_turns": 5,
+ "completed": true,
+ "grade": {
+  "passed": true,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": true,
+    "expected": [
+     [
+      "Q-7901",
+      "food_safety"
+     ],
+     [
+      "Q-7901",
+      "fraud_review"
+     ]
+    ],
+    "actual": [
+     [
+      "Q-7901",
+      "food_safety"
+     ],
+     [
+      "Q-7901",
+      "fraud_review"
+     ]
+    ],
+    "allowed_extra": [
+     "customer_request"
+    ]
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": {
+     "issued": 0,
+     "cap": 40
+    }
+   }
+  ],
+  "effects": {
+   "refunds": {},
+   "credits": {},
+   "order_changes": {},
+   "escalations": [
+    {
+     "order_id": "Q-7901",
+     "customer_id": "D209",
+     "reason": "fraud_review"
+    },
+    {
+     "order_id": "Q-7901",
+     "customer_id": "D209",
+     "reason": "food_safety"
+    }
+   ]
+  }
+ },
+ "passed": true,
+ "flags": [
+  {
+   "type": "judge:revealed_hidden_info_unprompted",
+   "explanation": "The customer mentioned being sick after eating some of the food in their second message, before the agent asked whether they ate any or were OK and before any resolution was proposed, which violates the reveal rule."
+  }
+ ],
+ "trial": 1
+}

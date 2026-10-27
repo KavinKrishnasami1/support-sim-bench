@@ -29,6 +29,7 @@ def _models(ap: argparse.ArgumentParser) -> None:
     ap.add_argument("--user-effort", default="low")
     ap.add_argument("--judge-model", default=DEFAULT_USER, help="model for the leak/character judge")
     ap.add_argument("--no-judge", action="store_true", help="only rule-based simulator flags")
+    ap.add_argument("--suite", default="v1", choices=["v1", "v2"], help="task suite (v2 is the harder one)")
     ap.add_argument("--tasks", default=None, help="comma-separated task ids (default: all)")
     ap.add_argument("-k", type=int, default=3, help="trials per task")
 
@@ -52,8 +53,8 @@ def main() -> None:
     load_dotenv()
     ap = argparse.ArgumentParser(prog="supportsim", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("tasks")
-    sub.add_parser("check")
+    for name in ("tasks", "check"):
+        sub.add_parser(name).add_argument("--suite", default="v1", choices=["v1", "v2"])
     _models(sub.add_parser("estimate"))
     r = sub.add_parser("run")
     _models(r)
@@ -74,10 +75,10 @@ def main() -> None:
     from .tasks import check_task, load_tasks
 
     if a.cmd == "tasks":
-        for t in load_tasks():
+        for t in load_tasks(suite=a.suite):
             print(f"{t['id']}  {t['title']}\n      {t['tricky']}")
     elif a.cmd == "check":
-        tasks = load_tasks()
+        tasks = load_tasks(suite=a.suite)
         problems = [p for t in tasks for p in check_task(t)]
         n_mistakes = sum(len(t.get("mistakes", [])) for t in tasks)
         print(f"{len(tasks)} oracles and {n_mistakes} known mistakes replayed through the grader")
@@ -88,7 +89,7 @@ def main() -> None:
     elif a.cmd in ("estimate", "run"):
         from .runner import estimate
 
-        tasks = load_tasks(a.tasks.split(",") if a.tasks else None)
+        tasks = load_tasks(a.tasks.split(",") if a.tasks else None, a.suite)
         judge = None if a.no_judge else a.judge_model
         est = estimate(tasks, a.k, a.agent_model, a.user_model, judge)
         print(f"{len(tasks)} tasks × k={a.k} = {est['runs']} runs. Estimated cost, priced as if nothing is cached "
@@ -118,7 +119,7 @@ def main() -> None:
         agent = load_provider(a.agent_provider, a.agent_model, budget, eff(a.agent_effort))
         user = load_provider(a.user_provider, a.user_model, budget, eff(a.user_effort))
         judge_p = None if a.no_judge else load_provider("anthropic", a.judge_model, budget, "low")
-        config = {k: getattr(a, k) for k in ("agent_model", "agent_effort", "user_model", "user_effort", "k",
+        config = {k: getattr(a, k) for k in ("suite", "agent_model", "agent_effort", "user_model", "user_effort", "k",
                                               "max_cost", "agent_provider", "user_provider")}
         config.update(judge_model=judge, tasks=[t["id"] for t in tasks], estimate=est)
         out = run_batch(tasks, a.k, agent, user, judge_p, a.workers, Path(a.out) if a.out else None, config)
@@ -153,7 +154,7 @@ def main() -> None:
         sums = [summarize(Path(d)) for d in a.dirs]
         tids = sorted({t for s in sums for t in s["tasks"]})
         k = min(s["k"] for s in sums)
-        names = [f"{s['config'].get('agent_model')} ({s['config'].get('agent_effort')})" for s in sums]
+        names = [f"{s['config'].get('agent_model')} {s['config'].get('suite', 'v1')}" for s in sums]
         print("| Task | " + " | ".join(f"{n} pass^1 | pass^{k}" for n in names) + " |")
         print("|---|" + "---|---|" * len(sums))
         for tid in tids:

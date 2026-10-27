@@ -13,11 +13,11 @@ import json
 import re
 
 from .providers import Provider
-from .tools import TOOLS
+from .tools import TOOLS, V2_TOOLS
 
 BREAK = re.compile(r"\b(as an ai|language model|simulat\w*|role-?play\w*|my instructions|the scenario|"
                    r"i am an assistant|i'm an assistant|test case|system prompt)\b", re.I)
-TOOL_WORDS = re.compile(r"\b(" + "|".join(t["name"] for t in TOOLS) + r"|refund_over_limit|fraud_review|"
+TOOL_WORDS = re.compile(r"\b(" + "|".join(t["name"] for t in TOOLS + V2_TOOLS) + r"|refund_over_limit|fraud_review|delivery_dispute|"
                         r"unrecognized_charge|food_safety|policy section|section \d)\b", re.I)
 
 

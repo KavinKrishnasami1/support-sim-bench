@@ -13,8 +13,12 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-WORLD_FILE = ROOT / "world" / "base.json"
-POLICY_FILE = ROOT / "world" / "policy.md"
+# Each suite has its own world, policy and task folder. v1 is the original 13 tasks.
+SUITES = {
+    "v1": {"world": ROOT / "world" / "base.json", "policy": ROOT / "world" / "policy.md", "tasks": ROOT / "tasks"},
+    "v2": {"world": ROOT / "world" / "v2" / "base.json", "policy": ROOT / "world" / "v2" / "policy.md",
+           "tasks": ROOT / "tasks" / "v2"},
+}
 
 
 @dataclass
@@ -32,17 +36,19 @@ class World:
         return next((c for c in self.data["customers"] if c["customer_id"] == customer_id), None)
 
     def order(self, order_id: str) -> dict | None:
-        oid = normalize_order_id(order_id)
-        return next((o for o in self.data["orders"] if o["order_id"] == oid), None)
+        """Find an order by its number, whatever prefix or punctuation the caller used ("7101", "Q-7101", "#7101")."""
+        digits = re.sub(r"\D", "", str(order_id or ""))
+        return next((o for o in self.data["orders"] if digits and re.sub(r"\D", "", o["order_id"]) == digits), None)
 
     def orders_of(self, customer_id: str) -> list[dict]:
         return [o for o in self.data["orders"] if o["customer_id"] == customer_id]
 
 
 def normalize_order_id(order_id: str) -> str:
-    """Accept "5102", "o5102", "O-5102" and "#5102" for the same order."""
+    """Canonical form for comparing IDs: "5102", "o5102", "#5102" -> "O-5102"; "q7101" -> "Q-7101"."""
     digits = re.sub(r"\D", "", str(order_id))
-    return f"O-{digits}" if digits else str(order_id)
+    m = re.match(r"\s*#?\s*([A-Za-z])", str(order_id))
+    return f"{m.group(1).upper() if m else 'O'}-{digits}" if digits else str(order_id)
 
 
 def _merge(base, patch):
@@ -64,15 +70,15 @@ def _merge(base, patch):
     return patch
 
 
-def load_world(patch: dict | None = None) -> World:
-    data = json.loads(WORLD_FILE.read_text())
+def load_world(patch: dict | None = None, suite: str = "v1") -> World:
+    data = json.loads(SUITES[suite]["world"].read_text())
     if patch:
         data = _merge(data, copy.deepcopy(patch))
     return World(data)
 
 
-def policy_text() -> str:
-    return POLICY_FILE.read_text()
+def policy_text(suite: str = "v1") -> str:
+    return SUITES[suite]["policy"].read_text()
 
 
 # ---------------------------------------------------------------------------

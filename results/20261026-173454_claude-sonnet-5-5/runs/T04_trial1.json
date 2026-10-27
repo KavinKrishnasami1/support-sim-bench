@@ -1,0 +1,417 @@
+{
+ "task_id": "T04",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 30.8,
+ "events": [
+  {
+   "role": "customer",
+   "text": "you guys sent me the wrong burger and honestly the whole meal is ruined"
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry your meal wasn't right. I can help with that. First I need to verify your account. Please give me your full name and either the email address or the phone number on the account."
+  },
+  {
+   "role": "customer",
+   "text": "Ugh, that's a lot of info just to fix a burger. Fine, it's Tom Becker and the email is tbecker@inbox.example."
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "email": "tbecker@inbox.example",
+    "full_name": "Tom Becker"
+   },
+   "result": {
+    "customer_id": "C104",
+    "name": "Tom Becker",
+    "email": "tbecker@inbox.example",
+    "phone": "+1 415-555-0190",
+    "default_address": "902 Market Row, Oakdale, CA 94604",
+    "member_since": "2024-01-15",
+    "refunds_last_30d": 0,
+    "credit_balance": 0.0,
+    "recent_orders": [
+     {
+      "order_id": "O-5104",
+      "restaurant": "Burger Barn",
+      "placed_at": "2026-10-24T18:20:00-07:00",
+      "status": "delivered",
+      "total": 40.35
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "customer_id": "C104",
+    "full_name": "Tom Becker",
+    "email": "tbecker@inbox.example"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "C104"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "O-5104"
+   },
+   "result": {
+    "order_id": "O-5104",
+    "customer_id": "C104",
+    "restaurant_id": "R6",
+    "restaurant": "Burger Barn",
+    "items": [
+     {
+      "item_id": "O-5104-1",
+      "name": "Classic burger",
+      "qty": 1,
+      "unit_price": 12.0
+     },
+     {
+      "item_id": "O-5104-2",
+      "name": "Bacon cheeseburger",
+      "qty": 1,
+      "unit_price": 14.5
+     },
+     {
+      "item_id": "O-5104-3",
+      "name": "Large fries",
+      "qty": 1,
+      "unit_price": 5.0
+     }
+    ],
+    "subtotal": 31.5,
+    "delivery_fee": 3.49,
+    "service_fee": 2.36,
+    "tip": 3.0,
+    "total": 40.35,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:20:00-07:00",
+    "promised_at": "2026-10-24T19:05:00-07:00",
+    "picked_up_at": "2026-10-24T18:48:00-07:00",
+    "delivered_at": "2026-10-24T19:02:00-07:00",
+    "delivery_address": "902 Market Row, Oakdale, CA 94604",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "Thanks, Tom, you're verified. I'm sorry about the hassle. I found your Burger Barn order, O-5104, delivered today. It had these items:\n\n- Classic burger: $12.00\n- Bacon cheeseburger: $14.50\n- Large fries: $5.00\n\nWhich burger was the wrong one, and what did you get in its place? Also, would you rather have a refund of the item's price to your Visa, or account credit for the item's price plus 20%?"
+  },
+  {
+   "role": "customer",
+   "text": "Wait, so the order had a classic burger AND a bacon cheeseburger? I only ordered the bacon cheeseburger. The classic burger and fries were fine, but what came in place of the bacon cheeseburger was a veggie burger. And I want the money back on my card, not credit. I'm not taking credit."
+  },
+  {
+   "role": "tool",
+   "name": "issue_refund",
+   "args": {
+    "order_id": "O-5104",
+    "amount": 14.5,
+    "reason": "wrong_item",
+    "item_ids": [
+     "O-5104-2"
+    ]
+   },
+   "result": {
+    "refund_id": "RF-4001",
+    "order_id": "O-5104",
+    "amount": 14.5,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've refunded $14.50 for the bacon cheeseburger to your Visa ending 4242. It should arrive in 3\u20135 business days. I'm sorry you got a veggie burger instead.\n\nYour order record does list the classic burger as part of the order. You said it arrived and was fine, so I've only refunded the bacon cheeseburger. If you think the classic burger was added to your order by mistake, tell me and I'll look into it.\n\nIs there anything else I can help with?"
+  },
+  {
+   "role": "customer",
+   "text": "Hold on, I didn't order a classic burger at all. The order was one bacon cheeseburger and fries, and the only burger I got was a veggie one instead of the bacon. So you're only refunding $14.50 when the whole meal is wrong? I want the classic burger money back too, $12.00 on my card."
+  },
+  {
+   "role": "agent",
+   "text": "I understand why you're frustrated, Tom, but I can't refund the classic burger. Earlier you told me the classic burger and fries were fine. Now you're saying the only burger you got was the veggie one. Our policy only lets me compensate items that were missing or wrong, and the order record shows the classic burger as part of the order. The bacon cheeseburger refund of $14.50 is already done.\n\nIf you think you were charged for a classic burger you never ordered, I can send the case to a specialist. They'd review the order and follow up within 24 hours. I can't promise how that review will turn out. Would you like me to do that?"
+  },
+  {
+   "role": "customer",
+   "text": "Ugh, fine. I said the classic burger was fine because I didn't realize it was on there at all. I still don't think I ordered it, so yeah, send it to the specialist. But I'm not happy about it. Just make sure the $14.50 actually lands on my Visa."
+  },
+  {
+   "role": "tool",
+   "name": "escalate_to_human",
+   "args": {
+    "customer_id": "C104",
+    "order_id": "O-5104",
+    "reason": "unrecognized_charge",
+    "summary": "Order O-5104 (Burger Barn, delivered 2026-10-24). Customer received a veggie burger instead of the bacon cheeseburger; $14.50 refunded to Visa 4242 (RF-4001). Customer now says he never ordered the Classic burger ($12.00, item O-5104-1) and wants it refunded. Earlier in the chat he said the classic burger was fine, then said he hadn't realized it was on the order. No refund issued for the classic burger. Needs review of whether the charge was valid."
+   },
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've sent your case to a specialist, Tom. The case covers the $12.00 classic burger charge on order O-5104. They'll follow up within 24 hours. I can't promise what they'll decide.\n\nYour $14.50 refund (RF-4001) has been issued to your Visa ending 4242. It should land in 3\u20135 business days.\n\nI'm sorry about the trouble with this order."
+  },
+  {
+   "role": "customer",
+   "text": "Okay, fine. So I'm waiting on the specialist for the $12 burger and the $14.50 should show up on my Visa in a few days. I'm still annoyed that the whole meal got messed up over this, but I guess that's all I can get tonight."
+  },
+  {
+   "role": "agent",
+   "text": "That's right, Tom. The specialist will follow up on the $12.00 classic burger within 24 hours. The $14.50 should reach your Visa in 3\u20135 business days. I'm sorry your meal was ruined tonight."
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "get_customer",
+   "args": {
+    "email": "tbecker@inbox.example",
+    "full_name": "Tom Becker"
+   },
+   "verified_before": [],
+   "result": {
+    "customer_id": "C104",
+    "name": "Tom Becker",
+    "email": "tbecker@inbox.example",
+    "phone": "+1 415-555-0190",
+    "default_address": "902 Market Row, Oakdale, CA 94604",
+    "member_since": "2024-01-15",
+    "refunds_last_30d": 0,
+    "credit_balance": 0.0,
+    "recent_orders": [
+     {
+      "order_id": "O-5104",
+      "restaurant": "Burger Barn",
+      "placed_at": "2026-10-24T18:20:00-07:00",
+      "status": "delivered",
+      "total": 40.35
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "customer_id": "C104",
+    "full_name": "Tom Becker",
+    "email": "tbecker@inbox.example"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "C104"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "O-5104"
+   },
+   "verified_before": [
+    "C104"
+   ],
+   "result": {
+    "order_id": "O-5104",
+    "customer_id": "C104",
+    "restaurant_id": "R6",
+    "restaurant": "Burger Barn",
+    "items": [
+     {
+      "item_id": "O-5104-1",
+      "name": "Classic burger",
+      "qty": 1,
+      "unit_price": 12.0
+     },
+     {
+      "item_id": "O-5104-2",
+      "name": "Bacon cheeseburger",
+      "qty": 1,
+      "unit_price": 14.5
+     },
+     {
+      "item_id": "O-5104-3",
+      "name": "Large fries",
+      "qty": 1,
+      "unit_price": 5.0
+     }
+    ],
+    "subtotal": 31.5,
+    "delivery_fee": 3.49,
+    "service_fee": 2.36,
+    "tip": 3.0,
+    "total": 40.35,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:20:00-07:00",
+    "promised_at": "2026-10-24T19:05:00-07:00",
+    "picked_up_at": "2026-10-24T18:48:00-07:00",
+    "delivered_at": "2026-10-24T19:02:00-07:00",
+    "delivery_address": "902 Market Row, Oakdale, CA 94604",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_refund",
+   "args": {
+    "order_id": "O-5104",
+    "amount": 14.5,
+    "reason": "wrong_item",
+    "item_ids": [
+     "O-5104-2"
+    ]
+   },
+   "verified_before": [
+    "C104"
+   ],
+   "result": {
+    "refund_id": "RF-4001",
+    "order_id": "O-5104",
+    "amount": 14.5,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "escalate_to_human",
+   "args": {
+    "customer_id": "C104",
+    "order_id": "O-5104",
+    "reason": "unrecognized_charge",
+    "summary": "Order O-5104 (Burger Barn, delivered 2026-10-24). Customer received a veggie burger instead of the bacon cheeseburger; $14.50 refunded to Visa 4242 (RF-4001). Customer now says he never ordered the Classic burger ($12.00, item O-5104-1) and wants it refunded. Earlier in the chat he said the classic burger was fine, then said he hadn't realized it was on the order. No refund issued for the classic burger. Needs review of whether the charge was valid."
+   },
+   "verified_before": [
+    "C104"
+   ],
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 32,
+   "output": 1924,
+   "cache_write": 3069,
+   "cache_read": 39573
+  },
+  "customer": {
+   "input": 24,
+   "output": 458,
+   "cache_write": 1050,
+   "cache_read": 6311
+  }
+ },
+ "cost_usd": 0.03532,
+ "customer_turns": 6,
+ "completed": true,
+ "grade": {
+  "passed": false,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {
+     "O-5104": 14.5
+    },
+    "actual": {
+     "O-5104": 14.5
+    }
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": false,
+    "expected": [],
+    "actual": [
+     [
+      "O-5104",
+      "unrecognized_charge"
+     ]
+    ],
+    "allowed_extra": [
+     "customer_request"
+    ]
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": {
+     "issued": 0,
+     "cap": 25
+    }
+   }
+  ],
+  "effects": {
+   "refunds": {
+    "O-5104": 14.5
+   },
+   "credits": {},
+   "order_changes": {},
+   "escalations": [
+    {
+     "order_id": "O-5104",
+     "customer_id": "C104",
+     "reason": "unrecognized_charge"
+    }
+   ]
+  }
+ },
+ "passed": false,
+ "flags": [],
+ "trial": 1
+}

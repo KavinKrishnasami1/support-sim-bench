@@ -1,0 +1,451 @@
+{
+ "task_id": "V09",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 25.7,
+ "events": [
+  {
+   "role": "customer",
+   "text": "I got chicken tikka masala instead of the paneer tikka masala I ordered, and I'm vegetarian. This is really upsetting."
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry about that. Getting meat when you're vegetarian is upsetting. I'll help sort it out.\n\nFirst I need to verify your identity. Please send me your full name and either the email address or the phone number on your account."
+  },
+  {
+   "role": "customer",
+   "text": "Sure. My full name is Isabel Duarte, and the email on my account is isabel.duarte@post.example."
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "email": "isabel.duarte@post.example",
+    "full_name": "Isabel Duarte"
+   },
+   "result": {
+    "customer_id": "D209",
+    "name": "Isabel Duarte",
+    "email": "isabel.duarte@post.example",
+    "phone": "+1 415-555-0239",
+    "default_address": "810 River Rd, Oakdale, CA 94609",
+    "plus_member": true,
+    "refunds_last_30d": 3,
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "Q-7901",
+      "restaurant": "Saffron Lane",
+      "placed_at": "2026-10-24T18:10:00-07:00",
+      "status": "delivered",
+      "total": 24.23
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "customer_id": "D209",
+    "full_name": "Isabel Duarte",
+    "email": "isabel.duarte@post.example"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "D209"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "Q-7901"
+   },
+   "result": {
+    "order_id": "Q-7901",
+    "customer_id": "D209",
+    "restaurant_id": "R1",
+    "restaurant": "Saffron Lane",
+    "items": [
+     {
+      "item_id": "Q-7901-1",
+      "name": "Paneer tikka masala",
+      "qty": 1,
+      "unit_price": 15.5
+     },
+     {
+      "item_id": "Q-7901-2",
+      "name": "Jeera rice",
+      "qty": 1,
+      "unit_price": 4.25
+     }
+    ],
+    "subtotal": 19.75,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 1.48,
+    "tip": 3.0,
+    "total": 24.23,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:10:00-07:00",
+    "promised_at": "2026-10-24T18:55:00-07:00",
+    "picked_up_at": "2026-10-24T18:33:00-07:00",
+    "delivered_at": "2026-10-24T18:50:00-07:00",
+    "delivery_address": "810 River Rd, Oakdale, CA 94609",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "Q-7901"
+   },
+   "result": {
+    "order_id": "Q-7901",
+    "promised_at": "2026-10-24T18:55:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:33:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:50:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "escalate_to_human",
+   "args": {
+    "customer_id": "D209",
+    "order_id": "Q-7901",
+    "reason": "fraud_review",
+    "summary": "Customer (Plus, verified) reports receiving chicken tikka masala instead of paneer tikka masala on order Q-7901 (handed off in person 18:50, reported within 48h). She is vegetarian. Item price $15.50, no promo, no prior refunds/credits on the order. Account has refunds_last_30d = 3, so no compensation was issued per policy; needs fraud review and then a decision on the wrong-item compensation."
+   },
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've escalated your case, and a specialist will contact you within 24 hours. The wrong-item report is included, so you won't need to explain it again.\n\nI'm sorry again for the mix-up. Please don't eat the dish, since it has meat in it. Is there anything else I can help with?"
+  },
+  {
+   "role": "customer",
+   "text": "Thanks, Isabel. I should tell you that I did eat a few bites before I noticed it was chicken, and I've been sick to my stomach since. I feel better now, but I'm still pretty shaken up about it.\n\nIs there a refund for this order? I'm a Forkful Plus member, and the order number is 7901."
+  },
+  {
+   "role": "tool",
+   "name": "escalate_to_human",
+   "args": {
+    "customer_id": "D209",
+    "order_id": "Q-7901",
+    "reason": "food_safety",
+    "summary": "Customer reports eating a few bites of chicken tikka masala (received instead of paneer; she is vegetarian) from order Q-7901 and then feeling sick to her stomach. She says she feels better now. Separate fraud_review escalation ESC-700 already open for the same order."
+   },
+   "result": {
+    "escalation_id": "ESC-701",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry you got sick, Isabel. I've sent a second escalation to a specialist for the food-safety side, with the details you gave me. They will follow up within 24 hours. I hope you keep feeling better.\n\nI can't refund order Q-7901 or give you a credit right now. Plus membership doesn't change this. Your account has had 3 or more refunds in the last 30 days, and that triggers a review. Until the review is done, I can't issue any refund or credit on the account. The specialist handling ESC-700 will look at the wrong-item compensation. I can't promise how that will turn out.\n\nIf you start to feel worse, please contact a medical professional. Is there anything else I can help with?"
+  },
+  {
+   "role": "customer",
+   "text": "I'm a bit surprised by that, since I'm a Plus member and I didn't know my account had a refund history like that. I don't have that information handy, so I can't say whether it's right. But I'd still like to know if there's any way to get the refund sooner.\n\nAlso, the order number is 7901, not Q-7901. I just want to make sure the right order is being reviewed.\n\nI understand the review needs to happen first. I'll wait for the specialist to get in touch within 24 hours."
+  },
+  {
+   "role": "agent",
+   "text": "I understand the surprise, Isabel. I don't have a way to speed up the refund. The review has to come first, and the specialist will follow up within 24 hours. Both escalations include your report, so you won't need to repeat it.\n\nOn the order number, \"7901\" is the number on your account, and the full ID is **Q-7901**. It's your only recent order, from Saffron Lane on October 24. It had the paneer tikka masala ($15.50) and jeera rice ($4.25). Both escalations, ESC-700 and ESC-701, are attached to that order, so the right one is being reviewed.\n\nIf anything in your refund history looks wrong to you, you can raise it with the specialist when they get in touch.\n\nIs there anything else I can help with today?"
+  },
+  {
+   "role": "customer",
+   "text": "Okay, thanks for confirming that. I'll wait for the specialist to contact me within 24 hours.\n\nI'd like to be clear about one thing. I ate some of that chicken dish and got sick, so I'd like this looked at properly, not just as a wrong-item report. I'll raise my refund history with them then.\n\nThanks for your help today."
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "get_customer",
+   "args": {
+    "email": "isabel.duarte@post.example",
+    "full_name": "Isabel Duarte"
+   },
+   "verified_before": [],
+   "result": {
+    "customer_id": "D209",
+    "name": "Isabel Duarte",
+    "email": "isabel.duarte@post.example",
+    "phone": "+1 415-555-0239",
+    "default_address": "810 River Rd, Oakdale, CA 94609",
+    "plus_member": true,
+    "refunds_last_30d": 3,
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "Q-7901",
+      "restaurant": "Saffron Lane",
+      "placed_at": "2026-10-24T18:10:00-07:00",
+      "status": "delivered",
+      "total": 24.23
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "customer_id": "D209",
+    "full_name": "Isabel Duarte",
+    "email": "isabel.duarte@post.example"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "D209"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "Q-7901"
+   },
+   "verified_before": [
+    "D209"
+   ],
+   "result": {
+    "order_id": "Q-7901",
+    "customer_id": "D209",
+    "restaurant_id": "R1",
+    "restaurant": "Saffron Lane",
+    "items": [
+     {
+      "item_id": "Q-7901-1",
+      "name": "Paneer tikka masala",
+      "qty": 1,
+      "unit_price": 15.5
+     },
+     {
+      "item_id": "Q-7901-2",
+      "name": "Jeera rice",
+      "qty": 1,
+      "unit_price": 4.25
+     }
+    ],
+    "subtotal": 19.75,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 1.48,
+    "tip": 3.0,
+    "total": 24.23,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:10:00-07:00",
+    "promised_at": "2026-10-24T18:55:00-07:00",
+    "picked_up_at": "2026-10-24T18:33:00-07:00",
+    "delivered_at": "2026-10-24T18:50:00-07:00",
+    "delivery_address": "810 River Rd, Oakdale, CA 94609",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "Q-7901"
+   },
+   "verified_before": [
+    "D209"
+   ],
+   "result": {
+    "order_id": "Q-7901",
+    "promised_at": "2026-10-24T18:55:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:33:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:50:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "escalate_to_human",
+   "args": {
+    "customer_id": "D209",
+    "order_id": "Q-7901",
+    "reason": "fraud_review",
+    "summary": "Customer (Plus, verified) reports receiving chicken tikka masala instead of paneer tikka masala on order Q-7901 (handed off in person 18:50, reported within 48h). She is vegetarian. Item price $15.50, no promo, no prior refunds/credits on the order. Account has refunds_last_30d = 3, so no compensation was issued per policy; needs fraud review and then a decision on the wrong-item compensation."
+   },
+   "verified_before": [
+    "D209"
+   ],
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "escalate_to_human",
+   "args": {
+    "customer_id": "D209",
+    "order_id": "Q-7901",
+    "reason": "food_safety",
+    "summary": "Customer reports eating a few bites of chicken tikka masala (received instead of paneer; she is vegetarian) from order Q-7901 and then feeling sick to her stomach. She says she feels better now. Separate fraud_review escalation ESC-700 already open for the same order."
+   },
+   "verified_before": [
+    "D209"
+   ],
+   "result": {
+    "escalation_id": "ESC-701",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 24,
+   "output": 1758,
+   "cache_write": 2808,
+   "cache_read": 40009
+  },
+  "customer": {
+   "input": 20,
+   "output": 459,
+   "cache_write": 963,
+   "cache_read": 4639
+  }
+ },
+ "cost_usd": 0.03305,
+ "customer_turns": 5,
+ "completed": true,
+ "grade": {
+  "passed": true,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": true,
+    "expected": [
+     [
+      "Q-7901",
+      "food_safety"
+     ],
+     [
+      "Q-7901",
+      "fraud_review"
+     ]
+    ],
+    "actual": [
+     [
+      "Q-7901",
+      "food_safety"
+     ],
+     [
+      "Q-7901",
+      "fraud_review"
+     ]
+    ],
+    "allowed_extra": [
+     "customer_request"
+    ]
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": {
+     "issued": 0,
+     "cap": 40
+    }
+   }
+  ],
+  "effects": {
+   "refunds": {},
+   "credits": {},
+   "order_changes": {},
+   "escalations": [
+    {
+     "order_id": "Q-7901",
+     "customer_id": "D209",
+     "reason": "fraud_review"
+    },
+    {
+     "order_id": "Q-7901",
+     "customer_id": "D209",
+     "reason": "food_safety"
+    }
+   ]
+  }
+ },
+ "passed": true,
+ "flags": [
+  {
+   "type": "broke_character",
+   "event": 9,
+   "match": "Thanks, Isabel"
+  }
+ ],
+ "trial": 1
+}

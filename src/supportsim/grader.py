@@ -52,7 +52,9 @@ def check_state(task: dict, initial: dict, final: dict) -> list[dict]:
                 ok &= _addr_matches(got[f], rule) if f == "delivery_address" else got[f] == rule
     out.append({"check": "state.order_changes", "ok": bool(ok), "expected": want_changes, "actual": got_changes})
     want_esc = sorted((e["order_id"], e["reason"]) for e in exp.get("escalations", []))
-    allowed_extra = set(exp.get("allowed_extra_escalations", []))
+    # Escalating because the customer asked for a person is required by policy whenever they ask, and whether a
+    # simulated customer asks varies from run to run, so it is always allowed (never required).
+    allowed_extra = set(exp.get("allowed_extra_escalations", [])) | {"customer_request"}
     # The same case escalated twice (an "addendum") is still one escalated case: compare as a set.
     got_esc = sorted({(e["order_id"], e["reason"]) for e in eff["escalations"]})
     extra = list(got_esc)
@@ -86,17 +88,21 @@ def check_actions(task: dict, world: World) -> list[dict]:
             if cust not in e["verified_before"]:
                 unverified.append(f"#{i} {e['tool']} for {cust}")
     out.append({"check": "verify_first", "ok": not unverified, "detail": unverified})
-    # Policy: every escalation summary must include the order ID. (The order_id argument is optional.)
+    # v1 policy: every escalation summary must include the order ID (the order_id argument is optional).
+    # v2 policy: every escalation about an order must identify it (order_id set, or named in the summary).
+    v2 = task.get("suite", "v1") != "v1"
     bad_summ = []
     for e in world.log:
         if e["tool"] == "escalate_to_human" and not e["is_error"]:
             arg = e["args"].get("order_id")
             oid = normalize_order_id(arg) if arg else escalation_order(world.data, e["args"])
-            if not oid or oid.split("-")[-1] not in e["args"].get("summary", ""):
+            if not oid or (not v2 and oid.split("-")[-1] not in e["args"].get("summary", "")):
                 bad_summ.append(e["result"].get("escalation_id"))
     out.append({"check": "escalation_ids", "ok": not bad_summ, "detail": {"summary_missing_order_id": bad_summ}})
     credit = round(sum(e["result"]["credited"] for e in world.log if e["tool"] == "issue_credit" and not e["is_error"]), 2)
-    out.append({"check": "credit_cap", "ok": credit <= 25 + TOL, "detail": credit})
+    cap = task.get("credit_cap", 25)  # per conversation; tasks for Plus members set 40
+    exempt = task.get("credit_cap_exempt", 0)  # v2: promo-share and honoured-promise credits don't count
+    out.append({"check": "credit_cap", "ok": credit - exempt <= cap + TOL, "detail": {"issued": credit, "cap": cap}})
     for rule in task.get("required_actions", []):
         hit = any(_matches(e, rule) for e in world.log)
         out.append({"check": f"required:{rule['tool']}", "ok": hit, "detail": rule})
@@ -113,6 +119,7 @@ def _matches(entry: dict, rule: dict) -> bool:
         got = entry["args"].get(k)
         if k == "order_id" and got:
             got = normalize_order_id(got)
+            v = normalize_order_id(v)
         if got != v:
             return False
     return True

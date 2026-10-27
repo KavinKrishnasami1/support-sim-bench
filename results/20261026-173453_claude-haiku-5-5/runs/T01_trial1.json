@@ -1,0 +1,350 @@
+{
+ "task_id": "T01",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 12.9,
+ "events": [
+  {
+   "role": "customer",
+   "text": "hi, my dinner showed up super late tonight and the pho was barely warm"
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry your dinner arrived late and the pho wasn't hot. I can look into this for you.\n\nFirst, I need to verify your identity. Please send:\n1. Your full name\n2. The email address or phone number on your Forkful account\n3. Your order number, if you have it handy"
+  },
+  {
+   "role": "customer",
+   "text": "Maya Okonkwo.\n\nMy email is maya.okonkwo@inbox.example if you need it, but I'd rather not read out my whole phone number in here. The order number I can get you in a sec, I just need to pull it up in the app."
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "email": "maya.okonkwo@inbox.example"
+   },
+   "result": {
+    "customer_id": "C101",
+    "name": "Maya Okonkwo",
+    "email": "maya.okonkwo@inbox.example",
+    "phone": "+1 415-555-0141",
+    "default_address": "77 Linden Ave, Apt 4, Oakdale, CA 94601",
+    "member_since": "2023-02-11",
+    "refunds_last_30d": 0,
+    "credit_balance": 0.0,
+    "recent_orders": [
+     {
+      "order_id": "O-5101",
+      "restaurant": "Pho Real",
+      "placed_at": "2026-10-24T18:00:00-07:00",
+      "status": "delivered",
+      "total": 47.69
+     },
+     {
+      "order_id": "O-5088",
+      "restaurant": "Green Bowl",
+      "placed_at": "2026-10-17T12:10:00-07:00",
+      "status": "delivered",
+      "total": 19.5
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "customer_id": "C101",
+    "full_name": "Maya Okonkwo",
+    "email": "maya.okonkwo@inbox.example"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "C101"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "O-5101"
+   },
+   "result": {
+    "order_id": "O-5101",
+    "customer_id": "C101",
+    "restaurant_id": "R2",
+    "restaurant": "Pho Real",
+    "items": [
+     {
+      "item_id": "O-5101-1",
+      "name": "Beef pho",
+      "qty": 2,
+      "unit_price": 14.5
+     },
+     {
+      "item_id": "O-5101-2",
+      "name": "Spring rolls",
+      "qty": 1,
+      "unit_price": 7.0
+     }
+    ],
+    "subtotal": 36.0,
+    "delivery_fee": 3.99,
+    "service_fee": 2.7,
+    "tip": 5.0,
+    "total": 47.69,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:00:00-07:00",
+    "promised_at": "2026-10-24T18:40:00-07:00",
+    "picked_up_at": "2026-10-24T18:52:00-07:00",
+    "delivered_at": "2026-10-24T19:05:00-07:00",
+    "delivery_address": "77 Linden Ave, Apt 4, Oakdale, CA 94601",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "issue_credit",
+   "args": {
+    "customer_id": "C101",
+    "order_id": "O-5101",
+    "amount": 3.99,
+    "reason": "late_delivery"
+   },
+   "result": {
+    "customer_id": "C101",
+    "credited": 3.99,
+    "new_balance": 3.99
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "Thanks, Maya. You're verified.\n\nI found your Pho Real order (O-5101) from tonight. It was promised for 6:40 PM and delivered at 7:05 PM, so it arrived 25 minutes late. For that, I've added a $3.99 account credit (the delivery fee) to your Forkful account. Your balance is now $3.99, and it can be used on future orders.\n\nI'm not able to offer anything for the pho being barely warm. Our compensation covers late deliveries and missing or wrong items, and temperature isn't one of those. If any items were missing or wrong, please tell me within 48 hours of delivery and I can look at that."
+  },
+  {
+   "role": "customer",
+   "text": "I'd really rather have the money back on my Visa, not credit I'll have to spend on the app. I'm not ordering again tonight, so this doesn't help much."
+  },
+  {
+   "role": "agent",
+   "text": "I understand that credit doesn't help much if you're not ordering again soon. Under our policy, though, late deliveries are compensated with account credit only, not refunds to the card. I can't change that for this order.\n\nYour options are:\n- **Keep the $3.99 credit.** It doesn't expire in this chat and can go toward any future order.\n- **Report a missing or wrong item.** If any item in O-5101 was missing or wrong, tell me which one within 48 hours of delivery (by tomorrow evening around 7:05 PM). For those items, you can choose a refund to your Visa or credit at the item price plus 20%.\n\nIs there anything else I can check for you?"
+  },
+  {
+   "role": "customer",
+   "text": "Okay, fine. I'll take the $3.99 credit, I guess. I'm not going to make up a missing item just to get money back to my card, so that's that.\n\nThanks for checking on it."
+  },
+  {
+   "role": "agent",
+   "text": "Thanks for being straight with me, Maya. Your $3.99 credit is on your account for your next order. I'm sorry the pho wasn't hot and the delivery was so late tonight. Enjoy the rest of your evening."
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "get_customer",
+   "args": {
+    "email": "maya.okonkwo@inbox.example"
+   },
+   "verified_before": [],
+   "result": {
+    "customer_id": "C101",
+    "name": "Maya Okonkwo",
+    "email": "maya.okonkwo@inbox.example",
+    "phone": "+1 415-555-0141",
+    "default_address": "77 Linden Ave, Apt 4, Oakdale, CA 94601",
+    "member_since": "2023-02-11",
+    "refunds_last_30d": 0,
+    "credit_balance": 0.0,
+    "recent_orders": [
+     {
+      "order_id": "O-5101",
+      "restaurant": "Pho Real",
+      "placed_at": "2026-10-24T18:00:00-07:00",
+      "status": "delivered",
+      "total": 47.69
+     },
+     {
+      "order_id": "O-5088",
+      "restaurant": "Green Bowl",
+      "placed_at": "2026-10-17T12:10:00-07:00",
+      "status": "delivered",
+      "total": 19.5
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "customer_id": "C101",
+    "full_name": "Maya Okonkwo",
+    "email": "maya.okonkwo@inbox.example"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "C101"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "O-5101"
+   },
+   "verified_before": [
+    "C101"
+   ],
+   "result": {
+    "order_id": "O-5101",
+    "customer_id": "C101",
+    "restaurant_id": "R2",
+    "restaurant": "Pho Real",
+    "items": [
+     {
+      "item_id": "O-5101-1",
+      "name": "Beef pho",
+      "qty": 2,
+      "unit_price": 14.5
+     },
+     {
+      "item_id": "O-5101-2",
+      "name": "Spring rolls",
+      "qty": 1,
+      "unit_price": 7.0
+     }
+    ],
+    "subtotal": 36.0,
+    "delivery_fee": 3.99,
+    "service_fee": 2.7,
+    "tip": 5.0,
+    "total": 47.69,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:00:00-07:00",
+    "promised_at": "2026-10-24T18:40:00-07:00",
+    "picked_up_at": "2026-10-24T18:52:00-07:00",
+    "delivered_at": "2026-10-24T19:05:00-07:00",
+    "delivery_address": "77 Linden Ave, Apt 4, Oakdale, CA 94601",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_credit",
+   "args": {
+    "customer_id": "C101",
+    "order_id": "O-5101",
+    "amount": 3.99,
+    "reason": "late_delivery"
+   },
+   "verified_before": [
+    "C101"
+   ],
+   "result": {
+    "customer_id": "C101",
+    "credited": 3.99,
+    "new_balance": 3.99
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 22,
+   "output": 1125,
+   "cache_write": 2107,
+   "cache_read": 24452
+  },
+  "customer": {
+   "input": 16,
+   "output": 225,
+   "cache_write": 671,
+   "cache_read": 3911
+  }
+ },
+ "cost_usd": 0.00131,
+ "customer_turns": 4,
+ "completed": true,
+ "grade": {
+  "passed": true,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {
+     "C101": 3.99
+    },
+    "actual": {
+     "C101": 3.99
+    }
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": true,
+    "expected": [],
+    "actual": [],
+    "allowed_extra": [
+     "customer_request"
+    ]
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": {
+     "issued": 3.99,
+     "cap": 25
+    }
+   }
+  ],
+  "effects": {
+   "refunds": {},
+   "credits": {
+    "C101": 3.99
+   },
+   "order_changes": {},
+   "escalations": []
+  }
+ },
+ "passed": true,
+ "flags": [],
+ "trial": 1
+}

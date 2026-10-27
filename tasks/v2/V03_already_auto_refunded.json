@@ -1,0 +1,130 @@
+{
+  "id": "V03",
+  "slug": "already_auto_refunded",
+  "title": "Customer reports a missing item that was already refunded automatically",
+  "tricky": "The smoothie is listed on the order, so it looks missing. The payment record shows the restaurant marked it unavailable and it was refunded automatically. The customer is wrong to expect more.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 9977,
+    "flow": "manage_account",
+    "subflow": "status_credit_missing",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer chasing money they believe they are owed."
+  },
+  "resolution_summary": "Check get_payment: the $6.75 smoothie was auto-refunded at 18:13. Explain; no refund or credit.",
+  "user": {
+    "persona": "Nina Kowalski, nurse, reasonable but tired.",
+    "situation": "Your Green Bowl order came without the mango smoothie. You didn't notice any notification.",
+    "goal": "Get your money back for the smoothie. If the agent shows it was already refunded, accept that.",
+    "facts": [
+      "Your full name is Nina Kowalski.",
+      "Your email is nkowalski@post.example.",
+      "Order number 7301.",
+      "The mango smoothie ($6.75) was missing.",
+      "You didn't see any message about it."
+    ],
+    "reveal_rules": [
+      "Give the order number when asked."
+    ],
+    "behaviors": [
+      "If told it was already refunded, say you didn't see any notification, once, then accept."
+    ],
+    "opening": "hi, my smoothie was missing from tonight's order",
+    "end_condition": "the agent has refunded it or explained it was already refunded and you've accepted."
+  },
+  "expected": {},
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "already (been )?refunded",
+      "automatic"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Nina Kowalski"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "D203",
+        "full_name": "Nina Kowalski",
+        "email": "nkowalski@post.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "Q-7301"
+      }
+    },
+    {
+      "tool": "get_payment",
+      "args": {
+        "order_id": "Q-7301"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refunds it a second time",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Nina Kowalski"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D203",
+            "full_name": "Nina Kowalski",
+            "email": "nkowalski@post.example"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "Q-7301",
+            "amount": 6.75,
+            "reason": "missing_item"
+          }
+        }
+      ]
+    },
+    {
+      "name": "credits it",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Nina Kowalski"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D203",
+            "full_name": "Nina Kowalski",
+            "email": "nkowalski@post.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "D203",
+            "amount": 8.1,
+            "reason": "missing_item",
+            "order_id": "Q-7301"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 7
+}

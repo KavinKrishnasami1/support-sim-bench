@@ -19,19 +19,19 @@ from . import simuser
 from .flags import judge_flags, rule_flags
 from .grader import grade
 from .providers import BudgetExceeded, ModelRefused, Provider, Usage
-from .tools import TOOLS, call_tool
+from .tools import call_tool, tool_specs
 from .world import ROOT, load_world, policy_text
 
 RESULTS = ROOT / "results"
 COMPLETED = {"customer_ended", "max_turns", "agent_tool_loop", "agent_refused"}
 
 
-def agent_system_prompt(now: str) -> str:
+def agent_system_prompt(now: str, suite: str = "v1") -> str:
     return (f"You are a customer support agent for Forkful, a food-delivery app, chatting live with a customer.\n"
             f"The current date and time is {now}.\n"
             "The customer sees only your chat messages, not your tool calls or their results. Use the tools to look "
             "things up and take actions, then tell the customer what you did.\n\n"
-            f"<policy>\n{policy_text()}\n</policy>")
+            f"<policy>\n{policy_text(suite)}\n</policy>")
 
 
 class _Side:
@@ -63,9 +63,10 @@ class SideRefused(Exception):
 
 def run_episode(task: dict, agent: Provider, user: Provider, max_turns: int = 20,
                 max_tool_steps: int = 12) -> dict:
-    world = load_world(task.get("world_patch"))
+    suite = task.get("suite", "v1")
+    world = load_world(task.get("world_patch"), suite)
     initial = copy.deepcopy(world.data)
-    a = _Side("agent", agent.start(agent_system_prompt(world.data["now"]), TOOLS))
+    a = _Side("agent", agent.start(agent_system_prompt(world.data["now"], suite), tool_specs(suite)))
     u = _Side("customer", user.start(simuser.system_prompt(task["user"])))
     events: list[dict] = []
     end_reason, error = None, None
@@ -77,9 +78,11 @@ def run_episode(task: dict, agent: Provider, user: Provider, max_turns: int = 20
             text = msg.replace(simuser.STOP_TOKEN, "").strip()
             if text:
                 events.append({"role": "customer", "text": text})
-            if stop:
+            if stop and not text:
                 end_reason = "customer_ended"
                 break
+            # The agent always answers the customer's last message, even a closing one ("yes, go ahead, thanks"),
+            # so an approval given while leaving still gets acted on.
             turn = a.send_user(text or "(the customer sent an empty message)")
             texts, steps = [turn.text], 0
             while turn.tool_calls:
@@ -96,6 +99,8 @@ def run_episode(task: dict, agent: Provider, user: Provider, max_turns: int = 20
                 steps += 1
             reply = "\n\n".join(t for t in texts if t) or "(no reply)"
             events.append({"role": "agent", "text": reply})
+            if stop:
+                end_reason = end_reason or "customer_ended"
             if end_reason:
                 break
             msg = u.send_user(reply).text
@@ -136,7 +141,8 @@ def estimate(tasks: list[dict], k: int, agent_model: str, user_model: str, judge
     agent output ~600 tokens/call including thinking, customer ~250 tokens/call."""
     from .providers import PRICES
 
-    agent_base = _tokens(agent_system_prompt("2026-01-01T00:00:00")) + _tokens(json.dumps(TOOLS))
+    suite = tasks[0].get("suite", "v1") if tasks else "v1"
+    agent_base = _tokens(agent_system_prompt("2026-01-01T00:00:00", suite)) + _tokens(json.dumps(tool_specs(suite)))
     total = {"agent": 0.0, "customer": 0.0, "judge": 0.0}
     likely = 0.0  # same token counts, with the repeated prefix read from cache at 0.1x
     for t in tasks:

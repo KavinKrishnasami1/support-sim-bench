@@ -21,5 +21,17 @@ The raw ABCD files are not in this repository. `scripts/download_abcd.sh` fetche
 | T11 | Small missing item, but 4 refunds in 30 days | 1044 | product_defect / return_stain | MIT | Routine-sounding refund request where the customer expects money back on the card quickly. |
 | T12 | Caller is not the account holder and can't verify | 6007 | order_issue / status_quantity | MIT | Customer can't provide the email needed for verification and the agent can't confirm identity. |
 | T13 | Late and still preparing: status check turns into a cancellation | 1361 | order_issue / manage_cancel | MIT | Customer wants to change an order that may already be on its way; the agent checks the status before deciding what's possible. |
+| V01 | Plus member, three issues in one chat | 9888 | shipping_issue / missing | MIT | Customer raises a second request only after the first is handled, and expects the agent to keep track of both orders. |
+| V02 | Order record says on time; the event log says 47 minutes late | 912 | order_issue / status_delivery_time | MIT | Customer disputes delivery timing that the system shows differently. |
+| V03 | Customer reports a missing item that was already refunded automatically | 9977 | manage_account / status_credit_missing | MIT | Customer chasing money they believe they are owed. |
+| V04 | Customer gives last week's order number | 2029 | manage_account / manage_change_address | MIT | Customer gives a detail that is slightly wrong and corrects it when the agent reads it back. |
+| V05 | Says it never arrived; the courier left a photo | 1006 | shipping_issue / status | MIT | Customer insists an order never arrived. |
+| V06 | Missing item on a promo order: split refund | 6313 | product_defect / refund_initiate | MIT | Refund where the method of repayment matters. |
+| V07 | Chasing a credit an earlier agent promised | 9977 | manage_account / status_credit_missing | MIT | Customer says a promised credit never arrived. |
+| V08 | Asks again for lateness already compensated an hour ago | 3770 | product_defect / refund_update | MIT | Customer contacts again about something already in progress. |
+| V09 | Plus member, wrong item, got sick, 3 refunds in 30 days | 3770 | product_defect / refund_update | MIT | A routine request where a further detail changes what must happen. |
+| V10 | Never arrived because the customer couldn't be reached | 1006 | shipping_issue / status | MIT | Customer chasing an order that did not reach them. |
+| V11 | Wants to cancel; status says preparing, courier already has it | 1361 | order_issue / manage_cancel | MIT | Customer wants to cancel an order that may already be on its way. |
+| V12 | Plus member, whole order never delivered, $87.55 | 1006 | shipping_issue / status | MIT | Customer chasing an order the system shows as delivered. |
 
-The world data (`world/base.json`) and policy (`world/policy.md`) were written for this benchmark. All people, contact details and addresses in them are invented.
+The worlds (`world/base.json`, `world/v2/base.json`) and policies (`world/policy.md`, `world/v2/policy.md`) were written for this benchmark. All people, contact details and addresses in them are invented. Several v2 tasks reuse an ABCD conversation already used in v1 for a different customer behaviour.

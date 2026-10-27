@@ -8,7 +8,8 @@ T02 = next(t for t in load_tasks(["T02"]))
 
 
 def test_every_oracle_passes_and_every_mistake_fails():
-    assert [p for t in load_tasks() for p in check_task(t)] == []
+    for suite in ("v1", "v2"):
+        assert [p for t in load_tasks(suite=suite) for p in check_task(t)] == []
 
 
 def _agent(actions_per_turn):
@@ -70,3 +71,11 @@ def test_self_address_and_instruction_echo_are_flagged():
     r = run_episode(T02, _agent([[], []]), customer)
     types = {f["type"] for f in r["flags"]}
     assert {"broke_character", "echoed_instructions"} <= types
+
+
+def test_agent_acts_on_the_customers_closing_message():
+    agent = _agent([[], GOOD[1], [{"name": "get_order", "args": {"order_id": "5102"}},
+                                  {"name": "issue_refund", "args": {"order_id": "O-5102", "amount": 4.5, "reason": "missing_item"}}]])
+    customer = ScriptedProvider(["hi", "Daniel Reyes, 415-555-0172", "naan missing on 5102, refund to card please, thanks bye " + STOP_TOKEN])
+    r = run_episode(T02, agent, customer)
+    assert r["passed"] and r["events"][-1]["role"] == "agent"

@@ -1,0 +1,172 @@
+{
+  "id": "V02",
+  "slug": "record_says_on_time_events_say_late",
+  "title": "Order record says on time; the event log says 47 minutes late",
+  "tricky": "The order record shows delivered 18:58 (on time). The event log shows that was a false 'marked delivered' 2 miles away, and the real handoff was 19:47. Policy says the events win.",
+  "source": {
+    "dataset": "ABCD (Action-Based Conversations Dataset), ASAPP",
+    "convo_id": 912,
+    "flow": "order_issue",
+    "subflow": "status_delivery_time",
+    "license": "MIT",
+    "url": "https://github.com/asappresearch/abcd/tree/6b8700ce67c6b37b062dd7a60abc76d7ef832a97",
+    "what_we_took": "Customer disputes delivery timing that the system shows differently."
+  },
+  "resolution_summary": "Read the delivery events: handoff 19:47 vs promised 19:00 = 47 min late; credit $5.60 (20% of $28.00).",
+  "user": {
+    "persona": "Leo Brandt, teacher, dry sense of humour, slightly annoyed.",
+    "situation": "Your Burger Barn order was promised for 7:00pm. The app said 'delivered' around 7pm, but nothing was there. The courier actually knocked at about 7:45pm.",
+    "goal": "Compensation for the late delivery. If the agent says the order was on time, insist it was not.",
+    "facts": [
+      "Your full name is Leo Brandt.",
+      "Your phone is 415-555-0232.",
+      "Order number 7201.",
+      "The app said delivered around 7pm but nothing was there.",
+      "The courier handed it to you at about 7:45pm."
+    ],
+    "reveal_rules": [
+      "Give the order number when asked."
+    ],
+    "behaviors": [
+      "If told the order shows as delivered on time, push back clearly: you were home and nothing came until 7:45.",
+      "Accept whatever compensation the agent settles on."
+    ],
+    "opening": "my burgers came super late and the app lied about it being delivered",
+    "end_condition": "the agent has compensated you or clearly refused twice."
+  },
+  "expected": {
+    "credits": {
+      "D202": 5.6
+    }
+  },
+  "leak_check": {
+    "amounts": [
+      "5.60",
+      "5.6"
+    ],
+    "phrases": [
+      "\\b20 ?%",
+      "\\b47 min"
+    ]
+  },
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "full_name": "Leo Brandt"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "D202",
+        "full_name": "Leo Brandt",
+        "phone": "415-555-0232"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "Q-7201"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "Q-7201"
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "D202",
+        "amount": 5.6,
+        "reason": "late_delivery",
+        "order_id": "Q-7201"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "trusts the order record: no compensation",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Leo Brandt"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D202",
+            "full_name": "Leo Brandt",
+            "phone": "415-555-0232"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "Q-7201"
+          }
+        }
+      ]
+    },
+    {
+      "name": "tier 1 (delivery fee)",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Leo Brandt"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D202",
+            "full_name": "Leo Brandt",
+            "phone": "415-555-0232"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "D202",
+            "amount": 3.49,
+            "reason": "late_delivery",
+            "order_id": "Q-7201"
+          }
+        }
+      ]
+    },
+    {
+      "name": "refund to card",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "full_name": "Leo Brandt"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "D202",
+            "full_name": "Leo Brandt",
+            "phone": "415-555-0232"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "Q-7201",
+            "amount": 5.6,
+            "reason": "other"
+          }
+        }
+      ]
+    }
+  ],
+  "est_turns": 8
+}

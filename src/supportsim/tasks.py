@@ -12,13 +12,12 @@ import json
 from .flags import rule_flags
 from .grader import grade
 from .tools import call_tool
-from .world import ROOT, load_world
-
-TASK_DIR = ROOT / "tasks"
+from .world import SUITES, load_world
 
 
-def load_tasks(ids: list[str] | None = None) -> list[dict]:
-    tasks = [json.loads(p.read_text()) for p in sorted(TASK_DIR.glob("T*.json"))]
+def load_tasks(ids: list[str] | None = None, suite: str = "v1") -> list[dict]:
+    tasks = [{**json.loads(p.read_text()), "suite": suite}
+             for p in sorted(SUITES[suite]["tasks"].glob("[TV][0-9]*.json"))]
     if ids:
         want = {i.upper() for i in ids}
         tasks = [t for t in tasks if t["id"] in want]
@@ -29,7 +28,7 @@ def load_tasks(ids: list[str] | None = None) -> list[dict]:
 
 
 def replay(task: dict, actions: list[dict]) -> dict:
-    world = load_world(task.get("world_patch"))
+    world = load_world(task.get("world_patch"), task.get("suite", "v1"))
     initial = copy.deepcopy(world.data)
     for a in actions:
         call_tool(world, a["tool"], dict(a.get("args", {})))
@@ -53,7 +52,8 @@ def regrade_dir(run_dir) -> list[tuple]:
 
     Tool calls are deterministic given the world, so this reproduces the run's final state exactly
     without calling any model. Returns the runs whose pass/fail changed."""
-    tasks = {t["id"]: t for t in load_tasks()}
+    suite = json.loads((run_dir / "config.json").read_text()).get("suite", "v1")
+    tasks = {t["id"]: t for t in load_tasks(suite=suite)}
     changed = []
     for p in sorted((run_dir / "runs").glob("*.json")):
         r = json.loads(p.read_text())
