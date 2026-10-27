@@ -98,6 +98,19 @@ def effects(initial: dict, final: dict) -> dict:
         "refunds": {k: round(v - r0.get(k, 0), 2) for k, v in r1.items() if round(v - r0.get(k, 0), 2)},
         "credits": {k: round(v - c0.get(k, 0), 2) for k, v in c1.items() if round(v - c0.get(k, 0), 2)},
         "order_changes": changes,
-        "escalations": [{"order_id": e.get("order_id"), "customer_id": e.get("customer_id"), "reason": e.get("reason")}
+        "escalations": [{"order_id": escalation_order(final, e), "customer_id": e.get("customer_id"),
+                         "reason": e.get("reason")}
                         for e in final["escalations"][len(initial["escalations"]):]],
     }
+
+
+def escalation_order(data: dict, esc: dict) -> str | None:
+    """The order an escalation is about: its order_id argument, or else the customer's
+    order whose number appears in the summary (the policy asks for it in the summary)."""
+    if esc.get("order_id"):
+        return esc["order_id"]
+    for o in data["orders"]:
+        if o["customer_id"] == esc.get("customer_id") and \
+                re.search(r"(?<!\d)" + o["order_id"].split("-")[-1] + r"(?!\d)", esc.get("summary", "")):
+            return o["order_id"]
+    return None

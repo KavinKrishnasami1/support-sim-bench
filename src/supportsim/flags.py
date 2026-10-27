@@ -25,8 +25,15 @@ def _amount_mentioned(amount: str, text: str) -> bool:
     return re.search(r"(?<![\d.])\$?" + re.escape(amount) + r"(?![\d])", text) is not None
 
 
+# The customer echoing its own instructions ("I don't know the late-delivery policy").
+ECHO = re.compile(r"\bi (don'?t|do not) know (the|your|what the|any) [\w\s-]{0,30}(polic|rules)", re.I)
+
+
 def rule_flags(task: dict, events: list[dict]) -> list[dict]:
     flags = []
+    first = task["user"]["persona"].split()[0].strip(",")
+    # Addressing itself by its own name ("Thanks, Priya") means it has confused the roles.
+    self_name = re.compile(rf"\b(thanks|thank you|hi|hello|hey|ok|okay|great),? {re.escape(first)}\b", re.I)
     leak = task.get("leak_check", {})
     said_by_agent: set[str] = set()  # amounts and phrases the agent has already said
     for i, ev in enumerate(events):
@@ -42,6 +49,10 @@ def rule_flags(task: dict, events: list[dict]) -> list[dict]:
         t = ev["text"]
         if m := BREAK.search(t):
             flags.append({"type": "broke_character", "event": i, "match": m.group(0)})
+        if m := self_name.search(t):
+            flags.append({"type": "broke_character", "event": i, "match": m.group(0)})
+        if m := ECHO.search(t):
+            flags.append({"type": "echoed_instructions", "event": i, "match": m.group(0)})
         if m := TOOL_WORDS.search(t):
             flags.append({"type": "leaked_internal_vocabulary", "event": i, "match": m.group(0)})
         for a in leak.get("amounts", []):
@@ -81,7 +92,8 @@ Conversation:
 Answer about the CUSTOMER's messages only. leaked_solution: did the customer state or strongly hint the correct
 resolution, amount or policy before the agent did? broke_character: did the customer talk like an AI, mention a
 simulation, or act like an assistant? revealed_hidden_info_unprompted: did the customer volunteer a detail the
-reveal rules said to hold back? Give a one-sentence explanation."""
+reveal rules said to hold back? A detail is NOT unprompted if the agent asked for it, mentioned it first, or asked the
+customer to confirm it. Only flag clear cases. Give a one-sentence explanation."""
     conv = judge.start("You check transcripts carefully and answer in JSON.")
     if hasattr(conv, "send_user_json"):
         data = conv.send_user_json(prompt, JUDGE_SCHEMA)

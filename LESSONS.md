@@ -1,8 +1,8 @@
 # What was hard
 
 Notes from building a 13-task, tau-bench-style support benchmark over a weekend. Written for conversations with
-people who build agent tasks and environments. Sections 1 to 4 come from building the tasks. Section 5 will come
-from running models.
+people who build agent tasks and environments. Sections 1 to 4 come from building the tasks. Section 5 comes from
+running two models on it.
 
 ## 1. Writing the policy: every rule had a hole until a task hit it
 
@@ -74,5 +74,60 @@ poor as labels for what the agent should have done; that comes from the policy.
 
 ## 5. From the runs
 
-To be filled in after running models (see RESULTS.md): where agents fail, whether the simulator stayed in character,
-how often it leaked, and what a run costs.
+We ran Claude Haiku 5.5 and Claude Sonnet 5.5 as agents, 13 tasks × 3 trials each, for $0.89 in total
+(details in RESULTS.md).
+
+**Most first-pass failures were ours.** The first grading said Haiku 77%, Sonnet 90%. Reading every failing
+transcript showed that 10 of the 13 failures were benchmark bugs:
+
+- 7 runs: the agent did what the policy literally asked (order ID in the escalation summary) and left the optional
+  `order_id` field empty, but the grader required the field.
+- 1 run: a scripted customer line ("I need to talk to someone") quietly triggered a policy rule (escalate when
+  asked for a person) that the task didn't expect.
+- 2 runs: an agent filed a follow-up "addendum" escalation for the same case, and the grader counted escalations as
+  a list instead of a set.
+
+After fixes, both models scored 92–97%. Without reading transcripts we would have published a 13-point gap between
+the models that was mostly grader noise. **The replay-based regrade** (re-run the logged tool calls through the
+current grader, no model calls) made fixing this cheap. Any task environment should log enough to re-grade
+without re-running.
+
+**Grader strictness is a policy decision you didn't know you made.** Every one of those fixes was a judgment call:
+is a duplicate escalation wrong? Does "include the order ID in the summary" mean the summary text or the record?
+Each choice moves a model's score. Exact-match grading is necessary but not neutral, and the choices need to be
+written down next to the results.
+
+**Policy lines that duplicate a structured field fail models in opposite ways.** The rule "the summary must
+include the order ID" exists so a human can find the order. Haiku satisfied the text and skipped the field;
+Sonnet filled the field and skipped the text. Sonnet's two "real" failures are this. A rule should either be
+enforced by the tool schema (make `order_id` required) or stated as an outcome ("the escalation must identify the
+order"), not both.
+
+**The most realistic failure was not looking, not misreading.** Haiku's real miss: it took the customer ID from
+the order record, verified, refunded, and never fetched the profile showing four refunds in 30 days. That's the
+failure mode that matters for real deployments, where the deciding fact sits in a record the agent has no
+obvious reason to open. Tasks that hide the deciding fact one lookup away are more discriminating than tasks that
+test whether the agent knows the rule.
+
+**A clean one-page policy is too easy for current models.** Both agents verified, chose refund versus credit,
+respected caps, refused politely, escalated correctly and did nothing when nothing was right, in nearly every run.
+To separate models, a task needs things this weekend version lacks: a longer policy with exceptions that
+interact, more tools with overlapping uses, longer conversations, facts that contradict each other across systems,
+and customers who are wrong rather than merely vague.
+
+**The simulator has tells that a judge model misses.** The cheap simulator mostly followed its reveal rules (the
+allergy only after the refund, the wrong suite number before the right one). But it also:
+
+- thanked itself by its own name ("Thanks, Priya"), in 5 of 78 runs and across both agents, apparently after the
+  agent used that name;
+- repeated its own instructions back ("I don't know the late-delivery policy");
+- kept chatting after its goal was met, asking the agent to reconfirm things.
+
+The judge model caught none of the first two. It raised two flags, one right and one wrong. Simple pattern rules,
+written after reading transcripts, caught more. Simulator QA needs a person reading a sample of transcripts; an LLM
+judge alone isn't enough.
+
+**Cost estimates from first principles were 4–6× high.** Conversations were about half as long as we assumed,
+and caching removed most of the input cost. The useful estimate is the observed cost per run from a small pilot,
+so the tool now reports that. A full 39-run pass cost $0.07 with Haiku as the agent and $0.81 with Sonnet. At these
+prices the expensive part of a benchmark like this is the human time spent reading transcripts, not the tokens.

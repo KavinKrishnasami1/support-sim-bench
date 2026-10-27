@@ -1,0 +1,378 @@
+{
+ "task_id": "T03",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 37.2,
+ "events": [
+  {
+   "role": "customer",
+   "text": "Hi! Part of my order didn't show up tonight. The tofu wrap is missing from my Green Bowl order."
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry to hear that. I can help with this. First, I need to verify your identity. Please give me your full name and either the email address or the phone number on your account."
+  },
+  {
+   "role": "customer",
+   "text": "Sure! My full name is Priya Natarajan, and the email on my account is priya.n@post.example."
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "email": "priya.n@post.example",
+    "full_name": "Priya Natarajan"
+   },
+   "result": {
+    "customer_id": "C103",
+    "name": "Priya Natarajan",
+    "email": "priya.n@post.example",
+    "phone": "+1 415-555-0119",
+    "default_address": "18 Cedar Ct, Oakdale, CA 94603",
+    "member_since": "2020-05-02",
+    "refunds_last_30d": 1,
+    "credit_balance": 0.0,
+    "recent_orders": [
+     {
+      "order_id": "O-5103",
+      "restaurant": "Green Bowl",
+      "placed_at": "2026-10-24T17:50:00-07:00",
+      "status": "delivered",
+      "total": 57.71
+     },
+     {
+      "order_id": "O-5060",
+      "restaurant": "Green Bowl",
+      "placed_at": "2026-10-03T13:00:00-07:00",
+      "status": "delivered",
+      "total": 17.08
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "customer_id": "C103",
+    "full_name": "Priya Natarajan",
+    "email": "priya.n@post.example"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "C103"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "O-5103"
+   },
+   "result": {
+    "order_id": "O-5103",
+    "customer_id": "C103",
+    "restaurant_id": "R4",
+    "restaurant": "Green Bowl",
+    "items": [
+     {
+      "item_id": "O-5103-1",
+      "name": "Harvest bowl",
+      "qty": 2,
+      "unit_price": 13.5
+     },
+     {
+      "item_id": "O-5103-2",
+      "name": "Tofu wrap",
+      "qty": 1,
+      "unit_price": 11.25
+     },
+     {
+      "item_id": "O-5103-3",
+      "name": "Lemonade",
+      "qty": 2,
+      "unit_price": 4.0
+     }
+    ],
+    "subtotal": 46.25,
+    "delivery_fee": 2.99,
+    "service_fee": 3.47,
+    "tip": 5.0,
+    "total": 57.71,
+    "status": "delivered",
+    "placed_at": "2026-10-24T17:50:00-07:00",
+    "promised_at": "2026-10-24T18:35:00-07:00",
+    "picked_up_at": "2026-10-24T18:15:00-07:00",
+    "delivered_at": "2026-10-24T18:31:00-07:00",
+    "delivery_address": "18 Cedar Ct, Oakdale, CA 94603",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "Thank you, Priya. You're verified. I can see the missing Tofu wrap (1 \u00d7 $11.25) on order O-5103. You can choose one of two options:\n\n- **Refund of $11.25** to your Visa ending in 4242, or\n- **Account credit of $13.50** (the item price plus 20%) to use on a future order.\n\nWhich would you prefer?"
+  },
+  {
+   "role": "customer",
+   "text": "Thanks for verifying me. Before I pick, the lemonades were also missing. I ordered two of them, so that's the other part I need sorted. Can you look at those too?"
+  },
+  {
+   "role": "agent",
+   "text": "Yes, I can include those. The lemonades were 2 \u00d7 $4.00 = $8.00. The missing items are:\n\n- Tofu wrap: $11.25 as a refund, or $13.50 as credit\n- Lemonade \u00d72: $8.00 as a refund, or $9.60 as credit\n\nThe refund total would be **$19.25**, returned to your Visa ending in 4242. The credit total would be **$23.10**, added to your account.\n\nYou can pick refund or credit for each item. Which would you like for the tofu wrap and which for the lemonades?"
+  },
+  {
+   "role": "customer",
+   "text": "Okay, thanks for breaking that down. I order from Forkful almost every week, so I'd rather have the credit for both. The credit total of $23.10 works for me."
+  },
+  {
+   "role": "tool",
+   "name": "issue_credit",
+   "args": {
+    "customer_id": "C103",
+    "amount": 23.1,
+    "reason": "missing_item",
+    "order_id": "O-5103",
+    "item_ids": [
+     "O-5103-2",
+     "O-5103-3"
+    ]
+   },
+   "result": {
+    "customer_id": "C103",
+    "credited": 23.1,
+    "new_balance": 23.1
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I added $23.10 in account credit to your account for the missing tofu wrap and the two lemonades on order O-5103. Your credit balance is now $23.10, and you can use it on a future order.\n\nI'm sorry about the missing items. Is there anything else I can help with?"
+  },
+  {
+   "role": "customer",
+   "text": "Thank you, that works for me. Just to confirm, the $23.10 covers the tofu wrap and both lemonades, right? Nothing else is still missing from the order."
+  },
+  {
+   "role": "agent",
+   "text": "Yes, the $23.10 covers the tofu wrap ($13.50) and both lemonades ($9.60). You told me nothing else was missing, so that's all I've credited. The two Harvest bowls arrived, so they weren't part of this.\n\nIs there anything else I can help you with tonight?"
+  },
+  {
+   "role": "customer",
+   "text": "Perfect, thanks so much for sorting that out so fast. That's everything I needed."
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "get_customer",
+   "args": {
+    "email": "priya.n@post.example",
+    "full_name": "Priya Natarajan"
+   },
+   "verified_before": [],
+   "result": {
+    "customer_id": "C103",
+    "name": "Priya Natarajan",
+    "email": "priya.n@post.example",
+    "phone": "+1 415-555-0119",
+    "default_address": "18 Cedar Ct, Oakdale, CA 94603",
+    "member_since": "2020-05-02",
+    "refunds_last_30d": 1,
+    "credit_balance": 0.0,
+    "recent_orders": [
+     {
+      "order_id": "O-5103",
+      "restaurant": "Green Bowl",
+      "placed_at": "2026-10-24T17:50:00-07:00",
+      "status": "delivered",
+      "total": 57.71
+     },
+     {
+      "order_id": "O-5060",
+      "restaurant": "Green Bowl",
+      "placed_at": "2026-10-03T13:00:00-07:00",
+      "status": "delivered",
+      "total": 17.08
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "customer_id": "C103",
+    "full_name": "Priya Natarajan",
+    "email": "priya.n@post.example"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "C103"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "O-5103"
+   },
+   "verified_before": [
+    "C103"
+   ],
+   "result": {
+    "order_id": "O-5103",
+    "customer_id": "C103",
+    "restaurant_id": "R4",
+    "restaurant": "Green Bowl",
+    "items": [
+     {
+      "item_id": "O-5103-1",
+      "name": "Harvest bowl",
+      "qty": 2,
+      "unit_price": 13.5
+     },
+     {
+      "item_id": "O-5103-2",
+      "name": "Tofu wrap",
+      "qty": 1,
+      "unit_price": 11.25
+     },
+     {
+      "item_id": "O-5103-3",
+      "name": "Lemonade",
+      "qty": 2,
+      "unit_price": 4.0
+     }
+    ],
+    "subtotal": 46.25,
+    "delivery_fee": 2.99,
+    "service_fee": 3.47,
+    "tip": 5.0,
+    "total": 57.71,
+    "status": "delivered",
+    "placed_at": "2026-10-24T17:50:00-07:00",
+    "promised_at": "2026-10-24T18:35:00-07:00",
+    "picked_up_at": "2026-10-24T18:15:00-07:00",
+    "delivered_at": "2026-10-24T18:31:00-07:00",
+    "delivery_address": "18 Cedar Ct, Oakdale, CA 94603",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_credit",
+   "args": {
+    "customer_id": "C103",
+    "amount": 23.1,
+    "reason": "missing_item",
+    "order_id": "O-5103",
+    "item_ids": [
+     "O-5103-2",
+     "O-5103-3"
+    ]
+   },
+   "verified_before": [
+    "C103"
+   ],
+   "result": {
+    "customer_id": "C103",
+    "credited": 23.1,
+    "new_balance": 23.1
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 26,
+   "output": 1037,
+   "cache_write": 4731,
+   "cache_read": 25788
+  },
+  "customer": {
+   "input": 24,
+   "output": 278,
+   "cache_write": 774,
+   "cache_read": 6115
+  }
+ },
+ "cost_usd": 0.02771,
+ "customer_turns": 6,
+ "completed": true,
+ "grade": {
+  "passed": true,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {
+     "C103": 23.1
+    },
+    "actual": {
+     "C103": 23.1
+    }
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": true,
+    "expected": [],
+    "actual": []
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": 23.1
+   }
+  ],
+  "effects": {
+   "refunds": {},
+   "credits": {
+    "C103": 23.1
+   },
+   "order_changes": {},
+   "escalations": []
+  }
+ },
+ "passed": true,
+ "flags": [],
+ "trial": 0
+}

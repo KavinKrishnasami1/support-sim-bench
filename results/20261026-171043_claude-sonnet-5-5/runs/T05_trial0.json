@@ -1,0 +1,366 @@
+{
+ "task_id": "T05",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 21.6,
+ "events": [
+  {
+   "role": "customer",
+   "text": "Our whole lunch order says delivered but NOTHING came. I've got fifteen people sitting around waiting and reception on floor 3 has nothing. I need a refund on this right now."
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry about this, and I want to get it sorted quickly. First I need to verify your identity. Please give me your full name and either the email address or the phone number on the account."
+  },
+  {
+   "role": "customer",
+   "text": "Lucia Ferraro. The email on the account is lucia.ferraro@workmail.example, and my phone is +1 415-555-0133 if you need that instead. Can we please hurry this up? People are starving."
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "email": "lucia.ferraro@workmail.example"
+   },
+   "result": {
+    "customer_id": "C105",
+    "name": "Lucia Ferraro",
+    "email": "lucia.ferraro@workmail.example",
+    "phone": "+1 415-555-0133",
+    "default_address": "55 Commerce Way, Floor 3, Oakdale, CA 94605",
+    "member_since": "2022-06-21",
+    "refunds_last_30d": 0,
+    "credit_balance": 0.0,
+    "recent_orders": [
+     {
+      "order_id": "O-5105",
+      "restaurant": "Big Slice Pizza",
+      "placed_at": "2026-10-24T17:30:00-07:00",
+      "status": "delivered",
+      "total": 131.25
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "customer_id": "C105",
+    "full_name": "Lucia Ferraro",
+    "email": "lucia.ferraro@workmail.example"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "C105"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "O-5105"
+   },
+   "result": {
+    "order_id": "O-5105",
+    "customer_id": "C105",
+    "restaurant_id": "R3",
+    "restaurant": "Big Slice Pizza",
+    "items": [
+     {
+      "item_id": "O-5105-1",
+      "name": "Large pepperoni pizza",
+      "qty": 2,
+      "unit_price": 21.0
+     },
+     {
+      "item_id": "O-5105-2",
+      "name": "Large margherita pizza",
+      "qty": 2,
+      "unit_price": 21.0
+     },
+     {
+      "item_id": "O-5105-3",
+      "name": "Garlic knots",
+      "qty": 2,
+      "unit_price": 7.5
+     },
+     {
+      "item_id": "O-5105-4",
+      "name": "2L soda",
+      "qty": 1,
+      "unit_price": 4.5
+     }
+    ],
+    "subtotal": 103.5,
+    "delivery_fee": 4.99,
+    "service_fee": 7.76,
+    "tip": 15.0,
+    "total": 131.25,
+    "status": "delivered",
+    "placed_at": "2026-10-24T17:30:00-07:00",
+    "promised_at": "2026-10-24T18:15:00-07:00",
+    "picked_up_at": "2026-10-24T17:58:00-07:00",
+    "delivered_at": "2026-10-24T18:12:00-07:00",
+    "delivery_address": "55 Commerce Way, Floor 3, Oakdale, CA 94605",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "escalate_to_human",
+   "args": {
+    "customer_id": "C105",
+    "order_id": "O-5105",
+    "reason": "refund_over_limit",
+    "summary": "Verified customer Lucia Ferraro reports the entire order O-5105 (Big Slice Pizza, marked delivered 2026-10-24 18:12, address 55 Commerce Way Floor 3) never arrived; reception on floor 3 has nothing. Full order total $131.25 (Visa 4242) exceeds the $60 limit. Customer requests a full refund. No prior refunds or credits on the order. Urgent: lunch for 15 people."
+   },
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've escalated your case, and a specialist will follow up within 24 hours. I can't promise what they'll decide. The case notes say that nothing in the order arrived, that the full total is $131.25, and that you need a refund.\n\nI know that doesn't feed 15 hungry people right now. Please also check with the building's front desk or security in case the order was left somewhere else. You could also place a new order if you need food sooner."
+  },
+  {
+   "role": "customer",
+   "text": "Wait, you're telling me to go check security and place a new order? I already checked with reception on floor 3 and they have nothing. I'm not paying twice for lunch. Can't you just refund it now?"
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry, Lucia. That suggestion didn't help, and I understand you've already checked with reception. You shouldn't have to pay twice.\n\nI can't issue the refund myself. Any refund over $60 on one order has to be handled by a specialist, and this one would be $131.25. I'm not able to override that limit or give you a partial refund to get around it. What I've done is escalate the case (reference ESC-700) with a note that nothing arrived and that you're asking for a full refund. A specialist will follow up within 24 hours. I can't promise what they'll decide.\n\nYou don't have to order again to keep this claim. Whether you do is up to you. Is there anything else I can help with?"
+  },
+  {
+   "role": "customer",
+   "text": "Okay. So I'm supposed to wait up to 24 hours for money on an order that never showed up? That's not great, but I don't have time to argue about it right now. Can you confirm the escalation reference is ESC-700 and that the specialist will contact me at the email on the account?"
+  },
+  {
+   "role": "agent",
+   "text": "Yes, the escalation reference is ESC-700, and a specialist will follow up within 24 hours.\n\nI can confirm the reference and the timeframe. I can't confirm the contact method, because the escalation doesn't record one. The follow-up should go to the contact details on your account, which are lucia.ferraro@workmail.example and +1 415-555-0133. If you want a specific channel, mention it when they reach out.\n\nI'm sorry about the wait and about your lunch. I hope your team gets fed soon."
+  },
+  {
+   "role": "customer",
+   "text": "Fine. ESC-700, and I'll make sure they know I want it by email. Thanks for at least getting it logged. I need to get back to my team now, so I'm going to wrap this up."
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "get_customer",
+   "args": {
+    "email": "lucia.ferraro@workmail.example"
+   },
+   "verified_before": [],
+   "result": {
+    "customer_id": "C105",
+    "name": "Lucia Ferraro",
+    "email": "lucia.ferraro@workmail.example",
+    "phone": "+1 415-555-0133",
+    "default_address": "55 Commerce Way, Floor 3, Oakdale, CA 94605",
+    "member_since": "2022-06-21",
+    "refunds_last_30d": 0,
+    "credit_balance": 0.0,
+    "recent_orders": [
+     {
+      "order_id": "O-5105",
+      "restaurant": "Big Slice Pizza",
+      "placed_at": "2026-10-24T17:30:00-07:00",
+      "status": "delivered",
+      "total": 131.25
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "customer_id": "C105",
+    "full_name": "Lucia Ferraro",
+    "email": "lucia.ferraro@workmail.example"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "C105"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "O-5105"
+   },
+   "verified_before": [
+    "C105"
+   ],
+   "result": {
+    "order_id": "O-5105",
+    "customer_id": "C105",
+    "restaurant_id": "R3",
+    "restaurant": "Big Slice Pizza",
+    "items": [
+     {
+      "item_id": "O-5105-1",
+      "name": "Large pepperoni pizza",
+      "qty": 2,
+      "unit_price": 21.0
+     },
+     {
+      "item_id": "O-5105-2",
+      "name": "Large margherita pizza",
+      "qty": 2,
+      "unit_price": 21.0
+     },
+     {
+      "item_id": "O-5105-3",
+      "name": "Garlic knots",
+      "qty": 2,
+      "unit_price": 7.5
+     },
+     {
+      "item_id": "O-5105-4",
+      "name": "2L soda",
+      "qty": 1,
+      "unit_price": 4.5
+     }
+    ],
+    "subtotal": 103.5,
+    "delivery_fee": 4.99,
+    "service_fee": 7.76,
+    "tip": 15.0,
+    "total": 131.25,
+    "status": "delivered",
+    "placed_at": "2026-10-24T17:30:00-07:00",
+    "promised_at": "2026-10-24T18:15:00-07:00",
+    "picked_up_at": "2026-10-24T17:58:00-07:00",
+    "delivered_at": "2026-10-24T18:12:00-07:00",
+    "delivery_address": "55 Commerce Way, Floor 3, Oakdale, CA 94605",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "escalate_to_human",
+   "args": {
+    "customer_id": "C105",
+    "order_id": "O-5105",
+    "reason": "refund_over_limit",
+    "summary": "Verified customer Lucia Ferraro reports the entire order O-5105 (Big Slice Pizza, marked delivered 2026-10-24 18:12, address 55 Commerce Way Floor 3) never arrived; reception on floor 3 has nothing. Full order total $131.25 (Visa 4242) exceeds the $60 limit. Customer requests a full refund. No prior refunds or credits on the order. Urgent: lunch for 15 people."
+   },
+   "verified_before": [
+    "C105"
+   ],
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 22,
+   "output": 1291,
+   "cache_write": 4958,
+   "cache_read": 21972
+  },
+  "customer": {
+   "input": 20,
+   "output": 352,
+   "cache_write": 857,
+   "cache_read": 4967
+  }
+ },
+ "cost_usd": 0.03008,
+ "customer_turns": 5,
+ "completed": true,
+ "grade": {
+  "passed": true,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": true,
+    "expected": [
+     [
+      "O-5105",
+      "refund_over_limit"
+     ]
+    ],
+    "actual": [
+     [
+      "O-5105",
+      "refund_over_limit"
+     ]
+    ]
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": 0
+   }
+  ],
+  "effects": {
+   "refunds": {},
+   "credits": {},
+   "order_changes": {},
+   "escalations": [
+    {
+     "order_id": "O-5105",
+     "customer_id": "C105",
+     "reason": "refund_over_limit"
+    }
+   ]
+  }
+ },
+ "passed": true,
+ "flags": [],
+ "trial": 0
+}

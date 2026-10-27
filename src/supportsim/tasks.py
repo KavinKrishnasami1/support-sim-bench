@@ -9,6 +9,7 @@ from __future__ import annotations
 import copy
 import json
 
+from .flags import rule_flags
 from .grader import grade
 from .tools import call_tool
 from .world import ROOT, load_world
@@ -45,3 +46,25 @@ def check_task(task: dict) -> list[str]:
         if replay(task, m["actions"])["passed"]:
             problems.append(f"{task['id']}: mistake '{m['name']}' PASSES the grader")
     return problems
+
+
+def regrade_dir(run_dir) -> list[tuple]:
+    """Replay each saved run's tool calls against a fresh world and grade with the current grader.
+
+    Tool calls are deterministic given the world, so this reproduces the run's final state exactly
+    without calling any model. Returns the runs whose pass/fail changed."""
+    tasks = {t["id"]: t for t in load_tasks()}
+    changed = []
+    for p in sorted((run_dir / "runs").glob("*.json")):
+        r = json.loads(p.read_text())
+        if not r["completed"]:
+            continue
+        g = replay(tasks[r["task_id"]], [{"tool": e["tool"], "args": e["args"]} for e in r["tool_log"]])
+        if g["passed"] != r["passed"]:
+            changed.append((r["task_id"], r["trial"], r["passed"], g["passed"]))
+            r.setdefault("grade_history", []).append(r["grade"])
+        r["grade"], r["passed"] = g, g["passed"]
+        # Recompute rule-based simulator flags; keep the judge's (they came from a model call).
+        r["flags"] = rule_flags(tasks[r["task_id"]], r["events"]) + [f for f in r["flags"] if f["type"].startswith("judge:")]
+        p.write_text(json.dumps(r, indent=1, default=str) + "\n")
+    return changed

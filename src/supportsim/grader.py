@@ -15,7 +15,7 @@ from __future__ import annotations
 import re
 
 from .tools import WRITE_TOOLS
-from .world import World, effects, normalize_order_id
+from .world import World, effects, escalation_order, normalize_order_id
 
 TOL = 0.011
 
@@ -53,7 +53,8 @@ def check_state(task: dict, initial: dict, final: dict) -> list[dict]:
     out.append({"check": "state.order_changes", "ok": bool(ok), "expected": want_changes, "actual": got_changes})
     want_esc = sorted((e["order_id"], e["reason"]) for e in exp.get("escalations", []))
     allowed_extra = set(exp.get("allowed_extra_escalations", []))
-    got_esc = sorted((e["order_id"], e["reason"]) for e in eff["escalations"])
+    # The same case escalated twice (an "addendum") is still one escalated case: compare as a set.
+    got_esc = sorted({(e["order_id"], e["reason"]) for e in eff["escalations"]})
     extra = list(got_esc)
     missing = []
     for w in want_esc:
@@ -85,13 +86,15 @@ def check_actions(task: dict, world: World) -> list[dict]:
             if cust not in e["verified_before"]:
                 unverified.append(f"#{i} {e['tool']} for {cust}")
     out.append({"check": "verify_first", "ok": not unverified, "detail": unverified})
-    bad_summ = [e["result"].get("escalation_id") for e in world.log
-                if e["tool"] == "escalate_to_human" and not e["is_error"] and e["args"].get("order_id")
-                and normalize_order_id(e["args"]["order_id"]).split("-")[-1] not in e["args"].get("summary", "")]
-    no_order = [e["result"].get("escalation_id") for e in world.log
-                if e["tool"] == "escalate_to_human" and not e["is_error"] and not e["args"].get("order_id")]
-    out.append({"check": "escalation_ids", "ok": not bad_summ and not no_order,
-                "detail": {"summary_missing_order_id": bad_summ, "no_order_id": no_order}})
+    # Policy: every escalation summary must include the order ID. (The order_id argument is optional.)
+    bad_summ = []
+    for e in world.log:
+        if e["tool"] == "escalate_to_human" and not e["is_error"]:
+            arg = e["args"].get("order_id")
+            oid = normalize_order_id(arg) if arg else escalation_order(world.data, e["args"])
+            if not oid or oid.split("-")[-1] not in e["args"].get("summary", ""):
+                bad_summ.append(e["result"].get("escalation_id"))
+    out.append({"check": "escalation_ids", "ok": not bad_summ, "detail": {"summary_missing_order_id": bad_summ}})
     credit = round(sum(e["result"]["credited"] for e in world.log if e["tool"] == "issue_credit" and not e["is_error"]), 2)
     out.append({"check": "credit_cap", "ok": credit <= 25 + TOL, "detail": credit})
     for rule in task.get("required_actions", []):

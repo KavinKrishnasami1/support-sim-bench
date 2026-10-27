@@ -7,6 +7,7 @@
   supportsim view <results dir>         write view.html for a run folder
   supportsim show <run json>            print one transcript to the terminal
   supportsim compare <dir> [<dir>...]   markdown table comparing run folders
+  supportsim regrade <dir>              re-grade saved runs with the current grader and tasks (no model calls)
 """
 from __future__ import annotations
 
@@ -64,6 +65,8 @@ def main() -> None:
     v.add_argument("dir")
     s = sub.add_parser("show")
     s.add_argument("run")
+    g = sub.add_parser("regrade")
+    g.add_argument("dir")
     c = sub.add_parser("compare")
     c.add_argument("dirs", nargs="+")
     a = ap.parse_args()
@@ -93,6 +96,10 @@ def main() -> None:
         print(f"  agent {a.agent_model}: ${est['agent']:.2f}   customer {a.user_model}: ${est['customer']:.2f}"
               + (f"   judge {judge}: ${est['judge']:.2f}" if judge else "") + f"   total ≈ ${est['total']:.2f}")
         print(f"  Likely with prompt caching: ≈ ${est['likely_with_cache']:.2f}")
+        prev = _observed_cost_per_run(a.agent_model, a.user_model)
+        if prev:
+            print(f"  Earlier runs with these models cost ${prev:.4f} per run on average: ≈ ${prev * est['runs']:.2f} "
+                  "for this run.")
         if a.cmd == "estimate":
             return
         print(f"Hard cap: ${a.max_cost:.2f}. No new API call starts once spend reaches it.")
@@ -129,6 +136,17 @@ def main() -> None:
         from .viewer import show_run
 
         show_run(Path(a.run))
+    elif a.cmd == "regrade":
+        from .report import print_summary, summarize
+        from .tasks import regrade_dir
+        from .viewer import render
+
+        changed = regrade_dir(Path(a.dir))
+        for tid, trial, old, new in changed:
+            print(f"  {tid} trial {trial}: {'PASS' if old else 'FAIL'} -> {'PASS' if new else 'FAIL'}")
+        print(f"{len(changed)} runs changed")
+        print_summary(summarize(Path(a.dir)))
+        render(Path(a.dir))
     elif a.cmd == "compare":
         from .report import summarize
 
@@ -146,6 +164,19 @@ def main() -> None:
             print(f"| {tid} | " + " | ".join(cells) + " |")
         print("| **All** | " + " | ".join(f"**{_p(s['overall']['pass^1'])}** | **{_p(s['overall'][f'pass^{k}'])}**"
                                           for s in sums) + " |")
+
+
+def _observed_cost_per_run(agent_model: str, user_model: str) -> float | None:
+    """Average actual cost per run from earlier result folders with the same models."""
+    from .runner import RESULTS
+
+    costs = []
+    for cfg in RESULTS.glob("*/config.json"):
+        c = json.loads(cfg.read_text())
+        n = len(list((cfg.parent / "runs").glob("*.json")))
+        if c.get("agent_model") == agent_model and c.get("user_model") == user_model and c.get("actual_spend_usd") and n:
+            costs.append(c["actual_spend_usd"] / n)
+    return sum(costs) / len(costs) if costs else None
 
 
 def _p(x) -> str:

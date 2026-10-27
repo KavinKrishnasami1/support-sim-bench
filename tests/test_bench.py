@@ -63,3 +63,10 @@ def test_pass_hat_k():
     assert pass_hat_k(3, 3, 3) == 1 and pass_hat_k(3, 2, 3) == 0
     assert abs(pass_hat_k(4, 2, 2) - 1 / 6) < 1e-9
     assert pass_hat_k(2, 2, 3) is None
+
+
+def test_self_address_and_instruction_echo_are_flagged():
+    customer = ScriptedProvider(["Thanks, Daniel. I don't know the refund policy here", "bye " + STOP_TOKEN])
+    r = run_episode(T02, _agent([[], []]), customer)
+    types = {f["type"] for f in r["flags"]}
+    assert {"broke_character", "echoed_instructions"} <= types
