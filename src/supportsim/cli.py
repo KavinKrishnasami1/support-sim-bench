@@ -32,7 +32,23 @@ def _models(ap: argparse.ArgumentParser) -> None:
     ap.add_argument("-k", type=int, default=3, help="trials per task")
 
 
+def load_dotenv() -> None:
+    """Read KEY=value lines from the repo's .env (gitignored) without overriding the environment."""
+    import os
+
+    from .world import ROOT
+
+    path = ROOT / ".env"
+    if not path.exists():
+        return
+    for line in path.read_text().splitlines():
+        key, sep, value = line.strip().partition("=")
+        if sep and key and not key.startswith("#") and value.strip():
+            os.environ.setdefault(key.strip(), value.strip().strip("'\""))
+
+
 def main() -> None:
+    load_dotenv()
     ap = argparse.ArgumentParser(prog="supportsim", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("tasks")
