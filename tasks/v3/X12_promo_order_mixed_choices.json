@@ -1,0 +1,469 @@
+{
+  "id": "X12",
+  "slug": "promo_order_mixed_choices",
+  "title": "Promo order, two missing items: one refunded, one credited",
+  "tricky": "$60 subtotal with a $15 promo. One $4 lemonade goes back to the card: $4 - 15×4/60 = $3.00 refund plus $1.00 promo-share credit. The $18 grain bowl is taken as credit: $21.60, with no split. The $1.00 promo share doesn't count towards the $25 limit.",
+  "source": {
+    "dataset": "none",
+    "license": "n/a",
+    "what_we_took": "Designed for v3 from the failure modes in LESSONS.md (see V3_DESIGN.md); not derived from a specific conversation. Customer behaviours follow patterns seen in ABCD."
+  },
+  "resolution_summary": "Refund $3.00 to card (lemonade) + $1.00 promo-share credit; $21.60 credit for the grain bowl. Total credit $22.60.",
+  "user": {
+    "persona": "Grace Oyelaran, regular Green Bowl customer, organised.",
+    "situation": "Your Green Bowl order (#9201) was missing the grain bowl and one of the two lemonades. You used a promo code (FALL15) when ordering.",
+    "goal": "Compensation for both missing items.",
+    "facts": [
+      "Your full name is Grace Oyelaran.",
+      "Your phone is 415-555-0312.",
+      "Order number 9201.",
+      "Missing: the grain bowl, and one of your two lemonades. Everything else arrived.",
+      "You used the promo code FALL15; you don't remember how much it took off."
+    ],
+    "reveal_rules": [
+      "Mention the promo code only if the agent asks about it or mentions a discount."
+    ],
+    "behaviors": [
+      "If asked how you'd like each item compensated: the lemonade back on your card, and the grain bowl as account credit since you order there often. If asked once for both, give that split.",
+      "Accept a split refund for the lemonade if the agent explains it."
+    ],
+    "opening": "my green bowl order was missing the grain bowl and a lemonade",
+    "end_condition": "the agent has told you what they've done or why they can't, and you've acknowledged it."
+  },
+  "expected": {
+    "refunds": {
+      "K-9201": 3.0
+    },
+    "credits": {
+      "E312": 22.6
+    }
+  },
+  "credit_cap": 25,
+  "leak_check": {
+    "amounts": [
+      "3.00",
+      "1.00",
+      "21.60",
+      "22.60"
+    ],
+    "phrases": []
+  },
+  "est_turns": 12,
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "phone": "415-555-0312"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "E312",
+        "full_name": "Grace Oyelaran",
+        "phone": "415-555-0312"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-9201"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-9201"
+      }
+    },
+    {
+      "tool": "get_restaurant",
+      "args": {
+        "restaurant_id": "S6"
+      }
+    },
+    {
+      "tool": "get_payment",
+      "args": {
+        "order_id": "K-9201"
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "K-9201",
+        "amount": 3.0,
+        "reason": "missing_item",
+        "item_ids": [
+          "K-9201-2"
+        ]
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "E312",
+        "amount": 1.0,
+        "reason": "other",
+        "order_id": "K-9201",
+        "item_ids": [
+          "K-9201-2"
+        ]
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "E312",
+        "amount": 21.6,
+        "reason": "missing_item",
+        "order_id": "K-9201",
+        "item_ids": [
+          "K-9201-1"
+        ]
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "lemonade refunded at full price",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0312"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E312",
+            "full_name": "Grace Oyelaran",
+            "phone": "415-555-0312"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9201"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9201"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S6"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-9201"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-9201",
+            "amount": 4.0,
+            "reason": "missing_item"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E312",
+            "amount": 21.6,
+            "reason": "missing_item",
+            "order_id": "K-9201",
+            "item_ids": [
+              "K-9201-1"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "promo-share credit forgotten",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0312"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E312",
+            "full_name": "Grace Oyelaran",
+            "phone": "415-555-0312"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9201"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9201"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S6"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-9201"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-9201",
+            "amount": 3.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-9201-2"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E312",
+            "amount": 21.6,
+            "reason": "missing_item",
+            "order_id": "K-9201",
+            "item_ids": [
+              "K-9201-1"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "bowl credited at price only",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0312"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E312",
+            "full_name": "Grace Oyelaran",
+            "phone": "415-555-0312"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9201"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9201"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S6"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-9201"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-9201",
+            "amount": 3.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-9201-2"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E312",
+            "amount": 1.0,
+            "reason": "other",
+            "order_id": "K-9201",
+            "item_ids": [
+              "K-9201-2"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E312",
+            "amount": 18.0,
+            "reason": "missing_item",
+            "order_id": "K-9201"
+          }
+        }
+      ]
+    },
+    {
+      "name": "bowl credit reduced by its promo share",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0312"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E312",
+            "full_name": "Grace Oyelaran",
+            "phone": "415-555-0312"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9201"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9201"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S6"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-9201"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-9201",
+            "amount": 3.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-9201-2"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E312",
+            "amount": 1.0,
+            "reason": "other",
+            "order_id": "K-9201",
+            "item_ids": [
+              "K-9201-2"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E312",
+            "amount": 16.2,
+            "reason": "missing_item",
+            "order_id": "K-9201"
+          }
+        }
+      ]
+    },
+    {
+      "name": "both items refunded to the card",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0312"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E312",
+            "full_name": "Grace Oyelaran",
+            "phone": "415-555-0312"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9201"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9201"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S6"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-9201"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-9201",
+            "amount": 16.5,
+            "reason": "missing_item"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E312",
+            "amount": 5.5,
+            "reason": "other",
+            "order_id": "K-9201"
+          }
+        }
+      ]
+    }
+  ],
+  "credit_cap_exempt": 1.0
+}

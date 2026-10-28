@@ -1,0 +1,338 @@
+{
+  "id": "X07",
+  "slug": "replacement_but_restaurant_closing",
+  "title": "Customer wants a replacement; the restaurant closes in 20 minutes",
+  "tricky": "The order was lost and the customer wants it re-sent. A replacement needs the restaurant open for 45 more minutes; the café closes at 19:50 and it's 19:30. So refund the full $34.82, and don't mark the order not_delivered (that's only for replacements).",
+  "source": {
+    "dataset": "none",
+    "license": "n/a",
+    "what_we_took": "Designed for v3 from the failure modes in LESSONS.md (see V3_DESIGN.md); not derived from a specific conversation. Customer behaviours follow patterns seen in ABCD."
+  },
+  "resolution_summary": "Refund $34.82 for K-8701. No replacement, no status change.",
+  "user": {
+    "persona": "Sofia Marino, disappointed; was looking forward to the food.",
+    "situation": "Your Corner Café order (#8701) never arrived; the app says something happened to the bag. You really wanted that food tonight.",
+    "goal": "Have the order re-sent tonight.",
+    "facts": [
+      "Your full name is Sofia Marino.",
+      "Your phone is 415-555-0307.",
+      "Order number 8701.",
+      "Nothing arrived."
+    ],
+    "reveal_rules": [],
+    "behaviors": [
+      "Ask for the food to be re-sent.",
+      "If the agent says it can't be re-sent, push back once ('can't you just send it again?'), then accept a refund to your card."
+    ],
+    "opening": "my corner cafe order never showed up, can you send it again?",
+    "end_condition": "the agent has told you what they've done or why they can't, and you've acknowledged it."
+  },
+  "expected": {
+    "refunds": {
+      "K-8701": 34.82
+    }
+  },
+  "credit_cap": 25,
+  "leak_check": {
+    "amounts": [
+      "34.82"
+    ],
+    "phrases": [
+      "clos(e|es|ing)",
+      "45 minutes"
+    ]
+  },
+  "est_turns": 10,
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "phone": "415-555-0307"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "E307",
+        "full_name": "Sofia Marino",
+        "phone": "415-555-0307"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-8701"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-8701"
+      }
+    },
+    {
+      "tool": "get_restaurant",
+      "args": {
+        "restaurant_id": "S5"
+      }
+    },
+    {
+      "tool": "get_payment",
+      "args": {
+        "order_id": "K-8701"
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "K-8701",
+        "amount": 34.82,
+        "reason": "whole_order"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "replacement despite the closing time",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0307"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E307",
+            "full_name": "Sofia Marino",
+            "phone": "415-555-0307"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-8701"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-8701"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S5"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-8701"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "K-8701",
+            "status": "not_delivered"
+          }
+        },
+        {
+          "tool": "create_replacement_order",
+          "args": {
+            "order_id": "K-8701",
+            "item_ids": [
+              "K-8701-1",
+              "K-8701-2",
+              "K-8701-3",
+              "K-8701-4"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "replacement plus refund",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0307"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E307",
+            "full_name": "Sofia Marino",
+            "phone": "415-555-0307"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-8701"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-8701"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S5"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-8701"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "K-8701",
+            "status": "not_delivered"
+          }
+        },
+        {
+          "tool": "create_replacement_order",
+          "args": {
+            "order_id": "K-8701",
+            "item_ids": [
+              "K-8701-1",
+              "K-8701-2",
+              "K-8701-3",
+              "K-8701-4"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-8701",
+            "amount": 34.82,
+            "reason": "whole_order"
+          }
+        }
+      ]
+    },
+    {
+      "name": "marks not_delivered and refunds",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0307"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E307",
+            "full_name": "Sofia Marino",
+            "phone": "415-555-0307"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-8701"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-8701"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S5"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-8701"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "K-8701",
+            "status": "not_delivered"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-8701",
+            "amount": 34.82,
+            "reason": "whole_order"
+          }
+        }
+      ]
+    },
+    {
+      "name": "escalates instead",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0307"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E307",
+            "full_name": "Sofia Marino",
+            "phone": "415-555-0307"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-8701"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-8701"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S5"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-8701"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "E307",
+            "order_id": "K-8701",
+            "reason": "other",
+            "summary": "K-8701 lost; customer wants it re-sent."
+          }
+        }
+      ]
+    }
+  ]
+}

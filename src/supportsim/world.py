@@ -18,6 +18,8 @@ SUITES = {
     "v1": {"world": ROOT / "world" / "base.json", "policy": ROOT / "world" / "policy.md", "tasks": ROOT / "tasks"},
     "v2": {"world": ROOT / "world" / "v2" / "base.json", "policy": ROOT / "world" / "v2" / "policy.md",
            "tasks": ROOT / "tasks" / "v2"},
+    "v3": {"world": ROOT / "world" / "v3" / "base.json", "policy": ROOT / "world" / "v3" / "policy.md",
+           "tasks": ROOT / "tasks" / "v3"},
 }
 
 
@@ -100,7 +102,7 @@ def effects(initial: dict, final: dict) -> dict:
         diff = {k: o[k] for k in ("status", "delivery_address") if before.get(k) != o.get(k)}
         if diff:
             changes[o["order_id"]] = diff
-    return {
+    out = {
         "refunds": {k: round(v - r0.get(k, 0), 2) for k, v in r1.items() if round(v - r0.get(k, 0), 2)},
         "credits": {k: round(v - c0.get(k, 0), 2) for k, v in c1.items() if round(v - c0.get(k, 0), 2)},
         "order_changes": changes,
@@ -108,6 +110,10 @@ def effects(initial: dict, final: dict) -> dict:
                          "reason": e.get("reason")}
                         for e in final["escalations"][len(initial["escalations"]):]],
     }
+    if "replacements" in final:  # v3
+        out["replacements"] = [{"order_id": r["original_order_id"], "item_ids": r["item_ids"]}
+                               for r in final["replacements"][len(initial.get("replacements", [])):]]
+    return out
 
 
 def escalation_order(data: dict, esc: dict) -> str | None:

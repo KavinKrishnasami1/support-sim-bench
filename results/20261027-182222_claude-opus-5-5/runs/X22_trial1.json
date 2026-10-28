@@ -1,0 +1,1178 @@
+{
+ "task_id": "X22",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 41.6,
+ "events": [
+  {
+   "role": "customer",
+   "text": "ugh, a few things went wrong with my orders tonight. I'm hosting friends in like an hour and I'm kind of stressed. Can you help me get my money back for the stuff that messed up?"
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry tonight has been stressful. I can help sort this out. First I need to verify your identity. Please send me:\n\n1. Your **full name**\n2. The **email address or phone number** on your Forkful account\n\nOnce you're verified, tell me which orders had problems and what went wrong with each, and I'll look into them."
+  },
+  {
+   "role": "customer",
+   "text": "Yusuf Demir. The email on my account is yusuf.demir@post.example.\n\nThe first one is order #6601 from Spice Route. I ordered paneer makhani and they sent chicken makhani instead. Nobody ate it, so it's just wrong."
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "email": "yusuf.demir@post.example"
+   },
+   "result": {
+    "customer_id": "E322",
+    "name": "Yusuf Demir",
+    "email": "yusuf.demir@post.example",
+    "phone": "+1 415-555-0322",
+    "default_address": "17 Thistle Ct, Oakdale, CA 94622",
+    "plus_member": false,
+    "plus_since": null,
+    "plus_until": null,
+    "refund_history": [],
+    "authorized_users": [],
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "K-6602",
+      "restaurant": "Spice Route",
+      "placed_at": "2026-10-24T19:02:00-07:00",
+      "status": "delivered",
+      "total": 19.43
+     },
+     {
+      "order_id": "K-6601",
+      "restaurant": "Spice Route",
+      "placed_at": "2026-10-24T18:58:00-07:00",
+      "status": "delivered",
+      "total": 26.95
+     },
+     {
+      "order_id": "K-6603",
+      "restaurant": "Lotus Garden",
+      "placed_at": "2026-10-24T18:30:00-07:00",
+      "status": "delivered",
+      "total": 29.64
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "customer_id": "E322",
+    "full_name": "Yusuf Demir",
+    "email": "yusuf.demir@post.example"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "E322",
+    "role": "account_holder"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_account_activity",
+   "args": {
+    "customer_id": "E322"
+   },
+   "result": {
+    "customer_id": "E322",
+    "now": "2026-10-24T19:30:00-07:00",
+    "events": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "K-6601"
+   },
+   "result": {
+    "order_id": "K-6601",
+    "customer_id": "E322",
+    "restaurant_id": "S4",
+    "restaurant": "Spice Route",
+    "items": [
+     {
+      "item_id": "K-6601-1",
+      "name": "Paneer makhani",
+      "qty": 1,
+      "unit_price": 15.0
+     },
+     {
+      "item_id": "K-6601-2",
+      "name": "Jeera rice",
+      "qty": 1,
+      "unit_price": 4.5
+     }
+    ],
+    "subtotal": 19.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 1.46,
+    "tip": 3.0,
+    "total": 26.95,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:58:00-07:00",
+    "promised_at": "2026-10-24T19:40:00-07:00",
+    "picked_up_at": "2026-10-24T19:10:00-07:00",
+    "delivered_at": "2026-10-24T19:24:00-07:00",
+    "delivery_address": "17 Thistle Ct, Oakdale, CA 94622",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "K-6601"
+   },
+   "result": {
+    "order_id": "K-6601",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 26.95,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 26.95,
+      "time": "2026-10-24T18:58:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 26.95,
+      "time": "2026-10-24T19:40:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 19.5,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-6601"
+   },
+   "result": {
+    "order_id": "K-6601",
+    "promised_at": "2026-10-24T19:40:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T19:10:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T19:24:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_ticket_history",
+   "args": {
+    "customer_id": "E322"
+   },
+   "result": {
+    "customer_id": "E322",
+    "tickets": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_restaurant",
+   "args": {
+    "restaurant_id": "S4"
+   },
+   "result": {
+    "restaurant_id": "S4",
+    "name": "Spice Route",
+    "opens_at": "2026-10-24T11:30:00-07:00",
+    "closes_at": "2026-10-24T22:00:00-07:00",
+    "incidents": [
+     {
+      "incident_id": "INC-311",
+      "status": "open",
+      "opened_at": "2026-10-24T18:50:00-07:00",
+      "summary": "A sauce batch used in curries was recalled by the supplier. The incident team is contacting and compensating every affected order.",
+      "covers_orders_placed": {
+       "from": "2026-10-24T17:00:00-07:00",
+       "to": "2026-10-24T19:00:00-07:00"
+      }
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "escalate_to_human",
+   "args": {
+    "customer_id": "E322",
+    "order_id": "K-6601",
+    "reason": "restaurant_incident",
+    "summary": "Customer reports wrong item on K-6601 (Spice Route): ordered Paneer makhani ($15.00, item K-6601-1), received chicken makhani instead. Nobody ate it, no harm reported. Order placed 18:58 falls within open incident INC-311 (recalled curry sauce batch, covers orders 17:00-19:00). No compensation issued by frontline support; please handle via incident team."
+   },
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "Thanks, Yusuf. You're verified.\n\nI've looked at order #K-6601 from Spice Route. It was placed at 6:58 PM, and Spice Route has an open incident right now: a supplier recalled a sauce batch used in their curries. The incident covers orders placed between 5:00 and 7:00 PM tonight, so yours is one of them.\n\nThat means I can't refund the wrong paneer makhani myself. Our incident team handles compensation for every affected order. I've sent your case to them, including the wrong item (reference **ESC-700**). A specialist will contact you within 24 hours. I can't promise what they'll decide, but they have all the details.\n\nSince the dish may contain the recalled sauce, please don't eat it or give it to your guests. If anyone did eat any of it and feels unwell, let me know right away.\n\nWhat went wrong with your other order? I see #K-6602 from Spice Route and #K-6603 from Lotus Garden on your account tonight."
+  },
+  {
+   "role": "customer",
+   "text": "Okay, thanks. Nobody's eaten it and everyone's fine, so that's good to hear. But I'm hosting in like an hour, so 24 hours is kind of a problem. Is there any way to get the refund sooner?\n\nAs for the other orders: #6602 from Spice Route was a small one I placed a few minutes after the first, for extra naan. One of the two garlic naans was missing."
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "K-6602"
+   },
+   "result": {
+    "order_id": "K-6602",
+    "customer_id": "E322",
+    "restaurant_id": "S4",
+    "restaurant": "Spice Route",
+    "items": [
+     {
+      "item_id": "K-6602-1",
+      "name": "Garlic naan",
+      "qty": 2,
+      "unit_price": 4.0
+     },
+     {
+      "item_id": "K-6602-2",
+      "name": "Mango lassi",
+      "qty": 1,
+      "unit_price": 4.5
+     }
+    ],
+    "subtotal": 12.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 0.94,
+    "tip": 3.0,
+    "total": 19.43,
+    "status": "delivered",
+    "placed_at": "2026-10-24T19:02:00-07:00",
+    "promised_at": "2026-10-24T19:45:00-07:00",
+    "picked_up_at": "2026-10-24T19:10:00-07:00",
+    "delivered_at": "2026-10-24T19:24:00-07:00",
+    "delivery_address": "17 Thistle Ct, Oakdale, CA 94622",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "K-6602"
+   },
+   "result": {
+    "order_id": "K-6602",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 19.43,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 19.43,
+      "time": "2026-10-24T19:02:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 19.43,
+      "time": "2026-10-24T19:45:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 12.5,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-6602"
+   },
+   "result": {
+    "order_id": "K-6602",
+    "promised_at": "2026-10-24T19:45:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T19:10:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T19:24:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry, but I can't speed up the incident team. They handle every affected order themselves, and I can't refund #K-6601 separately. Your case is filed, and a specialist will be in touch within 24 hours.\n\n**Order #K-6602 (extra naan):** This one I can handle now. It was placed at 7:02 PM, just after the recall window closed, so the incident doesn't cover it. You were charged for 2 garlic naans at $4.00 each. For the missing one, you can choose:\n\n1. **$4.00 refunded** to your Visa ending 4242, or\n2. **$4.80 in Forkful account credit** (the naan's price plus 20%), which you can use on future orders, including one tonight.\n\nIf you want to order more food before your guests arrive, the credit can go toward it. Which would you like? And what went wrong with #K-6603 from Lotus Garden?"
+  },
+  {
+   "role": "customer",
+   "text": "Ok, I'd like the $4.00 back to my Visa, please. Just the refund, I don't need the credit.\n\nThe Lotus Garden one, #6603, was missing the spring rolls. I ordered them as part of the meal and they just didn't come."
+  },
+  {
+   "role": "tool",
+   "name": "issue_refund",
+   "args": {
+    "order_id": "K-6602",
+    "amount": 4.0,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6602-1"
+    ]
+   },
+   "result": {
+    "refund_id": "RF-4000",
+    "order_id": "K-6602",
+    "amount": 4.0,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "K-6603"
+   },
+   "result": {
+    "order_id": "K-6603",
+    "customer_id": "E322",
+    "restaurant_id": "S2",
+    "restaurant": "Lotus Garden",
+    "items": [
+     {
+      "item_id": "K-6603-1",
+      "name": "Green curry",
+      "qty": 1,
+      "unit_price": 15.0
+     },
+     {
+      "item_id": "K-6603-2",
+      "name": "Spring rolls",
+      "qty": 1,
+      "unit_price": 7.0
+     }
+    ],
+    "subtotal": 22.0,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 1.65,
+    "tip": 3.0,
+    "total": 29.64,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:30:00-07:00",
+    "promised_at": "2026-10-24T19:15:00-07:00",
+    "picked_up_at": "2026-10-24T18:55:00-07:00",
+    "delivered_at": "2026-10-24T19:12:00-07:00",
+    "delivery_address": "17 Thistle Ct, Oakdale, CA 94622",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "K-6603"
+   },
+   "result": {
+    "order_id": "K-6603",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 29.64,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 29.64,
+      "time": "2026-10-24T18:30:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 29.64,
+      "time": "2026-10-24T19:15:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 22.0,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-6603"
+   },
+   "result": {
+    "order_id": "K-6603",
+    "promised_at": "2026-10-24T19:15:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:55:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T19:12:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_restaurant",
+   "args": {
+    "restaurant_id": "S2"
+   },
+   "result": {
+    "restaurant_id": "S2",
+    "name": "Lotus Garden",
+    "opens_at": "2026-10-24T11:00:00-07:00",
+    "closes_at": "2026-10-24T22:00:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "**Order #K-6602:** I've refunded **$4.00** to your Visa ending 4242 for the missing garlic naan (refund RF-4000). It should show up in 3\u20135 business days.\n\n**Order #K-6603 (Lotus Garden):** Lotus Garden has no open incidents, and you're well within the reporting window, so I can take care of this one now. The spring rolls cost $7.00. You can choose:\n\n1. **$7.00 refunded** to your Visa ending 4242, or\n2. **$8.40 in Forkful account credit** (the price plus 20%).\n\nWhich would you like?\n\nYour bank statement may show two entries for each order tonight. The extra one is a temporary authorization hold. It has already been released, so you won't be charged twice, and it should disappear within 1\u20133 business days."
+  },
+  {
+   "role": "customer",
+   "text": "I'll take the $7.00 back to my Visa, please. No credit.\n\nThanks for the naan refund. And good to know about the two entries on the statement, that's a relief. Is there anything else I need to do for the Spice Route order with the chicken, or is the incident team going to reach out on that one?"
+  },
+  {
+   "role": "tool",
+   "name": "issue_refund",
+   "args": {
+    "order_id": "K-6603",
+    "amount": 7.0,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6603-2"
+    ]
+   },
+   "result": {
+    "refund_id": "RF-4001",
+    "order_id": "K-6603",
+    "amount": 7.0,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've refunded **$7.00** to your Visa ending 4242 for the missing spring rolls on #K-6603 (refund RF-4001). It should arrive in 3\u20135 business days.\n\n**Spice Route order #K-6601:** You don't need to do anything. Your case (ESC-700) is with the incident team, and a specialist will contact you within 24 hours. I can't say what they'll decide, but they have the full details: you received chicken makhani instead of paneer makhani, and nobody ate it.\n\nUntil then, please keep the chicken makhani out of the food for your guests, since it may contain the recalled sauce. If anyone does eat some and feels unwell, contact us right away.\n\nHere's a recap of tonight:\n- **#K-6601 (Spice Route):** sent to the incident team, ESC-700\n- **#K-6602 (Spice Route):** $4.00 refunded for the missing garlic naan\n- **#K-6603 (Lotus Garden):** $7.00 refunded for the missing spring rolls\n\nI hope your evening with your friends goes well!"
+  },
+  {
+   "role": "customer",
+   "text": "Thanks, that helps. So the naan and spring rolls are refunded, and the chicken makhani is with the incident team. I'll keep it away from the guests.\n\nI hope the rest of the evening goes smoothly too. Thanks for your help."
+  },
+  {
+   "role": "agent",
+   "text": "You're welcome, Yusuf! That's right: the naan and spring rolls are refunded, and the chicken makhani is with the incident team. Enjoy your evening!"
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "get_customer",
+   "args": {
+    "email": "yusuf.demir@post.example"
+   },
+   "verified_before": [],
+   "result": {
+    "customer_id": "E322",
+    "name": "Yusuf Demir",
+    "email": "yusuf.demir@post.example",
+    "phone": "+1 415-555-0322",
+    "default_address": "17 Thistle Ct, Oakdale, CA 94622",
+    "plus_member": false,
+    "plus_since": null,
+    "plus_until": null,
+    "refund_history": [],
+    "authorized_users": [],
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "K-6602",
+      "restaurant": "Spice Route",
+      "placed_at": "2026-10-24T19:02:00-07:00",
+      "status": "delivered",
+      "total": 19.43
+     },
+     {
+      "order_id": "K-6601",
+      "restaurant": "Spice Route",
+      "placed_at": "2026-10-24T18:58:00-07:00",
+      "status": "delivered",
+      "total": 26.95
+     },
+     {
+      "order_id": "K-6603",
+      "restaurant": "Lotus Garden",
+      "placed_at": "2026-10-24T18:30:00-07:00",
+      "status": "delivered",
+      "total": 29.64
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "customer_id": "E322",
+    "full_name": "Yusuf Demir",
+    "email": "yusuf.demir@post.example"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "E322",
+    "role": "account_holder"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_account_activity",
+   "args": {
+    "customer_id": "E322"
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "customer_id": "E322",
+    "now": "2026-10-24T19:30:00-07:00",
+    "events": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "K-6601"
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "order_id": "K-6601",
+    "customer_id": "E322",
+    "restaurant_id": "S4",
+    "restaurant": "Spice Route",
+    "items": [
+     {
+      "item_id": "K-6601-1",
+      "name": "Paneer makhani",
+      "qty": 1,
+      "unit_price": 15.0
+     },
+     {
+      "item_id": "K-6601-2",
+      "name": "Jeera rice",
+      "qty": 1,
+      "unit_price": 4.5
+     }
+    ],
+    "subtotal": 19.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 1.46,
+    "tip": 3.0,
+    "total": 26.95,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:58:00-07:00",
+    "promised_at": "2026-10-24T19:40:00-07:00",
+    "picked_up_at": "2026-10-24T19:10:00-07:00",
+    "delivered_at": "2026-10-24T19:24:00-07:00",
+    "delivery_address": "17 Thistle Ct, Oakdale, CA 94622",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "K-6601"
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "order_id": "K-6601",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 26.95,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 26.95,
+      "time": "2026-10-24T18:58:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 26.95,
+      "time": "2026-10-24T19:40:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 19.5,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-6601"
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "order_id": "K-6601",
+    "promised_at": "2026-10-24T19:40:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T19:10:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T19:24:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_ticket_history",
+   "args": {
+    "customer_id": "E322"
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "customer_id": "E322",
+    "tickets": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_restaurant",
+   "args": {
+    "restaurant_id": "S4"
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "restaurant_id": "S4",
+    "name": "Spice Route",
+    "opens_at": "2026-10-24T11:30:00-07:00",
+    "closes_at": "2026-10-24T22:00:00-07:00",
+    "incidents": [
+     {
+      "incident_id": "INC-311",
+      "status": "open",
+      "opened_at": "2026-10-24T18:50:00-07:00",
+      "summary": "A sauce batch used in curries was recalled by the supplier. The incident team is contacting and compensating every affected order.",
+      "covers_orders_placed": {
+       "from": "2026-10-24T17:00:00-07:00",
+       "to": "2026-10-24T19:00:00-07:00"
+      }
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "escalate_to_human",
+   "args": {
+    "customer_id": "E322",
+    "order_id": "K-6601",
+    "reason": "restaurant_incident",
+    "summary": "Customer reports wrong item on K-6601 (Spice Route): ordered Paneer makhani ($15.00, item K-6601-1), received chicken makhani instead. Nobody ate it, no harm reported. Order placed 18:58 falls within open incident INC-311 (recalled curry sauce batch, covers orders 17:00-19:00). No compensation issued by frontline support; please handle via incident team."
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "K-6602"
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "order_id": "K-6602",
+    "customer_id": "E322",
+    "restaurant_id": "S4",
+    "restaurant": "Spice Route",
+    "items": [
+     {
+      "item_id": "K-6602-1",
+      "name": "Garlic naan",
+      "qty": 2,
+      "unit_price": 4.0
+     },
+     {
+      "item_id": "K-6602-2",
+      "name": "Mango lassi",
+      "qty": 1,
+      "unit_price": 4.5
+     }
+    ],
+    "subtotal": 12.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 0.94,
+    "tip": 3.0,
+    "total": 19.43,
+    "status": "delivered",
+    "placed_at": "2026-10-24T19:02:00-07:00",
+    "promised_at": "2026-10-24T19:45:00-07:00",
+    "picked_up_at": "2026-10-24T19:10:00-07:00",
+    "delivered_at": "2026-10-24T19:24:00-07:00",
+    "delivery_address": "17 Thistle Ct, Oakdale, CA 94622",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "K-6602"
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "order_id": "K-6602",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 19.43,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 19.43,
+      "time": "2026-10-24T19:02:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 19.43,
+      "time": "2026-10-24T19:45:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 12.5,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-6602"
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "order_id": "K-6602",
+    "promised_at": "2026-10-24T19:45:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T19:10:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T19:24:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_refund",
+   "args": {
+    "order_id": "K-6602",
+    "amount": 4.0,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6602-1"
+    ]
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "refund_id": "RF-4000",
+    "order_id": "K-6602",
+    "amount": 4.0,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "K-6603"
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "order_id": "K-6603",
+    "customer_id": "E322",
+    "restaurant_id": "S2",
+    "restaurant": "Lotus Garden",
+    "items": [
+     {
+      "item_id": "K-6603-1",
+      "name": "Green curry",
+      "qty": 1,
+      "unit_price": 15.0
+     },
+     {
+      "item_id": "K-6603-2",
+      "name": "Spring rolls",
+      "qty": 1,
+      "unit_price": 7.0
+     }
+    ],
+    "subtotal": 22.0,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 1.65,
+    "tip": 3.0,
+    "total": 29.64,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:30:00-07:00",
+    "promised_at": "2026-10-24T19:15:00-07:00",
+    "picked_up_at": "2026-10-24T18:55:00-07:00",
+    "delivered_at": "2026-10-24T19:12:00-07:00",
+    "delivery_address": "17 Thistle Ct, Oakdale, CA 94622",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "K-6603"
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "order_id": "K-6603",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 29.64,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 29.64,
+      "time": "2026-10-24T18:30:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 29.64,
+      "time": "2026-10-24T19:15:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 22.0,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-6603"
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "order_id": "K-6603",
+    "promised_at": "2026-10-24T19:15:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:55:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T19:12:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_restaurant",
+   "args": {
+    "restaurant_id": "S2"
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "restaurant_id": "S2",
+    "name": "Lotus Garden",
+    "opens_at": "2026-10-24T11:00:00-07:00",
+    "closes_at": "2026-10-24T22:00:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_refund",
+   "args": {
+    "order_id": "K-6603",
+    "amount": 7.0,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6603-2"
+    ]
+   },
+   "verified_before": [
+    "E322"
+   ],
+   "result": {
+    "refund_id": "RF-4001",
+    "order_id": "K-6603",
+    "amount": 7.0,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 42,
+   "output": 3097,
+   "cache_write": 7082,
+   "cache_read": 133933
+  },
+  "customer": {
+   "input": 24,
+   "output": 543,
+   "cache_write": 1772,
+   "cache_read": 8041
+  }
+ },
+ "cost_usd": 0.15167,
+ "customer_turns": 6,
+ "completed": true,
+ "grade": {
+  "passed": true,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {
+     "K-6602": 4.0,
+     "K-6603": 7.0
+    },
+    "actual": {
+     "K-6602": 4.0,
+     "K-6603": 7.0
+    }
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": true,
+    "expected": [
+     [
+      "K-6601",
+      "restaurant_incident"
+     ]
+    ],
+    "actual": [
+     [
+      "K-6601",
+      "restaurant_incident"
+     ]
+    ],
+    "allowed_extra": [
+     "customer_request"
+    ]
+   },
+   {
+    "check": "state.replacements",
+    "ok": true,
+    "expected": [],
+    "actual": []
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": {
+     "issued": 0,
+     "cap": 25
+    }
+   }
+  ],
+  "effects": {
+   "refunds": {
+    "K-6602": 4.0,
+    "K-6603": 7.0
+   },
+   "credits": {},
+   "order_changes": {},
+   "escalations": [
+    {
+     "order_id": "K-6601",
+     "customer_id": "E322",
+     "reason": "restaurant_incident"
+    }
+   ],
+   "replacements": []
+  }
+ },
+ "passed": true,
+ "flags": [],
+ "trial": 1
+}

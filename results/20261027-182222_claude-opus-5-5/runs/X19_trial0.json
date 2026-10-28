@@ -1,0 +1,1010 @@
+{
+ "task_id": "X19",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 32.6,
+ "events": [
+  {
+   "role": "customer",
+   "text": "hi, I need help with a few orders tonight"
+  },
+  {
+   "role": "agent",
+   "text": "I'm happy to help with your orders tonight. First I need to verify your identity. Please send me:\n\n1. Your **full name**\n2. The **email address or phone number** on your Forkful account\n\nOnce you're verified, tell me which orders you need help with and what went wrong."
+  },
+  {
+   "role": "customer",
+   "text": "Chloe Dubois. My phone is 415-555-0319."
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "phone": "415-555-0319",
+    "full_name": "Chloe Dubois"
+   },
+   "result": {
+    "customer_id": "E319",
+    "name": "Chloe Dubois",
+    "email": "chloe.dubois@post.example",
+    "phone": "+1 415-555-0319",
+    "default_address": "58 Aspen Way, Oakdale, CA 94619",
+    "plus_member": false,
+    "plus_since": null,
+    "plus_until": null,
+    "refund_history": [],
+    "authorized_users": [],
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "K-6301",
+      "restaurant": "Lotus Garden",
+      "placed_at": "2026-10-24T19:05:00-07:00",
+      "status": "preparing",
+      "total": 30.18
+     },
+     {
+      "order_id": "K-6302",
+      "restaurant": "Burger Barn",
+      "placed_at": "2026-10-24T18:50:00-07:00",
+      "status": "preparing",
+      "total": 24.8
+     },
+     {
+      "order_id": "K-6303",
+      "restaurant": "Green Bowl",
+      "placed_at": "2026-10-24T17:30:00-07:00",
+      "status": "delivery_failed",
+      "total": 28.03
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_account_activity",
+   "args": {
+    "customer_id": "E319"
+   },
+   "result": {
+    "customer_id": "E319",
+    "now": "2026-10-24T19:30:00-07:00",
+    "events": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "customer_id": "E319",
+    "full_name": "Chloe Dubois",
+    "phone": "415-555-0319"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "E319",
+    "role": "account_holder"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "Thanks, Chloe. You're verified as the account holder.\n\nI can see three orders from tonight on your account:\n- **K-6301**, Lotus Garden\n- **K-6302**, Burger Barn\n- **K-6303**, Green Bowl\n\nWhich ones do you need help with, and what's going on with each?"
+  },
+  {
+   "role": "customer",
+   "text": "Let's start with Lotus Garden, #6301. Plans changed and I don't want it anymore, so can you cancel that one?"
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-6301"
+   },
+   "result": {
+    "order_id": "K-6301",
+    "promised_at": "2026-10-24T19:50:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T19:07:00-07:00",
+      "type": "courier_assigned"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "K-6301"
+   },
+   "result": {
+    "order_id": "K-6301",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 30.18,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 30.18,
+      "time": "2026-10-24T19:05:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 30.18,
+      "time": "2026-10-24T19:50:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 22.5,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "K-6301"
+   },
+   "result": {
+    "order_id": "K-6301",
+    "customer_id": "E319",
+    "restaurant_id": "S2",
+    "restaurant": "Lotus Garden",
+    "items": [
+     {
+      "item_id": "K-6301-1",
+      "name": "Pad thai",
+      "qty": 1,
+      "unit_price": 13.5
+     },
+     {
+      "item_id": "K-6301-2",
+      "name": "Tom kha soup",
+      "qty": 1,
+      "unit_price": 9.0
+     }
+    ],
+    "subtotal": 22.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 1.69,
+    "tip": 3.0,
+    "total": 30.18,
+    "status": "preparing",
+    "placed_at": "2026-10-24T19:05:00-07:00",
+    "promised_at": "2026-10-24T19:50:00-07:00",
+    "picked_up_at": null,
+    "delivered_at": null,
+    "delivery_address": "58 Aspen Way, Oakdale, CA 94619",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "update_order",
+   "args": {
+    "order_id": "K-6301",
+    "status": "cancelled"
+   },
+   "result": {
+    "order_id": "K-6301",
+    "status": "cancelled",
+    "delivery_address": "58 Aspen Way, Oakdale, CA 94619"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "issue_refund",
+   "args": {
+    "order_id": "K-6301",
+    "amount": 30.18,
+    "reason": "cancelled"
+   },
+   "result": {
+    "refund_id": "RF-4000",
+    "order_id": "K-6301",
+    "amount": 30.18,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've cancelled your Lotus Garden order (K-6301). The courier hadn't picked it up yet, so it could still be stopped.\n\n- **Refund:** the full $30.18 is going back to your Visa ending 4242. It should arrive in 3\u20135 business days.\n- **Card statement:** you may also see a temporary $30.18 hold from when you placed the order. That hold has been released and isn't a charge, so it should drop off within 1\u20133 business days.\n\nNext, what's going on with the Burger Barn (K-6302) or Green Bowl (K-6303) order?"
+  },
+  {
+   "role": "customer",
+   "text": "Thanks, that's good. Next is the Burger Barn one, #6302. I need it sent to 22 Birch Ln, Oakdale, CA 94619 instead of my place. The app still shows it as preparing."
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-6302"
+   },
+   "result": {
+    "order_id": "K-6302",
+    "promised_at": "2026-10-24T19:35:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:52:00-07:00",
+      "type": "courier_assigned"
+     },
+     {
+      "time": "2026-10-24T19:20:00-07:00",
+      "type": "picked_up"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry, but I can't change the address on your Burger Barn order (K-6302). The app still says \"preparing,\" but the courier log shows the order was **picked up at 7:20 PM**. Once an order has been picked up, the delivery address can't be changed or the order cancelled.\n\nIt's due at 58 Aspen Way at around **7:35 PM**, so it should be there in the next few minutes.\n\nIs there anything else for this order? If not, what's the issue with the Green Bowl order (K-6303)?"
+  },
+  {
+   "role": "customer",
+   "text": "The app still says preparing, so I didn't realize it had already been picked up. Okay, I'll accept that. I'm stuck with it arriving at my place then.\n\nNow the Green Bowl, #6303. The app says it was lost. I'd like a replacement sent, not a refund."
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-6303"
+   },
+   "result": {
+    "order_id": "K-6303",
+    "promised_at": "2026-10-24T18:15:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T17:32:00-07:00",
+      "type": "courier_assigned"
+     },
+     {
+      "time": "2026-10-24T17:58:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:40:00-07:00",
+      "type": "order_lost",
+      "note": "Courier reported the bag was stolen from the bike; not delivered."
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "K-6303"
+   },
+   "result": {
+    "order_id": "K-6303",
+    "customer_id": "E319",
+    "restaurant_id": "S6",
+    "restaurant": "Green Bowl",
+    "items": [
+     {
+      "item_id": "K-6303-1",
+      "name": "Harvest bowl",
+      "qty": 1,
+      "unit_price": 14.0
+     },
+     {
+      "item_id": "K-6303-2",
+      "name": "Green juice",
+      "qty": 1,
+      "unit_price": 6.5
+     }
+    ],
+    "subtotal": 20.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 1.54,
+    "tip": 3.0,
+    "total": 28.03,
+    "status": "delivery_failed",
+    "placed_at": "2026-10-24T17:30:00-07:00",
+    "promised_at": "2026-10-24T18:15:00-07:00",
+    "picked_up_at": "2026-10-24T17:58:00-07:00",
+    "delivered_at": null,
+    "delivery_address": "58 Aspen Way, Oakdale, CA 94619",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "K-6303"
+   },
+   "result": {
+    "order_id": "K-6303",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 28.03,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 28.03,
+      "time": "2026-10-24T17:30:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 28.03,
+      "time": "2026-10-24T18:15:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 20.5,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_ticket_history",
+   "args": {
+    "customer_id": "E319"
+   },
+   "result": {
+    "customer_id": "E319",
+    "tickets": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_restaurant",
+   "args": {
+    "restaurant_id": "S6"
+   },
+   "result": {
+    "restaurant_id": "S6",
+    "name": "Green Bowl",
+    "opens_at": "2026-10-24T10:00:00-07:00",
+    "closes_at": "2026-10-24T21:30:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "update_order",
+   "args": {
+    "order_id": "K-6303",
+    "status": "not_delivered"
+   },
+   "result": {
+    "order_id": "K-6303",
+    "status": "not_delivered",
+    "delivery_address": "58 Aspen Way, Oakdale, CA 94619"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "create_replacement_order",
+   "args": {
+    "order_id": "K-6303",
+    "item_ids": [
+     "K-6303-1",
+     "K-6303-2"
+    ]
+   },
+   "result": {
+    "replacement_id": "RP-900",
+    "original_order_id": "K-6303",
+    "item_ids": [
+     "K-6303-1",
+     "K-6303-2"
+    ],
+    "created_at": "2026-10-24T19:30:00-07:00",
+    "charge": 0.0,
+    "eta": "45-60 minutes"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry your Green Bowl order went missing. The courier reported the bag was stolen from their bike, so it was never delivered. I've sent you a **free replacement (RP-900)**:\n\n- **Items:** Harvest bowl and Green juice, the same as your original order\n- **Cost:** $0, so you won't be charged again\n- **Estimated arrival:** 45\u201360 minutes, at 58 Aspen Way\n\nSince this is a replacement, you won't also get a refund for the original order (K-6303). You may see a temporary $28.03 hold from when you placed that order. It isn't a charge and will drop off your statement within 1\u20133 business days.\n\nHere's a summary of tonight's three orders:\n- **Lotus Garden (K-6301):** cancelled, with $30.18 going back to your Visa\n- **Burger Barn (K-6302):** already picked up, so the address couldn't be changed. It's due at 58 Aspen Way any minute.\n- **Green Bowl (K-6303):** replacement on its way\n\nIs there anything else I can help with?"
+  },
+  {
+   "role": "customer",
+   "text": "Okay, that all makes sense. Thanks for sorting the replacement. I'll just wait for the Burger Barn food and the new Green Bowl at my place."
+  },
+  {
+   "role": "agent",
+   "text": "You're welcome, Chloe. Your Burger Barn food should be there any minute, and the Green Bowl replacement should arrive in about 45\u201360 minutes. If anything goes wrong with either one, just message us here. Enjoy your dinner!"
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "get_customer",
+   "args": {
+    "phone": "415-555-0319",
+    "full_name": "Chloe Dubois"
+   },
+   "verified_before": [],
+   "result": {
+    "customer_id": "E319",
+    "name": "Chloe Dubois",
+    "email": "chloe.dubois@post.example",
+    "phone": "+1 415-555-0319",
+    "default_address": "58 Aspen Way, Oakdale, CA 94619",
+    "plus_member": false,
+    "plus_since": null,
+    "plus_until": null,
+    "refund_history": [],
+    "authorized_users": [],
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "K-6301",
+      "restaurant": "Lotus Garden",
+      "placed_at": "2026-10-24T19:05:00-07:00",
+      "status": "preparing",
+      "total": 30.18
+     },
+     {
+      "order_id": "K-6302",
+      "restaurant": "Burger Barn",
+      "placed_at": "2026-10-24T18:50:00-07:00",
+      "status": "preparing",
+      "total": 24.8
+     },
+     {
+      "order_id": "K-6303",
+      "restaurant": "Green Bowl",
+      "placed_at": "2026-10-24T17:30:00-07:00",
+      "status": "delivery_failed",
+      "total": 28.03
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_account_activity",
+   "args": {
+    "customer_id": "E319"
+   },
+   "verified_before": [],
+   "result": {
+    "customer_id": "E319",
+    "now": "2026-10-24T19:30:00-07:00",
+    "events": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "customer_id": "E319",
+    "full_name": "Chloe Dubois",
+    "phone": "415-555-0319"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "E319",
+    "role": "account_holder"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-6301"
+   },
+   "verified_before": [
+    "E319"
+   ],
+   "result": {
+    "order_id": "K-6301",
+    "promised_at": "2026-10-24T19:50:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T19:07:00-07:00",
+      "type": "courier_assigned"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "K-6301"
+   },
+   "verified_before": [
+    "E319"
+   ],
+   "result": {
+    "order_id": "K-6301",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 30.18,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 30.18,
+      "time": "2026-10-24T19:05:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 30.18,
+      "time": "2026-10-24T19:50:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 22.5,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "K-6301"
+   },
+   "verified_before": [
+    "E319"
+   ],
+   "result": {
+    "order_id": "K-6301",
+    "customer_id": "E319",
+    "restaurant_id": "S2",
+    "restaurant": "Lotus Garden",
+    "items": [
+     {
+      "item_id": "K-6301-1",
+      "name": "Pad thai",
+      "qty": 1,
+      "unit_price": 13.5
+     },
+     {
+      "item_id": "K-6301-2",
+      "name": "Tom kha soup",
+      "qty": 1,
+      "unit_price": 9.0
+     }
+    ],
+    "subtotal": 22.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 1.69,
+    "tip": 3.0,
+    "total": 30.18,
+    "status": "preparing",
+    "placed_at": "2026-10-24T19:05:00-07:00",
+    "promised_at": "2026-10-24T19:50:00-07:00",
+    "picked_up_at": null,
+    "delivered_at": null,
+    "delivery_address": "58 Aspen Way, Oakdale, CA 94619",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "update_order",
+   "args": {
+    "order_id": "K-6301",
+    "status": "cancelled"
+   },
+   "verified_before": [
+    "E319"
+   ],
+   "result": {
+    "order_id": "K-6301",
+    "status": "cancelled",
+    "delivery_address": "58 Aspen Way, Oakdale, CA 94619"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_refund",
+   "args": {
+    "order_id": "K-6301",
+    "amount": 30.18,
+    "reason": "cancelled"
+   },
+   "verified_before": [
+    "E319"
+   ],
+   "result": {
+    "refund_id": "RF-4000",
+    "order_id": "K-6301",
+    "amount": 30.18,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-6302"
+   },
+   "verified_before": [
+    "E319"
+   ],
+   "result": {
+    "order_id": "K-6302",
+    "promised_at": "2026-10-24T19:35:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:52:00-07:00",
+      "type": "courier_assigned"
+     },
+     {
+      "time": "2026-10-24T19:20:00-07:00",
+      "type": "picked_up"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-6303"
+   },
+   "verified_before": [
+    "E319"
+   ],
+   "result": {
+    "order_id": "K-6303",
+    "promised_at": "2026-10-24T18:15:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T17:32:00-07:00",
+      "type": "courier_assigned"
+     },
+     {
+      "time": "2026-10-24T17:58:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:40:00-07:00",
+      "type": "order_lost",
+      "note": "Courier reported the bag was stolen from the bike; not delivered."
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "K-6303"
+   },
+   "verified_before": [
+    "E319"
+   ],
+   "result": {
+    "order_id": "K-6303",
+    "customer_id": "E319",
+    "restaurant_id": "S6",
+    "restaurant": "Green Bowl",
+    "items": [
+     {
+      "item_id": "K-6303-1",
+      "name": "Harvest bowl",
+      "qty": 1,
+      "unit_price": 14.0
+     },
+     {
+      "item_id": "K-6303-2",
+      "name": "Green juice",
+      "qty": 1,
+      "unit_price": 6.5
+     }
+    ],
+    "subtotal": 20.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 1.54,
+    "tip": 3.0,
+    "total": 28.03,
+    "status": "delivery_failed",
+    "placed_at": "2026-10-24T17:30:00-07:00",
+    "promised_at": "2026-10-24T18:15:00-07:00",
+    "picked_up_at": "2026-10-24T17:58:00-07:00",
+    "delivered_at": null,
+    "delivery_address": "58 Aspen Way, Oakdale, CA 94619",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "K-6303"
+   },
+   "verified_before": [
+    "E319"
+   ],
+   "result": {
+    "order_id": "K-6303",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 28.03,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 28.03,
+      "time": "2026-10-24T17:30:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 28.03,
+      "time": "2026-10-24T18:15:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 20.5,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_ticket_history",
+   "args": {
+    "customer_id": "E319"
+   },
+   "verified_before": [
+    "E319"
+   ],
+   "result": {
+    "customer_id": "E319",
+    "tickets": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_restaurant",
+   "args": {
+    "restaurant_id": "S6"
+   },
+   "verified_before": [
+    "E319"
+   ],
+   "result": {
+    "restaurant_id": "S6",
+    "name": "Green Bowl",
+    "opens_at": "2026-10-24T10:00:00-07:00",
+    "closes_at": "2026-10-24T21:30:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "update_order",
+   "args": {
+    "order_id": "K-6303",
+    "status": "not_delivered"
+   },
+   "verified_before": [
+    "E319"
+   ],
+   "result": {
+    "order_id": "K-6303",
+    "status": "not_delivered",
+    "delivery_address": "58 Aspen Way, Oakdale, CA 94619"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "create_replacement_order",
+   "args": {
+    "order_id": "K-6303",
+    "item_ids": [
+     "K-6303-1",
+     "K-6303-2"
+    ]
+   },
+   "verified_before": [
+    "E319"
+   ],
+   "result": {
+    "replacement_id": "RP-900",
+    "original_order_id": "K-6303",
+    "item_ids": [
+     "K-6303-1",
+     "K-6303-2"
+    ],
+    "created_at": "2026-10-24T19:30:00-07:00",
+    "charge": 0.0,
+    "eta": "45-60 minutes"
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 42,
+   "output": 2202,
+   "cache_write": 10948,
+   "cache_read": 115070
+  },
+  "customer": {
+   "input": 24,
+   "output": 305,
+   "cache_write": 1997,
+   "cache_read": 5801
+  }
+ },
+ "cost_usd": 0.14544,
+ "customer_turns": 6,
+ "completed": true,
+ "grade": {
+  "passed": true,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {
+     "K-6301": 30.18
+    },
+    "actual": {
+     "K-6301": 30.18
+    }
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {
+     "K-6301": {
+      "status": "cancelled"
+     },
+     "K-6303": {
+      "status": "not_delivered"
+     }
+    },
+    "actual": {
+     "K-6301": {
+      "status": "cancelled"
+     },
+     "K-6303": {
+      "status": "not_delivered"
+     }
+    }
+   },
+   {
+    "check": "state.escalations",
+    "ok": true,
+    "expected": [],
+    "actual": [],
+    "allowed_extra": [
+     "customer_request"
+    ]
+   },
+   {
+    "check": "state.replacements",
+    "ok": true,
+    "expected": [
+     [
+      "K-6303",
+      [
+       "K-6303-1",
+       "K-6303-2"
+      ]
+     ]
+    ],
+    "actual": [
+     [
+      "K-6303",
+      [
+       "K-6303-1",
+       "K-6303-2"
+      ]
+     ]
+    ]
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": {
+     "issued": 0,
+     "cap": 25
+    }
+   }
+  ],
+  "effects": {
+   "refunds": {
+    "K-6301": 30.18
+   },
+   "credits": {},
+   "order_changes": {
+    "K-6301": {
+     "status": "cancelled"
+    },
+    "K-6303": {
+     "status": "not_delivered"
+    }
+   },
+   "escalations": [],
+   "replacements": [
+    {
+     "order_id": "K-6303",
+     "item_ids": [
+      "K-6303-1",
+      "K-6303-2"
+     ]
+    }
+   ]
+  }
+ },
+ "passed": true,
+ "flags": [],
+ "trial": 0
+}

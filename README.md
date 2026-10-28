@@ -12,8 +12,12 @@ Two suites, each task run k times and reported as pass rate and pass^k (the chan
 - **v2**: 12 harder tasks, a longer policy and 10 tools. Records conflict (a courier event log versus the order
   record), there are promo splits, earlier promises in ticket history, Plus membership limits, a fraud review that
   overrides everything, customers who are wrong, and several issues in one chat.
+- **v3**: 21 tasks aimed at the strongest models, a 13-section policy and 13 tools. Rules that override each other,
+  account security and authorized users, restaurant incidents, replacements, UTC courier logs, updated ETAs, and
+  long multi-issue chats. Opus 5.5 and Sonnet 5.5 pass all of it; see [RESULTS_V3.md](RESULTS_V3.md) and
+  [V3_DESIGN.md](V3_DESIGN.md).
 
-Current results are in [RESULTS.md](RESULTS.md); what we learned building it is in [LESSONS.md](LESSONS.md).
+Current results are in [RESULTS.md](RESULTS.md) (v1, v2) and [RESULTS_V3.md](RESULTS_V3.md); what we learned building it is in [LESSONS.md](LESSONS.md).
 
 ## Quick start
 

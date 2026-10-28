@@ -1,0 +1,1459 @@
+{
+ "task_id": "X17",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 63.9,
+ "events": [
+  {
+   "role": "customer",
+   "text": "ok I've had a terrible week with forkful, can we go through a few orders? I've got a bunch of problems to sort out at once."
+  },
+  {
+   "role": "agent",
+   "text": "Sorry your week with Forkful has been so rough. I can go through each order with you. First I need to confirm who you are: please send me your **full name** and the **email address or phone number** on your account."
+  },
+  {
+   "role": "customer",
+   "text": "Sure. My full name is Hannah Cole, and the email on my account is hannah.cole@inbox.example.\n\nI've got four orders I want to go over. Should I start with the most recent one?"
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "email": "hannah.cole@inbox.example"
+   },
+   "result": {
+    "customer_id": "E317",
+    "name": "Hannah Cole",
+    "email": "hannah.cole@inbox.example",
+    "phone": "+1 415-555-0317",
+    "default_address": "33 Juniper St, Oakdale, CA 94617",
+    "plus_member": false,
+    "plus_since": null,
+    "plus_until": null,
+    "refund_history": [],
+    "authorized_users": [],
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "K-6101",
+      "restaurant": "Saffron Lane",
+      "placed_at": "2026-10-24T17:20:00-07:00",
+      "status": "delivered",
+      "total": 70.49
+     },
+     {
+      "order_id": "K-6104",
+      "restaurant": "Pho Real",
+      "placed_at": "2026-10-24T12:10:00-07:00",
+      "status": "delivered",
+      "total": 26.68
+     },
+     {
+      "order_id": "K-6102",
+      "restaurant": "Burger Barn",
+      "placed_at": "2026-10-23T19:00:00-07:00",
+      "status": "delivered",
+      "total": 30.18
+     },
+     {
+      "order_id": "K-6103",
+      "restaurant": "Taqueria Luz",
+      "placed_at": "2026-10-21T18:30:00-07:00",
+      "status": "delivered",
+      "total": 26.42
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "customer_id": "E317",
+    "full_name": "Hannah Cole",
+    "email": "hannah.cole@inbox.example"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "E317",
+    "role": "account_holder"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_account_activity",
+   "args": {
+    "customer_id": "E317"
+   },
+   "result": {
+    "customer_id": "E317",
+    "now": "2026-10-24T19:30:00-07:00",
+    "events": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_ticket_history",
+   "args": {
+    "customer_id": "E317"
+   },
+   "result": {
+    "customer_id": "E317",
+    "tickets": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "Thanks, Hannah. You're verified as the account holder, so we can go through your orders.\n\nThese are the four recent orders I can see on your account:\n\n1. **K-6101**, Saffron Lane, today at 5:20 PM\n2. **K-6104**, Pho Real, today at 12:10 PM\n3. **K-6102**, Burger Barn, yesterday (Oct 23) at 7:00 PM\n4. **K-6103**, Taqueria Luz, Oct 21 at 6:30 PM\n\nStarting with the most recent one works. Or if it's quicker, you can describe all four problems in one message and I'll look into them together. For each order, please tell me what went wrong, such as late delivery, missing or wrong items, or the order never arriving. If items were missing or wrong, tell me which ones."
+  },
+  {
+   "role": "customer",
+   "text": "Let's start with the most recent one, Saffron Lane. It was promised for 6pm and didn't show up until around 6:50, so it was almost an hour late. On top of that, one of the two mango lassis was missing."
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "K-6101"
+   },
+   "result": {
+    "order_id": "K-6101",
+    "customer_id": "E317",
+    "restaurant_id": "S1",
+    "restaurant": "Saffron Lane",
+    "items": [
+     {
+      "item_id": "K-6101-1",
+      "name": "Chicken tikka",
+      "qty": 1,
+      "unit_price": 18.0
+     },
+     {
+      "item_id": "K-6101-2",
+      "name": "Lamb korma",
+      "qty": 1,
+      "unit_price": 22.0
+     },
+     {
+      "item_id": "K-6101-3",
+      "name": "Basmati rice",
+      "qty": 2,
+      "unit_price": 4.0
+     },
+     {
+      "item_id": "K-6101-4",
+      "name": "Mango lassi",
+      "qty": 2,
+      "unit_price": 4.5
+     },
+     {
+      "item_id": "K-6101-5",
+      "name": "Papadum",
+      "qty": 1,
+      "unit_price": 3.0
+     }
+    ],
+    "subtotal": 60.0,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 4.5,
+    "tip": 3.0,
+    "total": 70.49,
+    "status": "delivered",
+    "placed_at": "2026-10-24T17:20:00-07:00",
+    "promised_at": "2026-10-24T18:00:00-07:00",
+    "picked_up_at": "2026-10-24T18:31:00-07:00",
+    "delivered_at": "2026-10-24T18:50:00-07:00",
+    "delivery_address": "33 Juniper St, Oakdale, CA 94617",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-6101"
+   },
+   "result": {
+    "order_id": "K-6101",
+    "promised_at": "2026-10-24T18:00:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T17:22:00-07:00",
+      "type": "courier_assigned"
+     },
+     {
+      "time": "2026-10-24T18:31:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:50:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "K-6101"
+   },
+   "result": {
+    "order_id": "K-6101",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 70.49,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 70.49,
+      "time": "2026-10-24T17:20:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 70.49,
+      "time": "2026-10-24T18:00:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 60.0,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_restaurant",
+   "args": {
+    "restaurant_id": "S1"
+   },
+   "result": {
+    "restaurant_id": "S1",
+    "name": "Saffron Lane",
+    "opens_at": "2026-10-24T11:00:00-07:00",
+    "closes_at": "2026-10-24T22:30:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "issue_credit",
+   "args": {
+    "customer_id": "E317",
+    "amount": 12.0,
+    "reason": "late_delivery",
+    "order_id": "K-6101"
+   },
+   "result": {
+    "customer_id": "E317",
+    "credited": 12.0,
+    "new_balance": 12.0
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry about this order, Hannah. I've checked the delivery records, and they match what you said.\n\n**Late delivery:** The order was promised for 6:00 PM, and the courier handed it over at 6:50 PM, so it was 50 minutes late. For deliveries 45 minutes or more late, we give account credit worth 20% of the order subtotal. On your $60.00 subtotal, that's **$12.00**, and I've already added it to your account. You can use it on future orders.\n\n**Missing mango lassi:** One lassi is $4.50. You can choose how to get that back:\n- **A $4.50 refund** to your Visa ending 4242, or\n- **$5.40 in account credit** (the item price plus 20%)\n\nWhich would you prefer? Once you tell me, we can move on to the Pho Real order."
+  },
+  {
+   "role": "customer",
+   "text": "Okay, thanks for the $12 credit on the late delivery. For the missing lassi, I'd take the account credit, since I order a lot from Forkful anyway. I'll go with the $5.40.\n\nNext is yesterday's Burger Barn order. I ordered a veggie burger and got a beef burger instead. I didn't eat it."
+  },
+  {
+   "role": "tool",
+   "name": "issue_credit",
+   "args": {
+    "customer_id": "E317",
+    "amount": 5.4,
+    "reason": "missing_item",
+    "order_id": "K-6101",
+    "item_ids": [
+     "K-6101-4"
+    ]
+   },
+   "result": {
+    "customer_id": "E317",
+    "credited": 5.4,
+    "new_balance": 17.4
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "K-6102"
+   },
+   "result": {
+    "order_id": "K-6102",
+    "customer_id": "E317",
+    "restaurant_id": "S7",
+    "restaurant": "Burger Barn",
+    "items": [
+     {
+      "item_id": "K-6102-1",
+      "name": "Veggie burger",
+      "qty": 1,
+      "unit_price": 11.0
+     },
+     {
+      "item_id": "K-6102-2",
+      "name": "Fries",
+      "qty": 1,
+      "unit_price": 5.0
+     },
+     {
+      "item_id": "K-6102-3",
+      "name": "Vanilla shake",
+      "qty": 1,
+      "unit_price": 6.5
+     }
+    ],
+    "subtotal": 22.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 1.69,
+    "tip": 3.0,
+    "total": 30.18,
+    "status": "delivered",
+    "placed_at": "2026-10-23T19:00:00-07:00",
+    "promised_at": "2026-10-23T19:45:00-07:00",
+    "picked_up_at": "2026-10-23T19:21:00-07:00",
+    "delivered_at": "2026-10-23T19:40:00-07:00",
+    "delivery_address": "33 Juniper St, Oakdale, CA 94617",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-6102"
+   },
+   "result": {
+    "order_id": "K-6102",
+    "promised_at": "2026-10-23T19:45:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-23T19:21:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-23T19:40:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "K-6102"
+   },
+   "result": {
+    "order_id": "K-6102",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 30.18,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 30.18,
+      "time": "2026-10-23T19:00:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 30.18,
+      "time": "2026-10-23T19:45:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 22.5,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_restaurant",
+   "args": {
+    "restaurant_id": "S7"
+   },
+   "result": {
+    "restaurant_id": "S7",
+    "name": "Burger Barn",
+    "opens_at": "2026-10-24T11:00:00-07:00",
+    "closes_at": "2026-10-24T23:00:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've added the **$5.40 credit** for the missing lassi. Your account credit balance is now **$17.40**.\n\n**Burger Barn (K-6102):** I'm sorry you got a beef burger instead of a veggie burger. I can see the veggie burger on the order at $11.00, and you've reported it in time.\n\nNormally you could choose between an $11.00 refund to your card and $13.20 in account credit. But there's a limit of $25.00 on the total account credit I can add in one conversation. I've already added $17.40 today, and $13.20 more would go over that limit. So for this item, I can only offer:\n\n- **An $11.00 refund** to your Visa ending 4242\n\nShould I go ahead with that refund?"
+  },
+  {
+   "role": "customer",
+   "text": "Okay, I'll take the $11 refund to my Visa. I'm a bit annoyed that the credit cap means I can't get the extra $2.20 in credit, but I understand the limit.\n\nBefore we finish, I also need to tell you about Wednesday's Taqueria Luz order. The churros were missing from it."
+  },
+  {
+   "role": "tool",
+   "name": "issue_refund",
+   "args": {
+    "order_id": "K-6102",
+    "amount": 11.0,
+    "reason": "wrong_item",
+    "item_ids": [
+     "K-6102-1"
+    ]
+   },
+   "result": {
+    "refund_id": "RF-4000",
+    "order_id": "K-6102",
+    "amount": 11.0,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "K-6103"
+   },
+   "result": {
+    "order_id": "K-6103",
+    "customer_id": "E317",
+    "restaurant_id": "S3",
+    "restaurant": "Taqueria Luz",
+    "items": [
+     {
+      "item_id": "K-6103-1",
+      "name": "Fish tacos",
+      "qty": 1,
+      "unit_price": 13.0
+     },
+     {
+      "item_id": "K-6103-2",
+      "name": "Churros",
+      "qty": 1,
+      "unit_price": 6.0
+     }
+    ],
+    "subtotal": 19.0,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 1.43,
+    "tip": 3.0,
+    "total": 26.42,
+    "status": "delivered",
+    "placed_at": "2026-10-21T18:30:00-07:00",
+    "promised_at": "2026-10-21T19:15:00-07:00",
+    "picked_up_at": "2026-10-21T18:52:00-07:00",
+    "delivered_at": "2026-10-21T19:10:00-07:00",
+    "delivery_address": "33 Juniper St, Oakdale, CA 94617",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-6103"
+   },
+   "result": {
+    "order_id": "K-6103",
+    "promised_at": "2026-10-21T19:15:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-21T18:52:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-21T19:10:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "K-6103"
+   },
+   "result": {
+    "order_id": "K-6103",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 26.42,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 26.42,
+      "time": "2026-10-21T18:30:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 26.42,
+      "time": "2026-10-21T19:15:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 19.0,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've refunded **$11.00** to your Visa ending 4242 for the wrong burger (refund ID RF-4000). It should show up in 3\u20135 business days.\n\n**Taqueria Luz (K-6103):** I'm sorry about the missing churros, but I can't compensate them. Missing items need to be reported within 48 hours of delivery. This order was delivered Wednesday, Oct 21 at 7:10 PM, so the window closed Friday, Oct 23 at 7:10 PM. I know that's frustrating, especially after the week you've had.\n\n**Where things stand:**\n- **Saffron Lane (K-6101):** $12.00 credit for the late delivery, plus $5.40 credit for the missing lassi\n- **Burger Barn (K-6102):** $11.00 refund to your Visa\n- **Taqueria Luz (K-6103):** past the reporting window, so I can't compensate it\n- **Account credit balance:** $17.40\n\nYou also mentioned a fourth order, today's **Pho Real (K-6104)**. What went wrong with that one?"
+  },
+  {
+   "role": "customer",
+   "text": "Okay, I'm disappointed about the churros, but I'll accept that. Why is the window only 48 hours, though? I didn't notice the churros were missing until later.\n\nAnyway, the Pho Real order from today is missing the iced coffee. I didn't notice it until after lunch, so I don't think I ever got a refund for it."
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "K-6104"
+   },
+   "result": {
+    "order_id": "K-6104",
+    "customer_id": "E317",
+    "restaurant_id": "S9",
+    "restaurant": "Pho Real",
+    "items": [
+     {
+      "item_id": "K-6104-1",
+      "name": "Chicken pho",
+      "qty": 1,
+      "unit_price": 14.5
+     },
+     {
+      "item_id": "K-6104-2",
+      "name": "Iced coffee",
+      "qty": 1,
+      "unit_price": 4.75
+     }
+    ],
+    "subtotal": 19.25,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 1.44,
+    "tip": 3.0,
+    "total": 26.68,
+    "status": "delivered",
+    "placed_at": "2026-10-24T12:10:00-07:00",
+    "promised_at": "2026-10-24T12:55:00-07:00",
+    "picked_up_at": "2026-10-24T12:31:00-07:00",
+    "delivered_at": "2026-10-24T12:50:00-07:00",
+    "delivery_address": "33 Juniper St, Oakdale, CA 94617",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-6104"
+   },
+   "result": {
+    "order_id": "K-6104",
+    "promised_at": "2026-10-24T12:55:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T12:20:00-07:00",
+      "type": "item_unavailable",
+      "item": "Iced coffee",
+      "note": "Restaurant marked unavailable"
+     },
+     {
+      "time": "2026-10-24T12:31:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T12:50:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "K-6104"
+   },
+   "result": {
+    "order_id": "K-6104",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 26.68,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [
+     {
+      "amount": 4.75,
+      "item": "Iced coffee",
+      "time": "2026-10-24T12:21:00-07:00",
+      "reason": "item unavailable; refunded automatically to card"
+     }
+    ],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 26.68,
+      "time": "2026-10-24T12:10:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 26.68,
+      "time": "2026-10-24T12:55:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 19.25,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "**About the 48-hour window:** that's Forkful's set deadline for reporting missing or wrong items, and I have to apply it the same way to every order. It lets us check a problem while the delivery and restaurant records are still fresh. I understand it's frustrating when you don't notice something until later, and I'm sorry I can't make an exception for the churros.\n\n**Pho Real (K-6104):** You have already been refunded for the iced coffee. Our records show the restaurant marked it unavailable at 12:20 PM, before the courier picked up your order. Forkful then automatically refunded **$4.75** to your Visa ending 4242 at 12:21 PM. Since that refund already covers the iced coffee, I can't compensate it again. If you don't see the refund yet, it should show on your statement within a few business days.\n\n**Summary of everything today:**\n- **Saffron Lane (K-6101):** $12.00 credit (late delivery) + $5.40 credit (missing lassi)\n- **Burger Barn (K-6102):** $11.00 refund to your Visa (wrong burger)\n- **Taqueria Luz (K-6103):** reported after the 48-hour window, so no compensation\n- **Pho Real (K-6104):** iced coffee already refunded automatically ($4.75)\n- **Account credit balance:** $17.40\n\nIs there anything else I can help with?"
+  },
+  {
+   "role": "customer",
+   "text": "Okay, so the iced coffee was already refunded automatically? I never saw that refund, and I was never told the restaurant had marked it unavailable. Could you check whether the $4.75 refund is actually on the Visa ending 4242? I'd like to be sure it went through.\n\nOtherwise, thanks for going through everything. I'll wait for the refund and the credit to show up."
+  },
+  {
+   "role": "agent",
+   "text": "I checked our payment record for the Pho Real order (K-6104), and the refund is there:\n\n- **$4.75 refund for the iced coffee**, sent to your **Visa ending 4242**\n- Issued automatically at **12:21 PM today**, because the restaurant marked the item unavailable\n\nSo the refund went through on our side. Card refunds can take a few business days to appear on your statement, which is probably why you don't see it yet. I'm sorry nobody told you the iced coffee was unavailable. That would have been confusing when it didn't show up.\n\n**One more thing you might notice:** each order also has a temporary authorization hold from when it was placed. All of those holds have been released, so you won't be charged for them. They'll drop off your statement within a few business days, and only the final charges stand.\n\n**What to expect:**\n- **$17.40 account credit:** already on your account and ready for your next order\n- **$11.00 refund (Burger Barn):** 3\u20135 business days to your Visa\n- **$4.75 refund (Pho Real):** already issued; should appear within a few business days\n\nThanks for your patience going through all of this, Hannah. I hope next week goes better with Forkful."
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "get_customer",
+   "args": {
+    "email": "hannah.cole@inbox.example"
+   },
+   "verified_before": [],
+   "result": {
+    "customer_id": "E317",
+    "name": "Hannah Cole",
+    "email": "hannah.cole@inbox.example",
+    "phone": "+1 415-555-0317",
+    "default_address": "33 Juniper St, Oakdale, CA 94617",
+    "plus_member": false,
+    "plus_since": null,
+    "plus_until": null,
+    "refund_history": [],
+    "authorized_users": [],
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "K-6101",
+      "restaurant": "Saffron Lane",
+      "placed_at": "2026-10-24T17:20:00-07:00",
+      "status": "delivered",
+      "total": 70.49
+     },
+     {
+      "order_id": "K-6104",
+      "restaurant": "Pho Real",
+      "placed_at": "2026-10-24T12:10:00-07:00",
+      "status": "delivered",
+      "total": 26.68
+     },
+     {
+      "order_id": "K-6102",
+      "restaurant": "Burger Barn",
+      "placed_at": "2026-10-23T19:00:00-07:00",
+      "status": "delivered",
+      "total": 30.18
+     },
+     {
+      "order_id": "K-6103",
+      "restaurant": "Taqueria Luz",
+      "placed_at": "2026-10-21T18:30:00-07:00",
+      "status": "delivered",
+      "total": 26.42
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "customer_id": "E317",
+    "full_name": "Hannah Cole",
+    "email": "hannah.cole@inbox.example"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "E317",
+    "role": "account_holder"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_account_activity",
+   "args": {
+    "customer_id": "E317"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "customer_id": "E317",
+    "now": "2026-10-24T19:30:00-07:00",
+    "events": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_ticket_history",
+   "args": {
+    "customer_id": "E317"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "customer_id": "E317",
+    "tickets": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "K-6101"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "order_id": "K-6101",
+    "customer_id": "E317",
+    "restaurant_id": "S1",
+    "restaurant": "Saffron Lane",
+    "items": [
+     {
+      "item_id": "K-6101-1",
+      "name": "Chicken tikka",
+      "qty": 1,
+      "unit_price": 18.0
+     },
+     {
+      "item_id": "K-6101-2",
+      "name": "Lamb korma",
+      "qty": 1,
+      "unit_price": 22.0
+     },
+     {
+      "item_id": "K-6101-3",
+      "name": "Basmati rice",
+      "qty": 2,
+      "unit_price": 4.0
+     },
+     {
+      "item_id": "K-6101-4",
+      "name": "Mango lassi",
+      "qty": 2,
+      "unit_price": 4.5
+     },
+     {
+      "item_id": "K-6101-5",
+      "name": "Papadum",
+      "qty": 1,
+      "unit_price": 3.0
+     }
+    ],
+    "subtotal": 60.0,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 4.5,
+    "tip": 3.0,
+    "total": 70.49,
+    "status": "delivered",
+    "placed_at": "2026-10-24T17:20:00-07:00",
+    "promised_at": "2026-10-24T18:00:00-07:00",
+    "picked_up_at": "2026-10-24T18:31:00-07:00",
+    "delivered_at": "2026-10-24T18:50:00-07:00",
+    "delivery_address": "33 Juniper St, Oakdale, CA 94617",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-6101"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "order_id": "K-6101",
+    "promised_at": "2026-10-24T18:00:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T17:22:00-07:00",
+      "type": "courier_assigned"
+     },
+     {
+      "time": "2026-10-24T18:31:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:50:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "K-6101"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "order_id": "K-6101",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 70.49,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 70.49,
+      "time": "2026-10-24T17:20:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 70.49,
+      "time": "2026-10-24T18:00:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 60.0,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_restaurant",
+   "args": {
+    "restaurant_id": "S1"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "restaurant_id": "S1",
+    "name": "Saffron Lane",
+    "opens_at": "2026-10-24T11:00:00-07:00",
+    "closes_at": "2026-10-24T22:30:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_credit",
+   "args": {
+    "customer_id": "E317",
+    "amount": 12.0,
+    "reason": "late_delivery",
+    "order_id": "K-6101"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "customer_id": "E317",
+    "credited": 12.0,
+    "new_balance": 12.0
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_credit",
+   "args": {
+    "customer_id": "E317",
+    "amount": 5.4,
+    "reason": "missing_item",
+    "order_id": "K-6101",
+    "item_ids": [
+     "K-6101-4"
+    ]
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "customer_id": "E317",
+    "credited": 5.4,
+    "new_balance": 17.4
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "K-6102"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "order_id": "K-6102",
+    "customer_id": "E317",
+    "restaurant_id": "S7",
+    "restaurant": "Burger Barn",
+    "items": [
+     {
+      "item_id": "K-6102-1",
+      "name": "Veggie burger",
+      "qty": 1,
+      "unit_price": 11.0
+     },
+     {
+      "item_id": "K-6102-2",
+      "name": "Fries",
+      "qty": 1,
+      "unit_price": 5.0
+     },
+     {
+      "item_id": "K-6102-3",
+      "name": "Vanilla shake",
+      "qty": 1,
+      "unit_price": 6.5
+     }
+    ],
+    "subtotal": 22.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 1.69,
+    "tip": 3.0,
+    "total": 30.18,
+    "status": "delivered",
+    "placed_at": "2026-10-23T19:00:00-07:00",
+    "promised_at": "2026-10-23T19:45:00-07:00",
+    "picked_up_at": "2026-10-23T19:21:00-07:00",
+    "delivered_at": "2026-10-23T19:40:00-07:00",
+    "delivery_address": "33 Juniper St, Oakdale, CA 94617",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-6102"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "order_id": "K-6102",
+    "promised_at": "2026-10-23T19:45:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-23T19:21:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-23T19:40:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "K-6102"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "order_id": "K-6102",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 30.18,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 30.18,
+      "time": "2026-10-23T19:00:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 30.18,
+      "time": "2026-10-23T19:45:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 22.5,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_restaurant",
+   "args": {
+    "restaurant_id": "S7"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "restaurant_id": "S7",
+    "name": "Burger Barn",
+    "opens_at": "2026-10-24T11:00:00-07:00",
+    "closes_at": "2026-10-24T23:00:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_refund",
+   "args": {
+    "order_id": "K-6102",
+    "amount": 11.0,
+    "reason": "wrong_item",
+    "item_ids": [
+     "K-6102-1"
+    ]
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "refund_id": "RF-4000",
+    "order_id": "K-6102",
+    "amount": 11.0,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "K-6103"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "order_id": "K-6103",
+    "customer_id": "E317",
+    "restaurant_id": "S3",
+    "restaurant": "Taqueria Luz",
+    "items": [
+     {
+      "item_id": "K-6103-1",
+      "name": "Fish tacos",
+      "qty": 1,
+      "unit_price": 13.0
+     },
+     {
+      "item_id": "K-6103-2",
+      "name": "Churros",
+      "qty": 1,
+      "unit_price": 6.0
+     }
+    ],
+    "subtotal": 19.0,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 1.43,
+    "tip": 3.0,
+    "total": 26.42,
+    "status": "delivered",
+    "placed_at": "2026-10-21T18:30:00-07:00",
+    "promised_at": "2026-10-21T19:15:00-07:00",
+    "picked_up_at": "2026-10-21T18:52:00-07:00",
+    "delivered_at": "2026-10-21T19:10:00-07:00",
+    "delivery_address": "33 Juniper St, Oakdale, CA 94617",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-6103"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "order_id": "K-6103",
+    "promised_at": "2026-10-21T19:15:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-21T18:52:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-21T19:10:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "K-6103"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "order_id": "K-6103",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 26.42,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 26.42,
+      "time": "2026-10-21T18:30:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 26.42,
+      "time": "2026-10-21T19:15:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 19.0,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "K-6104"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "order_id": "K-6104",
+    "customer_id": "E317",
+    "restaurant_id": "S9",
+    "restaurant": "Pho Real",
+    "items": [
+     {
+      "item_id": "K-6104-1",
+      "name": "Chicken pho",
+      "qty": 1,
+      "unit_price": 14.5
+     },
+     {
+      "item_id": "K-6104-2",
+      "name": "Iced coffee",
+      "qty": 1,
+      "unit_price": 4.75
+     }
+    ],
+    "subtotal": 19.25,
+    "promo_discount": 0.0,
+    "delivery_fee": 2.99,
+    "service_fee": 1.44,
+    "tip": 3.0,
+    "total": 26.68,
+    "status": "delivered",
+    "placed_at": "2026-10-24T12:10:00-07:00",
+    "promised_at": "2026-10-24T12:55:00-07:00",
+    "picked_up_at": "2026-10-24T12:31:00-07:00",
+    "delivered_at": "2026-10-24T12:50:00-07:00",
+    "delivery_address": "33 Juniper St, Oakdale, CA 94617",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-6104"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "order_id": "K-6104",
+    "promised_at": "2026-10-24T12:55:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T12:20:00-07:00",
+      "type": "item_unavailable",
+      "item": "Iced coffee",
+      "note": "Restaurant marked unavailable"
+     },
+     {
+      "time": "2026-10-24T12:31:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T12:50:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "K-6104"
+   },
+   "verified_before": [
+    "E317"
+   ],
+   "result": {
+    "order_id": "K-6104",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 26.68,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [
+     {
+      "amount": 4.75,
+      "item": "Iced coffee",
+      "time": "2026-10-24T12:21:00-07:00",
+      "reason": "item unavailable; refunded automatically to card"
+     }
+    ],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 26.68,
+      "time": "2026-10-24T12:10:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 26.68,
+      "time": "2026-10-24T12:55:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 19.25,
+    "support_refunds": []
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 48,
+   "output": 4163,
+   "cache_write": 8894,
+   "cache_read": 158364
+  },
+  "customer": {
+   "input": 28,
+   "output": 626,
+   "cache_write": 2121,
+   "cache_read": 11164
+  }
+ },
+ "cost_usd": 0.19196,
+ "customer_turns": 7,
+ "completed": true,
+ "grade": {
+  "passed": true,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {
+     "K-6102": 11.0
+    },
+    "actual": {
+     "K-6102": 11.0
+    }
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {
+     "E317": 17.4
+    },
+    "actual": {
+     "E317": 17.4
+    }
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": true,
+    "expected": [],
+    "actual": [],
+    "allowed_extra": [
+     "customer_request"
+    ]
+   },
+   {
+    "check": "state.replacements",
+    "ok": true,
+    "expected": [],
+    "actual": []
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": {
+     "issued": 17.4,
+     "cap": 25
+    }
+   }
+  ],
+  "effects": {
+   "refunds": {
+    "K-6102": 11.0
+   },
+   "credits": {
+    "E317": 17.4
+   },
+   "order_changes": {},
+   "escalations": [],
+   "replacements": []
+  }
+ },
+ "passed": true,
+ "flags": [],
+ "trial": 3
+}

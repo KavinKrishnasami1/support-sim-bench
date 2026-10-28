@@ -1,0 +1,224 @@
+{
+  "id": "X09",
+  "slug": "authorized_user_wants_card_refund",
+  "title": "An authorized user wants a card refund",
+  "tricky": "Ken is an authorized user on his wife Mei's account. He can be helped with the missing salmon roll ($9.50), but compensation for an authorized user is account credit only, at the usual price + 20%: $11.40 credit, no card refund.",
+  "source": {
+    "dataset": "none",
+    "license": "n/a",
+    "what_we_took": "Designed for v3 from the failure modes in LESSONS.md (see V3_DESIGN.md); not derived from a specific conversation. Customer behaviours follow patterns seen in ABCD."
+  },
+  "resolution_summary": "Credit $11.40 to E309 for the missing salmon roll on K-8901.",
+  "user": {
+    "persona": "Ken Tanaka, Mei Tanaka's husband. Friendly, in a rush.",
+    "situation": "Tonight's Kaze Sushi order (#8901), placed on your wife Mei's Forkful account, was missing the salmon roll. You're listed as an authorized user on her account and use it all the time.",
+    "goal": "The salmon roll refunded to the card.",
+    "facts": [
+      "Your full name is Ken Tanaka.",
+      "Your email is ken.tanaka@inbox.example.",
+      "Order number 8901.",
+      "The account belongs to your wife, Mei Tanaka. You're an authorized user on it.",
+      "You don't know Mei's email or phone number by heart.",
+      "The salmon roll was missing; everything else was there."
+    ],
+    "reveal_rules": [
+      "Mention that the account is Mei's only when the agent asks whose account it is, asks for details, or can't find you."
+    ],
+    "behaviors": [
+      "Ask for the refund to go back to the card.",
+      "If told it can only be account credit, ask once why it can't go to the card, then accept the credit."
+    ],
+    "opening": "hey, the salmon roll was missing from our sushi order",
+    "end_condition": "the agent has told you what they've done or why they can't, and you've acknowledged it."
+  },
+  "expected": {
+    "credits": {
+      "E309": 11.4
+    }
+  },
+  "credit_cap": 25,
+  "leak_check": {
+    "amounts": [
+      "11.40",
+      "9.50"
+    ],
+    "phrases": []
+  },
+  "est_turns": 10,
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "email": "ken.tanaka@inbox.example"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "E309",
+        "full_name": "Ken Tanaka",
+        "email": "ken.tanaka@inbox.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-8901"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-8901"
+      }
+    },
+    {
+      "tool": "get_restaurant",
+      "args": {
+        "restaurant_id": "S10"
+      }
+    },
+    {
+      "tool": "get_payment",
+      "args": {
+        "order_id": "K-8901"
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "E309",
+        "amount": 11.4,
+        "reason": "missing_item",
+        "order_id": "K-8901",
+        "item_ids": [
+          "K-8901-1"
+        ]
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "card refund for an authorized user",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "ken.tanaka@inbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E309",
+            "full_name": "Ken Tanaka",
+            "email": "ken.tanaka@inbox.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-8901"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-8901"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S10"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-8901"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-8901",
+            "amount": 9.5,
+            "reason": "missing_item"
+          }
+        }
+      ]
+    },
+    {
+      "name": "credit without the 20%",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "ken.tanaka@inbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E309",
+            "full_name": "Ken Tanaka",
+            "email": "ken.tanaka@inbox.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-8901"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-8901"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S10"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-8901"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E309",
+            "amount": 9.5,
+            "reason": "missing_item",
+            "order_id": "K-8901"
+          }
+        }
+      ]
+    },
+    {
+      "name": "refuses to help an authorized user",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "ken.tanaka@inbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E309",
+            "full_name": "Ken Tanaka",
+            "email": "ken.tanaka@inbox.example"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,679 @@
+{
+ "task_id": "X12",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 31.1,
+ "events": [
+  {
+   "role": "customer",
+   "text": "my green bowl order was missing the grain bowl and a lemonade. everything else was there but those two are missing"
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry those two items didn't arrive. Before I can look into the order, I need to verify your identity. Could you please give me your full name and the email address or phone number on your Forkful account?"
+  },
+  {
+   "role": "customer",
+   "text": "Sure. It's Grace Oyelaran, and the phone number on the account is 415-555-0312. The order is #9201 if that helps you find it."
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "phone": "415-555-0312"
+   },
+   "result": {
+    "customer_id": "E312",
+    "name": "Grace Oyelaran",
+    "email": "grace.oyelaran@mailbox.example",
+    "phone": "+1 415-555-0312",
+    "default_address": "510 Vista Blvd, Oakdale, CA 94612",
+    "plus_member": false,
+    "plus_since": null,
+    "plus_until": null,
+    "refund_history": [],
+    "authorized_users": [],
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "K-9201",
+      "restaurant": "Green Bowl",
+      "placed_at": "2026-10-24T18:00:00-07:00",
+      "status": "delivered",
+      "total": 55.49
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "9201"
+   },
+   "result": {
+    "order_id": "K-9201",
+    "customer_id": "E312",
+    "restaurant_id": "S6",
+    "restaurant": "Green Bowl",
+    "items": [
+     {
+      "item_id": "K-9201-1",
+      "name": "Grain bowl",
+      "qty": 1,
+      "unit_price": 18.0
+     },
+     {
+      "item_id": "K-9201-2",
+      "name": "Lemonade",
+      "qty": 2,
+      "unit_price": 4.0
+     },
+     {
+      "item_id": "K-9201-3",
+      "name": "Chicken plate",
+      "qty": 1,
+      "unit_price": 22.0
+     },
+     {
+      "item_id": "K-9201-4",
+      "name": "Hummus platter",
+      "qty": 1,
+      "unit_price": 12.0
+     }
+    ],
+    "subtotal": 60.0,
+    "promo_discount": 15.0,
+    "delivery_fee": 2.99,
+    "service_fee": 4.5,
+    "tip": 3.0,
+    "total": 55.49,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:00:00-07:00",
+    "promised_at": "2026-10-24T18:45:00-07:00",
+    "picked_up_at": "2026-10-24T18:21:00-07:00",
+    "delivered_at": "2026-10-24T18:40:00-07:00",
+    "delivery_address": "510 Vista Blvd, Oakdale, CA 94612",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "customer_id": "E312",
+    "full_name": "Grace Oyelaran",
+    "phone": "415-555-0312"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "E312",
+    "role": "account_holder"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_account_activity",
+   "args": {
+    "customer_id": "E312"
+   },
+   "result": {
+    "customer_id": "E312",
+    "now": "2026-10-24T19:30:00-07:00",
+    "events": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_restaurant",
+   "args": {
+    "restaurant_id": "S6"
+   },
+   "result": {
+    "restaurant_id": "S6",
+    "name": "Green Bowl",
+    "opens_at": "2026-10-24T10:00:00-07:00",
+    "closes_at": "2026-10-24T21:30:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "K-9201"
+   },
+   "result": {
+    "order_id": "K-9201",
+    "promo_code": "FALL15",
+    "promo_discount": 15.0,
+    "charged": 55.49,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 55.49,
+      "time": "2026-10-24T18:00:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 55.49,
+      "time": "2026-10-24T18:45:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 60.0,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-9201"
+   },
+   "result": {
+    "order_id": "K-9201",
+    "promised_at": "2026-10-24T18:45:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:21:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:40:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_ticket_history",
+   "args": {
+    "customer_id": "E312"
+   },
+   "result": {
+    "customer_id": "E312",
+    "tickets": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "Thanks, Grace. You're verified. I found order K-9201 from Green Bowl. It was handed to you at 6:40 PM, so you're well within the window to report missing items.\n\n**First, a quick question:** your order had **2 lemonades**. Was one missing or both?\n\n**Your options for each missing item:** Your order used the promo code FALL15 ($15 off), so a card refund for an item is the item's price minus its share of that discount. You'd get that share back as Forkful credit instead.\n\n**Grain bowl ($18.00):**\n- **Refund to card:** $13.50 to your Visa ending 4242, plus $4.50 in account credit, **or**\n- **Account credit:** $21.60 (the item's price plus 20%)\n\n**Lemonade ($4.00 each):**\n- **Refund to card:** $3.00 to your card plus $1.00 in credit per lemonade, **or**\n- **Account credit:** $4.80 per lemonade\n\n**One limit to know about:** I can give up to $25 in account credit per conversation. If you choose credit for the grain bowl ($21.60), I'd have to refund the lemonade to your card instead, since credit for it would go over $25.\n\nPlease tell me how many lemonades were missing and whether you'd like a refund or credit, and I'll take care of it right away."
+  },
+  {
+   "role": "customer",
+   "text": "One lemonade was missing, not both. The grain bowl and that one lemonade are what's missing.\n\nFor the grain bowl, I'd like account credit since I order there a lot. For the lemonade, I'd like the money back on my card."
+  },
+  {
+   "role": "tool",
+   "name": "issue_credit",
+   "args": {
+    "customer_id": "E312",
+    "amount": 21.6,
+    "reason": "missing_item",
+    "order_id": "K-9201",
+    "item_ids": [
+     "K-9201-1"
+    ]
+   },
+   "result": {
+    "customer_id": "E312",
+    "credited": 21.6,
+    "new_balance": 21.6
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "issue_refund",
+   "args": {
+    "order_id": "K-9201",
+    "amount": 3.0,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-9201-2"
+    ]
+   },
+   "result": {
+    "refund_id": "RF-4000",
+    "order_id": "K-9201",
+    "amount": 3.0,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "issue_credit",
+   "args": {
+    "customer_id": "E312",
+    "amount": 1.0,
+    "reason": "missing_item",
+    "order_id": "K-9201",
+    "item_ids": [
+     "K-9201-2"
+    ]
+   },
+   "result": {
+    "customer_id": "E312",
+    "credited": 1.0,
+    "new_balance": 22.6
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've sorted out both items:\n\n- **Grain bowl:** $21.60 has been added to your Forkful account (the $18.00 price plus 20%).\n- **Lemonade:** $3.00 is going back to your Visa ending 4242 and should show up in 3\u20135 business days. The other $1.00 is the lemonade's share of the FALL15 discount, so it's been added to your account.\n\nYour account balance is now **$22.60**, and it will apply to your next order, maybe your next Green Bowl order.\n\nYou may also see a $55.49 pending hold from when you placed the order. That's not a second charge. It was released when the real charge went through and should drop off your statement in 1\u20133 business days.\n\nIs there anything else I can help with?"
+  },
+  {
+   "role": "customer",
+   "text": "Okay, thanks. Just to check the numbers: the grain bowl credit was $21.60 and the lemonade's $1.00 share went to my account too, so $22.60 total? That's what I'm seeing you describe.\n\nAlso, I didn't know about the $55.49 hold, so I'm glad you flagged it. I'll keep an eye out for it dropping off my statement. Anything else I need to do on my end?"
+  },
+  {
+   "role": "agent",
+   "text": "You've got it right: $21.60 for the grain bowl plus $1.00 for the lemonade's share of the discount makes **$22.60** in account credit. Separately, the **$3.00** refund is going to your Visa.\n\nYou don't need to do anything else:\n- The $22.60 credit will apply to your next order automatically.\n- The $3.00 refund should reach your card in 3\u20135 business days.\n- The $55.49 hold should drop off your statement on its own in 1\u20133 business days.\n\nIf the refund hasn't shown up after 5 business days, or the hold is still there after a few days, just message us. I'm sorry again about the missing grain bowl and lemonade, and enjoy your next Green Bowl order!"
+  },
+  {
+   "role": "customer",
+   "text": "Thanks, that all makes sense. I'll watch for the $3.00 on my Visa and the hold dropping off, and I'll message again if either one doesn't show up in the timeframe you gave. Appreciate the help, Grace is all set on this one."
+  },
+  {
+   "role": "agent",
+   "text": "You're welcome, Grace. Glad we got this sorted out. Have a great evening!"
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "get_customer",
+   "args": {
+    "phone": "415-555-0312"
+   },
+   "verified_before": [],
+   "result": {
+    "customer_id": "E312",
+    "name": "Grace Oyelaran",
+    "email": "grace.oyelaran@mailbox.example",
+    "phone": "+1 415-555-0312",
+    "default_address": "510 Vista Blvd, Oakdale, CA 94612",
+    "plus_member": false,
+    "plus_since": null,
+    "plus_until": null,
+    "refund_history": [],
+    "authorized_users": [],
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "K-9201",
+      "restaurant": "Green Bowl",
+      "placed_at": "2026-10-24T18:00:00-07:00",
+      "status": "delivered",
+      "total": 55.49
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "9201"
+   },
+   "verified_before": [],
+   "result": {
+    "order_id": "K-9201",
+    "customer_id": "E312",
+    "restaurant_id": "S6",
+    "restaurant": "Green Bowl",
+    "items": [
+     {
+      "item_id": "K-9201-1",
+      "name": "Grain bowl",
+      "qty": 1,
+      "unit_price": 18.0
+     },
+     {
+      "item_id": "K-9201-2",
+      "name": "Lemonade",
+      "qty": 2,
+      "unit_price": 4.0
+     },
+     {
+      "item_id": "K-9201-3",
+      "name": "Chicken plate",
+      "qty": 1,
+      "unit_price": 22.0
+     },
+     {
+      "item_id": "K-9201-4",
+      "name": "Hummus platter",
+      "qty": 1,
+      "unit_price": 12.0
+     }
+    ],
+    "subtotal": 60.0,
+    "promo_discount": 15.0,
+    "delivery_fee": 2.99,
+    "service_fee": 4.5,
+    "tip": 3.0,
+    "total": 55.49,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:00:00-07:00",
+    "promised_at": "2026-10-24T18:45:00-07:00",
+    "picked_up_at": "2026-10-24T18:21:00-07:00",
+    "delivered_at": "2026-10-24T18:40:00-07:00",
+    "delivery_address": "510 Vista Blvd, Oakdale, CA 94612",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "customer_id": "E312",
+    "full_name": "Grace Oyelaran",
+    "phone": "415-555-0312"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "E312",
+    "role": "account_holder"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_account_activity",
+   "args": {
+    "customer_id": "E312"
+   },
+   "verified_before": [
+    "E312"
+   ],
+   "result": {
+    "customer_id": "E312",
+    "now": "2026-10-24T19:30:00-07:00",
+    "events": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_restaurant",
+   "args": {
+    "restaurant_id": "S6"
+   },
+   "verified_before": [
+    "E312"
+   ],
+   "result": {
+    "restaurant_id": "S6",
+    "name": "Green Bowl",
+    "opens_at": "2026-10-24T10:00:00-07:00",
+    "closes_at": "2026-10-24T21:30:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "K-9201"
+   },
+   "verified_before": [
+    "E312"
+   ],
+   "result": {
+    "order_id": "K-9201",
+    "promo_code": "FALL15",
+    "promo_discount": 15.0,
+    "charged": 55.49,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 55.49,
+      "time": "2026-10-24T18:00:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 55.49,
+      "time": "2026-10-24T18:45:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 60.0,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-9201"
+   },
+   "verified_before": [
+    "E312"
+   ],
+   "result": {
+    "order_id": "K-9201",
+    "promised_at": "2026-10-24T18:45:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:21:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:40:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_ticket_history",
+   "args": {
+    "customer_id": "E312"
+   },
+   "verified_before": [
+    "E312"
+   ],
+   "result": {
+    "customer_id": "E312",
+    "tickets": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_credit",
+   "args": {
+    "customer_id": "E312",
+    "amount": 21.6,
+    "reason": "missing_item",
+    "order_id": "K-9201",
+    "item_ids": [
+     "K-9201-1"
+    ]
+   },
+   "verified_before": [
+    "E312"
+   ],
+   "result": {
+    "customer_id": "E312",
+    "credited": 21.6,
+    "new_balance": 21.6
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_refund",
+   "args": {
+    "order_id": "K-9201",
+    "amount": 3.0,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-9201-2"
+    ]
+   },
+   "verified_before": [
+    "E312"
+   ],
+   "result": {
+    "refund_id": "RF-4000",
+    "order_id": "K-9201",
+    "amount": 3.0,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_credit",
+   "args": {
+    "customer_id": "E312",
+    "amount": 1.0,
+    "reason": "missing_item",
+    "order_id": "K-9201",
+    "item_ids": [
+     "K-9201-2"
+    ]
+   },
+   "verified_before": [
+    "E312"
+   ],
+   "result": {
+    "customer_id": "E312",
+    "credited": 1.0,
+    "new_balance": 22.6
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 28,
+   "output": 2302,
+   "cache_write": 4321,
+   "cache_read": 67883
+  },
+  "customer": {
+   "input": 20,
+   "output": 384,
+   "cache_write": 2011,
+   "cache_read": 4602
+  }
+ },
+ "cost_usd": 0.0954,
+ "customer_turns": 5,
+ "completed": true,
+ "grade": {
+  "passed": true,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {
+     "K-9201": 3.0
+    },
+    "actual": {
+     "K-9201": 3.0
+    }
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {
+     "E312": 22.6
+    },
+    "actual": {
+     "E312": 22.6
+    }
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": true,
+    "expected": [],
+    "actual": [],
+    "allowed_extra": [
+     "customer_request"
+    ]
+   },
+   {
+    "check": "state.replacements",
+    "ok": true,
+    "expected": [],
+    "actual": []
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": {
+     "issued": 22.6,
+     "cap": 25
+    }
+   }
+  ],
+  "effects": {
+   "refunds": {
+    "K-9201": 3.0
+   },
+   "credits": {
+    "E312": 22.6
+   },
+   "order_changes": {},
+   "escalations": [],
+   "replacements": []
+  }
+ },
+ "passed": true,
+ "flags": [],
+ "trial": 0
+}

@@ -1,0 +1,236 @@
+{
+  "id": "X20",
+  "slug": "long_refund_history_boundary",
+  "title": "Thirteen refunds on the profile, two that count",
+  "tricky": "A lost order ($48.99, under $60) should be refunded unless fraud review applies. The profile lists 13 refunds over three months. In the 30 days before now there are 2 support refunds; one more support refund is 30 days and 30 minutes old (19:00 on Sep 24), and the 3 recent automatic ones don't count. No fraud review: refund in full.",
+  "source": {
+    "dataset": "none",
+    "license": "n/a",
+    "what_we_took": "Designed for v3 from the failure modes in LESSONS.md (see V3_DESIGN.md); not derived from a specific conversation. Customer behaviours follow patterns seen in ABCD."
+  },
+  "resolution_summary": "Refund $48.99 for K-6401. No escalation.",
+  "user": {
+    "persona": "Isaac Brennan, frequent Forkful user, matter-of-fact.",
+    "situation": "Tonight's Kaze Sushi order (#6401) never arrived; the app says the courier abandoned it.",
+    "goal": "Your money back on your card.",
+    "facts": [
+      "Your full name is Isaac Brennan.",
+      "Your phone is 415-555-0320.",
+      "Order number 6401.",
+      "Nothing arrived.",
+      "You order several times a week and have had refunds before."
+    ],
+    "reveal_rules": [],
+    "behaviors": [
+      "If asked, you want a refund, not a replacement.",
+      "If the agent says your account needs a review, ask why once, then accept whatever they decide."
+    ],
+    "opening": "my sushi order never came",
+    "end_condition": "the agent has told you what they've done or why they can't, and you've acknowledged it."
+  },
+  "expected": {
+    "refunds": {
+      "K-6401": 48.99
+    }
+  },
+  "credit_cap": 25,
+  "leak_check": {
+    "amounts": [
+      "48.99"
+    ],
+    "phrases": [
+      "fraud",
+      "\\breview\\b"
+    ]
+  },
+  "est_turns": 10,
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "phone": "415-555-0320"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "E320",
+        "full_name": "Isaac Brennan",
+        "phone": "415-555-0320"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-6401"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-6401"
+      }
+    },
+    {
+      "tool": "get_payment",
+      "args": {
+        "order_id": "K-6401"
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "K-6401",
+        "amount": 48.99,
+        "reason": "whole_order"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "fraud review counting the boundary refund",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0320"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E320",
+            "full_name": "Isaac Brennan",
+            "phone": "415-555-0320"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-6401"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-6401"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-6401"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "E320",
+            "order_id": "K-6401",
+            "reason": "fraud_review",
+            "summary": "K-6401 lost; 3 support refunds in the last 30 days."
+          }
+        }
+      ]
+    },
+    {
+      "name": "refund plus fraud review",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0320"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E320",
+            "full_name": "Isaac Brennan",
+            "phone": "415-555-0320"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-6401"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-6401"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-6401"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6401",
+            "amount": 48.99,
+            "reason": "whole_order"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "E320",
+            "order_id": "K-6401",
+            "reason": "fraud_review",
+            "summary": "K-6401: many refunds."
+          }
+        }
+      ]
+    },
+    {
+      "name": "partial refund",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0320"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E320",
+            "full_name": "Isaac Brennan",
+            "phone": "415-555-0320"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-6401"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-6401"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-6401"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6401",
+            "amount": 40.0,
+            "reason": "whole_order"
+          }
+        }
+      ]
+    }
+  ]
+}

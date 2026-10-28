@@ -51,23 +51,31 @@ def check_state(task: dict, initial: dict, final: dict) -> list[dict]:
             if f in got:
                 ok &= _addr_matches(got[f], rule) if f == "delivery_address" else got[f] == rule
     out.append({"check": "state.order_changes", "ok": bool(ok), "expected": want_changes, "actual": got_changes})
+    # An expected order_id of "*" matches an escalation on any order or none (v3 account_security, where the
+    # escalation is about the account rather than the order that brought the customer in).
     want_esc = sorted((e["order_id"], e["reason"]) for e in exp.get("escalations", []))
     # Escalating because the customer asked for a person is required by policy whenever they ask, and whether a
     # simulated customer asks varies from run to run, so it is always allowed (never required).
     allowed_extra = set(exp.get("allowed_extra_escalations", [])) | {"customer_request"}
     # The same case escalated twice (an "addendum") is still one escalated case: compare as a set.
-    got_esc = sorted({(e["order_id"], e["reason"]) for e in eff["escalations"]})
+    got_esc = sorted({(e["order_id"], e["reason"]) for e in eff["escalations"]}, key=lambda t: (str(t[0]), t[1]))
     extra = list(got_esc)
     missing = []
     for w in want_esc:
-        if w in extra:
-            extra.remove(w)
+        hit = w if w in extra else next((e for e in extra if w[0] == "*" and e[1] == w[1]), None)
+        if hit:
+            extra.remove(hit)
         else:
             missing.append(w)
     extra_bad = [e for e in extra if e[1] not in allowed_extra]
     out.append({"check": "state.escalations", "ok": not missing and not extra_bad,
                 "expected": want_esc, "actual": got_esc,
                 **({"allowed_extra": sorted(allowed_extra)} if allowed_extra else {})})
+    if "replacements" in eff:  # v3
+        key = lambda r: (r["order_id"], tuple(sorted(r["item_ids"])))  # noqa: E731
+        want_rep, got_rep = sorted(map(key, exp.get("replacements", []))), sorted(map(key, eff["replacements"]))
+        out.append({"check": "state.replacements", "ok": want_rep == got_rep, "expected": want_rep,
+                    "actual": got_rep})
     return out
 
 
@@ -84,6 +92,8 @@ def check_actions(task: dict, world: World) -> list[dict]:
     unverified = []
     for i, e in enumerate(world.log):
         if e["tool"] in WRITE_TOOLS and not e["is_error"]:
+            if e["tool"] == "escalate_to_human" and e["args"].get("reason") == "account_security":
+                continue  # v3 policy: the one action allowed when the customer can't be verified
             cust = _target_customer(world, e)
             if cust not in e["verified_before"]:
                 unverified.append(f"#{i} {e['tool']} for {cust}")
@@ -93,7 +103,7 @@ def check_actions(task: dict, world: World) -> list[dict]:
     v2 = task.get("suite", "v1") != "v1"
     bad_summ = []
     for e in world.log:
-        if e["tool"] == "escalate_to_human" and not e["is_error"]:
+        if e["tool"] == "escalate_to_human" and not e["is_error"] and e["args"].get("reason") != "account_security":
             arg = e["args"].get("order_id")
             oid = normalize_order_id(arg) if arg else escalation_order(world.data, e["args"])
             if not oid or (not v2 and oid.split("-")[-1] not in e["args"].get("summary", "")):

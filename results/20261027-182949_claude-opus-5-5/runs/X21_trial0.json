@@ -1,0 +1,1316 @@
+{
+ "task_id": "X21",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 68.8,
+ "events": [
+  {
+   "role": "customer",
+   "text": "basically every order I placed this week was late, and I'd like this sorted. I've got a note of each one, so I can give you the details."
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry your orders this week have been late. I can look into each one. Before I start, I need to verify your identity. Please send me:\n\n1. Your full name\n2. The email address or phone number on your Forkful account\n\nOnce you're verified, send me the order details and I'll check each order."
+  },
+  {
+   "role": "customer",
+   "text": "Sure. My full name is Monique Laurent, and the email on my account is monique.laurent@mailbox.example. I'm a Forkful Plus member, if that helps you find the account."
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "email": "monique.laurent@mailbox.example"
+   },
+   "result": {
+    "customer_id": "E321",
+    "name": "Monique Laurent",
+    "email": "monique.laurent@mailbox.example",
+    "phone": "+1 415-555-0321",
+    "default_address": "400 Bayview Ter, Apt 12, Oakdale, CA 94621",
+    "plus_member": true,
+    "plus_since": "2024-11-03T08:00:00-07:00",
+    "plus_until": null,
+    "refund_history": [],
+    "authorized_users": [],
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "K-6501",
+      "restaurant": "Saffron Lane",
+      "placed_at": "2026-10-24T17:10:00-07:00",
+      "status": "delivered",
+      "total": 140.6
+     },
+     {
+      "order_id": "K-6502",
+      "restaurant": "Pho Real",
+      "placed_at": "2026-10-22T18:30:00-07:00",
+      "status": "delivered",
+      "total": 33.64
+     },
+     {
+      "order_id": "K-6503",
+      "restaurant": "Taqueria Luz",
+      "placed_at": "2026-10-20T17:45:00-07:00",
+      "status": "delivered",
+      "total": 22.35
+     },
+     {
+      "order_id": "K-6504",
+      "restaurant": "Burger Barn",
+      "placed_at": "2026-10-16T18:15:00-07:00",
+      "status": "delivered",
+      "total": 25.04
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "customer_id": "E321",
+    "full_name": "Monique Laurent",
+    "email": "monique.laurent@mailbox.example"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "E321",
+    "role": "account_holder"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_account_activity",
+   "args": {
+    "customer_id": "E321"
+   },
+   "result": {
+    "customer_id": "E321",
+    "now": "2026-10-24T19:30:00-07:00",
+    "events": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "Thanks, Monique. Your identity is verified, and I can see your Forkful Plus membership on the account.\n\nYour recent orders are:\n- **K-6501**: Saffron Lane, placed today (Oct 24)\n- **K-6502**: Pho Real, placed Oct 22\n- **K-6503**: Taqueria Luz, placed Oct 20\n- **K-6504**: Burger Barn, placed Oct 16\n\nWhich of these were late? Please send the order numbers from your notes, plus any other details you have, and I'll check the delivery records for each one."
+  },
+  {
+   "role": "customer",
+   "text": "Thanks. Here are the order numbers from my note: 6501 (tonight, Saffron Lane), 6502 (Thursday, Pho Real), 6503 (Tuesday, Taqueria Luz), and 6504 (last Friday, Burger Barn). All four were late."
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "K-6501"
+   },
+   "result": {
+    "order_id": "K-6501",
+    "customer_id": "E321",
+    "restaurant_id": "S1",
+    "restaurant": "Saffron Lane",
+    "items": [
+     {
+      "item_id": "K-6501-1",
+      "name": "Family thali",
+      "qty": 2,
+      "unit_price": 32.0
+     },
+     {
+      "item_id": "K-6501-2",
+      "name": "Lamb biryani",
+      "qty": 2,
+      "unit_price": 18.0
+     },
+     {
+      "item_id": "K-6501-3",
+      "name": "Garlic naan",
+      "qty": 4,
+      "unit_price": 4.0
+     },
+     {
+      "item_id": "K-6501-4",
+      "name": "Gulab jamun",
+      "qty": 2,
+      "unit_price": 6.0
+     }
+    ],
+    "subtotal": 128.0,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 9.6,
+    "tip": 3.0,
+    "total": 140.6,
+    "status": "delivered",
+    "placed_at": "2026-10-24T17:10:00-07:00",
+    "promised_at": "2026-10-24T18:00:00-07:00",
+    "picked_up_at": "2026-10-25T01:30:00Z",
+    "delivered_at": "2026-10-24T18:50:00-07:00",
+    "delivery_address": "400 Bayview Ter, Apt 12, Oakdale, CA 94621",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-6501"
+   },
+   "result": {
+    "order_id": "K-6501",
+    "promised_at": "2026-10-24T18:00:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-25T00:12:00Z",
+      "type": "courier_assigned"
+     },
+     {
+      "time": "2026-10-25T01:30:00Z",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-25T01:52:00Z",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "K-6502"
+   },
+   "result": {
+    "order_id": "K-6502",
+    "customer_id": "E321",
+    "restaurant_id": "S9",
+    "restaurant": "Pho Real",
+    "items": [
+     {
+      "item_id": "K-6502-1",
+      "name": "Beef pho",
+      "qty": 1,
+      "unit_price": 15.5
+     },
+     {
+      "item_id": "K-6502-2",
+      "name": "Summer rolls",
+      "qty": 1,
+      "unit_price": 9.0
+     },
+     {
+      "item_id": "K-6502-3",
+      "name": "Thai iced tea",
+      "qty": 1,
+      "unit_price": 4.0
+     }
+    ],
+    "subtotal": 28.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 2.14,
+    "tip": 3.0,
+    "total": 33.64,
+    "status": "delivered",
+    "placed_at": "2026-10-22T18:30:00-07:00",
+    "promised_at": "2026-10-22T19:15:00-07:00",
+    "picked_up_at": "2026-10-22T19:22:00-07:00",
+    "delivered_at": "2026-10-22T19:45:00-07:00",
+    "delivery_address": "400 Bayview Ter, Apt 12, Oakdale, CA 94621",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-6502"
+   },
+   "result": {
+    "order_id": "K-6502",
+    "promised_at": "2026-10-22T19:15:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-22T19:22:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-22T19:45:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "K-6503"
+   },
+   "result": {
+    "order_id": "K-6503",
+    "customer_id": "E321",
+    "restaurant_id": "S3",
+    "restaurant": "Taqueria Luz",
+    "items": [
+     {
+      "item_id": "K-6503-1",
+      "name": "Carnitas burrito",
+      "qty": 1,
+      "unit_price": 13.0
+     },
+     {
+      "item_id": "K-6503-2",
+      "name": "Elote",
+      "qty": 1,
+      "unit_price": 5.0
+     }
+    ],
+    "subtotal": 18.0,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 1.35,
+    "tip": 3.0,
+    "total": 22.35,
+    "status": "delivered",
+    "placed_at": "2026-10-20T17:45:00-07:00",
+    "promised_at": "2026-10-20T18:30:00-07:00",
+    "picked_up_at": "2026-10-20T18:55:00-07:00",
+    "delivered_at": "2026-10-20T19:12:00-07:00",
+    "delivery_address": "400 Bayview Ter, Apt 12, Oakdale, CA 94621",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-6503"
+   },
+   "result": {
+    "order_id": "K-6503",
+    "promised_at": "2026-10-20T18:30:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-20T17:50:00-07:00",
+      "type": "eta_updated",
+      "new_eta": "2026-10-20T19:00:00-07:00",
+      "reason": "Courier shortage",
+      "notified_customer": true,
+      "channel": "push notification"
+     },
+     {
+      "time": "2026-10-20T18:55:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-20T19:12:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "K-6504"
+   },
+   "result": {
+    "order_id": "K-6504",
+    "customer_id": "E321",
+    "restaurant_id": "S7",
+    "restaurant": "Burger Barn",
+    "items": [
+     {
+      "item_id": "K-6504-1",
+      "name": "Double cheeseburger",
+      "qty": 1,
+      "unit_price": 14.5
+     },
+     {
+      "item_id": "K-6504-2",
+      "name": "Onion rings",
+      "qty": 1,
+      "unit_price": 6.0
+     }
+    ],
+    "subtotal": 20.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 1.54,
+    "tip": 3.0,
+    "total": 25.04,
+    "status": "delivered",
+    "placed_at": "2026-10-16T18:15:00-07:00",
+    "promised_at": "2026-10-16T19:00:00-07:00",
+    "picked_up_at": "2026-10-16T19:40:00-07:00",
+    "delivered_at": "2026-10-16T20:00:00-07:00",
+    "delivery_address": "400 Bayview Ter, Apt 12, Oakdale, CA 94621",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-6504"
+   },
+   "result": {
+    "order_id": "K-6504",
+    "promised_at": "2026-10-16T19:00:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-16T19:40:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-16T20:00:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_ticket_history",
+   "args": {
+    "customer_id": "E321"
+   },
+   "result": {
+    "customer_id": "E321",
+    "tickets": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "issue_credit",
+   "args": {
+    "customer_id": "E321",
+    "order_id": "K-6501",
+    "amount": 25.0,
+    "reason": "late_delivery"
+   },
+   "result": {
+    "customer_id": "E321",
+    "credited": 25.0,
+    "new_balance": 25.0
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "issue_credit",
+   "args": {
+    "customer_id": "E321",
+    "order_id": "K-6502",
+    "amount": 5.0,
+    "reason": "late_delivery"
+   },
+   "result": {
+    "customer_id": "E321",
+    "credited": 5.0,
+    "new_balance": 30.0
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I checked the delivery records for all four orders. Two were late and qualify for credit. The other two don't, and here's why.\n\n**K-6501, Saffron Lane (tonight): $25 credit added**\nIt was promised for 6:00 PM and handed to you at 6:52 PM, 52 minutes late. For deliveries 45+ minutes late, the credit is 20% of the subtotal. 20% of $128.00 is $25.60, but the maximum for Plus orders is $25, so I've added $25.\n\n**K-6502, Pho Real (Thursday): $5 credit added**\nIt was promised for 7:15 PM and handed to you at 7:45 PM, 30 minutes late. Plus orders have no delivery fee, so the credit for a 16\u201344 minute delay is a flat $5.\n\n**K-6503, Taqueria Luz (Tuesday): not late**\nAt 5:50 PM, 40 minutes before the original 6:30 PM time, we sent you a push notification moving the estimate to 7:00 PM because of a courier shortage. That updated time becomes the promised time. The order arrived at 7:12 PM, 12 minutes after it. An order only counts as late when it arrives more than 15 minutes after the promised time.\n\n**K-6504, Burger Barn (last Friday, Oct 16): too old to compensate**\nThis one was an hour late: promised for 7:00 PM, handed to you at 8:00 PM. However, late deliveries can only be compensated within 7 days of delivery, and that window closed at 8:00 PM on Oct 23. I'm sorry I can't add credit for it.\n\n**Total: $30.00 in credit**, which is now your account balance. It will apply to your future orders.\n\nI'm sorry about the delays this week. Is there anything else I can help with?"
+  },
+  {
+   "role": "customer",
+   "text": "Okay, so 6501 and 6502 got credit. I'd like to understand the other two though. For 6503, I got a notification at 5:50 saying it would be 7:00, but the order came at 7:12 and I'd planned around 6:30. Why does the new time count as the promise when I was never told it would be 7?\n\nFor 6504, I'm not going to push on the date, but I did get the message that it was late and I had no idea I had a window to claim. Can you tell me why it's 7 days and not something longer? Either way, I'll accept your answer after that.\n\nAlso, the summer rolls were missing from order 6502 on Thursday. I paid for them and they weren't in the bag, so I'd like account credit for them."
+  },
+  {
+   "role": "tool",
+   "name": "get_restaurant",
+   "args": {
+    "restaurant_id": "S9"
+   },
+   "result": {
+    "restaurant_id": "S9",
+    "name": "Pho Real",
+    "opens_at": "2026-10-24T11:00:00-07:00",
+    "closes_at": "2026-10-24T22:00:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "K-6502"
+   },
+   "result": {
+    "order_id": "K-6502",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 33.64,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 33.64,
+      "time": "2026-10-22T18:30:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 33.64,
+      "time": "2026-10-22T19:15:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 28.5,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "issue_refund",
+   "args": {
+    "order_id": "K-6502",
+    "amount": 9.0,
+    "reason": "missing_item",
+    "item_ids": "[\"K-6502-1\".replace(\"1\",\"2\")]"
+   },
+   "result": {
+    "refund_id": "RF-4000",
+    "order_id": "K-6502",
+    "amount": 9.0,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "Here are answers on both orders, plus the missing summer rolls.\n\n**K-6503 (Taqueria Luz)**\nI understand you'd planned around 6:30. Our policy says that if we send you an updated arrival time at least 30 minutes before the original time, the updated time becomes the promised time. Our records show the push notification moving your order to 7:00 PM went out at 5:50 PM, 40 minutes before 6:30. That made 7:00 PM the promised time. The order arrived at 7:12 PM, 12 minutes after it. An order only counts as late when it arrives more than 15 minutes after the promised time, so this one doesn't qualify. I know it's frustrating when your plans were built around the first time.\n\n**K-6504 (Burger Barn)**\nThe 7-day window is part of Forkful's support policy. I don't have any more detail on why the cutoff was set at 7 days, and I can't make exceptions to it. You're right that the window isn't obvious, and I'm sorry you didn't know about it in time.\n\n**Missing summer rolls, K-6502 (Pho Real)**\nYou reported this within the 48-hour window, and there was no automatic refund for the rolls, so you're owed compensation. I couldn't give it as credit, though. Credit for a missing item is the price plus 20%, which here is $10.80. Plus members can get up to $40 in account credit per conversation, and with the $30 already added today, $10.80 more would go over that limit. When that happens, our policy is to refund the item to your card instead. So I've **refunded $9.00 to your Visa ending 4242**. It should arrive in 3\u20135 business days.\n\n**Today's summary:**\n- $30.00 account credit ($25 for K-6501, $5 for K-6502)\n- $9.00 refunded to your card for the summer rolls\n\nIs there anything else I can help with?"
+  },
+  {
+   "role": "customer",
+   "text": "Okay, I see the policy on 6503, though I still don't think the notification was clear enough. I'd planned around 6:30 and didn't see 7:00 until it was too late to change anything.\n\nOn the summer rolls, I'm not happy that the amount is $9 when I paid for them and they weren't in the bag. I'd rather have the account credit, since that's what I asked for. Is a card refund my only option, or is there any way to get the full amount?"
+  },
+  {
+   "role": "agent",
+   "text": "I understand. Seeing the 7:00 update too late to change your plans is frustrating, and I'll note your feedback that the notification wasn't clear enough. I still can't change the outcome for that order, though.\n\n**On the summer rolls:** the $9.00 is the full price you paid. The rolls were $9.00 on your receipt, and there was no promo discount on the order, so nothing was taken off. The extra $1.80 in the credit option is the 20% bonus Forkful adds when you choose credit instead of a refund.\n\nI'm sorry, but I can't give it as credit in this conversation. Plus members can get up to $40 in account credit per conversation, and $10.80 on top of the $30 already added would go over that. When that happens, the policy requires the item to be refunded to your card instead, even if you'd prefer credit. The refund has already gone through, so you've been fully repaid for the rolls.\n\nIf you'd like a specialist to look at any of this, I can pass your case to one. They'll follow up within 24 hours, but I can't promise a different outcome. Would you like me to do that?"
+  },
+  {
+   "role": "customer",
+   "text": "Hmm, okay. I'd still prefer the credit, but I don't want to keep going around in circles. Yes, please pass it to a specialist so someone can look at the summer rolls and the 6503 notification. Can you confirm the case reference number once it's sent?"
+  },
+  {
+   "role": "tool",
+   "name": "escalate_to_human",
+   "args": {
+    "customer_id": "E321",
+    "order_id": "K-6502",
+    "reason": "customer_request",
+    "summary": "Plus member Monique Laurent (verified account holder) reported missing summer rolls ($9.00) on K-6502, within 48h. She asked for account credit ($10.80), but $30 in late-delivery credit was already issued this conversation (K-6501 $25, K-6502 $5), so under the $40 Plus per-conversation credit limit the item was refunded to card instead: $9.00, refund RF-4000. She still prefers credit and asked for a specialist to review."
+   },
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "escalate_to_human",
+   "args": {
+    "customer_id": "E321",
+    "order_id": "K-6503",
+    "reason": "customer_request",
+    "summary": "Customer disputes the late-delivery outcome on K-6503. Original promised time 6:30 PM. An eta_updated push notification at 5:50 PM (40 min before) moved it to 7:00 PM. Handoff was at 7:12 PM, 12 min after the updated time, so it was not late under policy and no credit was given. She says the notification wasn't clear enough and she didn't see it in time to change her plans. She asked for a specialist to review."
+   },
+   "result": {
+    "escalation_id": "ESC-701",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've sent both issues to a specialist as two separate cases, one for each order:\n\n- **ESC-700**: the summer rolls on K-6502 and your preference for account credit\n- **ESC-701**: the delivery-time notification on K-6503\n\nBoth cases explain what happened and what you're asking for, so you won't need to repeat it. A specialist will contact you within 24 hours. I can't promise what they'll decide.\n\n**Today's summary:**\n- $30.00 account credit, already in your balance ($25 for K-6501, $5 for K-6502)\n- $9.00 refunded to your Visa ending 4242 for the summer rolls, arriving in 3\u20135 business days\n- Two specialist cases open: ESC-700 and ESC-701\n\nThanks for being patient with me. Is there anything else I can help with tonight?"
+  },
+  {
+   "role": "customer",
+   "text": "Thanks for sending those through. Just to check, I'm not sure I can keep track of everything from this chat, so could you confirm the 6504 window isn't something a specialist could look at too? I'd rather it was written down somewhere than just dropped.\n\nOtherwise, I think that's everything for today. I appreciate you getting the credit sorted and passing the rest on."
+  },
+  {
+   "role": "tool",
+   "name": "escalate_to_human",
+   "args": {
+    "customer_id": "E321",
+    "order_id": "K-6504",
+    "reason": "customer_request",
+    "summary": "K-6504 (Burger Barn): promised 7:00 PM on Oct 16, handed over at 8:00 PM, so 60 minutes late. The customer asked about it on Oct 24 at 7:30 PM, after the 7-day late-compensation window closed (Oct 23, 8:00 PM), so no credit was given. She received the late notice but didn't know a claim window existed. She asked for a specialist to look at it so it's on record. Related cases: ESC-700 (K-6502) and ESC-701 (K-6503)."
+   },
+   "result": {
+    "escalation_id": "ESC-702",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've passed K-6504 to a specialist too, so it's written down. The case is **ESC-702**, and it's linked to your other two cases. The case notes say the order was an hour late and that you didn't know there was a 7-day window to claim. A specialist will contact you within 24 hours. As with the others, I can't promise what they'll decide.\n\n**Everything from today:**\n- **$30.00 account credit**, already in your balance ($25 for K-6501, $5 for K-6502)\n- **$9.00 refunded** to your Visa ending 4242 for the missing summer rolls, arriving in 3\u20135 business days\n- **Specialist cases:**\n  - ESC-700: summer rolls on K-6502\n  - ESC-701: delivery-time notification on K-6503\n  - ESC-702: claim window on K-6504\n\nThanks for your patience, Monique, and I'm sorry again about this week's deliveries. Have a good evening."
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "get_customer",
+   "args": {
+    "email": "monique.laurent@mailbox.example"
+   },
+   "verified_before": [],
+   "result": {
+    "customer_id": "E321",
+    "name": "Monique Laurent",
+    "email": "monique.laurent@mailbox.example",
+    "phone": "+1 415-555-0321",
+    "default_address": "400 Bayview Ter, Apt 12, Oakdale, CA 94621",
+    "plus_member": true,
+    "plus_since": "2024-11-03T08:00:00-07:00",
+    "plus_until": null,
+    "refund_history": [],
+    "authorized_users": [],
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "K-6501",
+      "restaurant": "Saffron Lane",
+      "placed_at": "2026-10-24T17:10:00-07:00",
+      "status": "delivered",
+      "total": 140.6
+     },
+     {
+      "order_id": "K-6502",
+      "restaurant": "Pho Real",
+      "placed_at": "2026-10-22T18:30:00-07:00",
+      "status": "delivered",
+      "total": 33.64
+     },
+     {
+      "order_id": "K-6503",
+      "restaurant": "Taqueria Luz",
+      "placed_at": "2026-10-20T17:45:00-07:00",
+      "status": "delivered",
+      "total": 22.35
+     },
+     {
+      "order_id": "K-6504",
+      "restaurant": "Burger Barn",
+      "placed_at": "2026-10-16T18:15:00-07:00",
+      "status": "delivered",
+      "total": 25.04
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "customer_id": "E321",
+    "full_name": "Monique Laurent",
+    "email": "monique.laurent@mailbox.example"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "E321",
+    "role": "account_holder"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_account_activity",
+   "args": {
+    "customer_id": "E321"
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "customer_id": "E321",
+    "now": "2026-10-24T19:30:00-07:00",
+    "events": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "K-6501"
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "order_id": "K-6501",
+    "customer_id": "E321",
+    "restaurant_id": "S1",
+    "restaurant": "Saffron Lane",
+    "items": [
+     {
+      "item_id": "K-6501-1",
+      "name": "Family thali",
+      "qty": 2,
+      "unit_price": 32.0
+     },
+     {
+      "item_id": "K-6501-2",
+      "name": "Lamb biryani",
+      "qty": 2,
+      "unit_price": 18.0
+     },
+     {
+      "item_id": "K-6501-3",
+      "name": "Garlic naan",
+      "qty": 4,
+      "unit_price": 4.0
+     },
+     {
+      "item_id": "K-6501-4",
+      "name": "Gulab jamun",
+      "qty": 2,
+      "unit_price": 6.0
+     }
+    ],
+    "subtotal": 128.0,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 9.6,
+    "tip": 3.0,
+    "total": 140.6,
+    "status": "delivered",
+    "placed_at": "2026-10-24T17:10:00-07:00",
+    "promised_at": "2026-10-24T18:00:00-07:00",
+    "picked_up_at": "2026-10-25T01:30:00Z",
+    "delivered_at": "2026-10-24T18:50:00-07:00",
+    "delivery_address": "400 Bayview Ter, Apt 12, Oakdale, CA 94621",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-6501"
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "order_id": "K-6501",
+    "promised_at": "2026-10-24T18:00:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-25T00:12:00Z",
+      "type": "courier_assigned"
+     },
+     {
+      "time": "2026-10-25T01:30:00Z",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-25T01:52:00Z",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "K-6502"
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "order_id": "K-6502",
+    "customer_id": "E321",
+    "restaurant_id": "S9",
+    "restaurant": "Pho Real",
+    "items": [
+     {
+      "item_id": "K-6502-1",
+      "name": "Beef pho",
+      "qty": 1,
+      "unit_price": 15.5
+     },
+     {
+      "item_id": "K-6502-2",
+      "name": "Summer rolls",
+      "qty": 1,
+      "unit_price": 9.0
+     },
+     {
+      "item_id": "K-6502-3",
+      "name": "Thai iced tea",
+      "qty": 1,
+      "unit_price": 4.0
+     }
+    ],
+    "subtotal": 28.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 2.14,
+    "tip": 3.0,
+    "total": 33.64,
+    "status": "delivered",
+    "placed_at": "2026-10-22T18:30:00-07:00",
+    "promised_at": "2026-10-22T19:15:00-07:00",
+    "picked_up_at": "2026-10-22T19:22:00-07:00",
+    "delivered_at": "2026-10-22T19:45:00-07:00",
+    "delivery_address": "400 Bayview Ter, Apt 12, Oakdale, CA 94621",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-6502"
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "order_id": "K-6502",
+    "promised_at": "2026-10-22T19:15:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-22T19:22:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-22T19:45:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "K-6503"
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "order_id": "K-6503",
+    "customer_id": "E321",
+    "restaurant_id": "S3",
+    "restaurant": "Taqueria Luz",
+    "items": [
+     {
+      "item_id": "K-6503-1",
+      "name": "Carnitas burrito",
+      "qty": 1,
+      "unit_price": 13.0
+     },
+     {
+      "item_id": "K-6503-2",
+      "name": "Elote",
+      "qty": 1,
+      "unit_price": 5.0
+     }
+    ],
+    "subtotal": 18.0,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 1.35,
+    "tip": 3.0,
+    "total": 22.35,
+    "status": "delivered",
+    "placed_at": "2026-10-20T17:45:00-07:00",
+    "promised_at": "2026-10-20T18:30:00-07:00",
+    "picked_up_at": "2026-10-20T18:55:00-07:00",
+    "delivered_at": "2026-10-20T19:12:00-07:00",
+    "delivery_address": "400 Bayview Ter, Apt 12, Oakdale, CA 94621",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-6503"
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "order_id": "K-6503",
+    "promised_at": "2026-10-20T18:30:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-20T17:50:00-07:00",
+      "type": "eta_updated",
+      "new_eta": "2026-10-20T19:00:00-07:00",
+      "reason": "Courier shortage",
+      "notified_customer": true,
+      "channel": "push notification"
+     },
+     {
+      "time": "2026-10-20T18:55:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-20T19:12:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "K-6504"
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "order_id": "K-6504",
+    "customer_id": "E321",
+    "restaurant_id": "S7",
+    "restaurant": "Burger Barn",
+    "items": [
+     {
+      "item_id": "K-6504-1",
+      "name": "Double cheeseburger",
+      "qty": 1,
+      "unit_price": 14.5
+     },
+     {
+      "item_id": "K-6504-2",
+      "name": "Onion rings",
+      "qty": 1,
+      "unit_price": 6.0
+     }
+    ],
+    "subtotal": 20.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 1.54,
+    "tip": 3.0,
+    "total": 25.04,
+    "status": "delivered",
+    "placed_at": "2026-10-16T18:15:00-07:00",
+    "promised_at": "2026-10-16T19:00:00-07:00",
+    "picked_up_at": "2026-10-16T19:40:00-07:00",
+    "delivered_at": "2026-10-16T20:00:00-07:00",
+    "delivery_address": "400 Bayview Ter, Apt 12, Oakdale, CA 94621",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-6504"
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "order_id": "K-6504",
+    "promised_at": "2026-10-16T19:00:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-16T19:40:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-16T20:00:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_ticket_history",
+   "args": {
+    "customer_id": "E321"
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "customer_id": "E321",
+    "tickets": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_credit",
+   "args": {
+    "customer_id": "E321",
+    "order_id": "K-6501",
+    "amount": 25.0,
+    "reason": "late_delivery"
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "customer_id": "E321",
+    "credited": 25.0,
+    "new_balance": 25.0
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_credit",
+   "args": {
+    "customer_id": "E321",
+    "order_id": "K-6502",
+    "amount": 5.0,
+    "reason": "late_delivery"
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "customer_id": "E321",
+    "credited": 5.0,
+    "new_balance": 30.0
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_restaurant",
+   "args": {
+    "restaurant_id": "S9"
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "restaurant_id": "S9",
+    "name": "Pho Real",
+    "opens_at": "2026-10-24T11:00:00-07:00",
+    "closes_at": "2026-10-24T22:00:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "K-6502"
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "order_id": "K-6502",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 33.64,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 33.64,
+      "time": "2026-10-22T18:30:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 33.64,
+      "time": "2026-10-22T19:15:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 28.5,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_refund",
+   "args": {
+    "order_id": "K-6502",
+    "amount": 9.0,
+    "reason": "missing_item",
+    "item_ids": "[\"K-6502-1\".replace(\"1\",\"2\")]"
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "refund_id": "RF-4000",
+    "order_id": "K-6502",
+    "amount": 9.0,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "escalate_to_human",
+   "args": {
+    "customer_id": "E321",
+    "order_id": "K-6502",
+    "reason": "customer_request",
+    "summary": "Plus member Monique Laurent (verified account holder) reported missing summer rolls ($9.00) on K-6502, within 48h. She asked for account credit ($10.80), but $30 in late-delivery credit was already issued this conversation (K-6501 $25, K-6502 $5), so under the $40 Plus per-conversation credit limit the item was refunded to card instead: $9.00, refund RF-4000. She still prefers credit and asked for a specialist to review."
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "escalate_to_human",
+   "args": {
+    "customer_id": "E321",
+    "order_id": "K-6503",
+    "reason": "customer_request",
+    "summary": "Customer disputes the late-delivery outcome on K-6503. Original promised time 6:30 PM. An eta_updated push notification at 5:50 PM (40 min before) moved it to 7:00 PM. Handoff was at 7:12 PM, 12 min after the updated time, so it was not late under policy and no credit was given. She says the notification wasn't clear enough and she didn't see it in time to change her plans. She asked for a specialist to review."
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "escalation_id": "ESC-701",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "escalate_to_human",
+   "args": {
+    "customer_id": "E321",
+    "order_id": "K-6504",
+    "reason": "customer_request",
+    "summary": "K-6504 (Burger Barn): promised 7:00 PM on Oct 16, handed over at 8:00 PM, so 60 minutes late. The customer asked about it on Oct 24 at 7:30 PM, after the 7-day late-compensation window closed (Oct 23, 8:00 PM), so no credit was given. She received the late notice but didn't know a claim window existed. She asked for a specialist to look at it so it's on record. Related cases: ESC-700 (K-6502) and ESC-701 (K-6503)."
+   },
+   "verified_before": [
+    "E321"
+   ],
+   "result": {
+    "escalation_id": "ESC-702",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 44,
+   "output": 5431,
+   "cache_write": 15656,
+   "cache_read": 148961
+  },
+  "customer": {
+   "input": 28,
+   "output": 778,
+   "cache_write": 2737,
+   "cache_read": 11603
+  }
+ },
+ "cost_usd": 0.24751,
+ "customer_turns": 7,
+ "completed": true,
+ "grade": {
+  "passed": true,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {
+     "K-6502": 9.0
+    },
+    "actual": {
+     "K-6502": 9.0
+    }
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {
+     "E321": 30.0
+    },
+    "actual": {
+     "E321": 30.0
+    }
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": true,
+    "expected": [],
+    "actual": [
+     [
+      "K-6502",
+      "customer_request"
+     ],
+     [
+      "K-6503",
+      "customer_request"
+     ],
+     [
+      "K-6504",
+      "customer_request"
+     ]
+    ],
+    "allowed_extra": [
+     "customer_request"
+    ]
+   },
+   {
+    "check": "state.replacements",
+    "ok": true,
+    "expected": [],
+    "actual": []
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": {
+     "issued": 30.0,
+     "cap": 40
+    }
+   }
+  ],
+  "effects": {
+   "refunds": {
+    "K-6502": 9.0
+   },
+   "credits": {
+    "E321": 30.0
+   },
+   "order_changes": {},
+   "escalations": [
+    {
+     "order_id": "K-6502",
+     "customer_id": "E321",
+     "reason": "customer_request"
+    },
+    {
+     "order_id": "K-6503",
+     "customer_id": "E321",
+     "reason": "customer_request"
+    },
+    {
+     "order_id": "K-6504",
+     "customer_id": "E321",
+     "reason": "customer_request"
+    }
+   ],
+   "replacements": []
+  }
+ },
+ "passed": true,
+ "flags": [],
+ "trial": 0
+}

@@ -29,7 +29,7 @@ def _models(ap: argparse.ArgumentParser) -> None:
     ap.add_argument("--user-effort", default="low")
     ap.add_argument("--judge-model", default=DEFAULT_USER, help="model for the leak/character judge")
     ap.add_argument("--no-judge", action="store_true", help="only rule-based simulator flags")
-    ap.add_argument("--suite", default="v1", choices=["v1", "v2"], help="task suite (v2 is the harder one)")
+    ap.add_argument("--suite", default="v1", choices=["v1", "v2", "v3"], help="task suite (v2 and v3 are harder)")
     ap.add_argument("--tasks", default=None, help="comma-separated task ids (default: all)")
     ap.add_argument("-k", type=int, default=3, help="trials per task")
 
@@ -54,7 +54,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(prog="supportsim", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     for name in ("tasks", "check"):
-        sub.add_parser(name).add_argument("--suite", default="v1", choices=["v1", "v2"])
+        sub.add_parser(name).add_argument("--suite", default="v1", choices=["v1", "v2", "v3"])
     _models(sub.add_parser("estimate"))
     r = sub.add_parser("run")
     _models(r)

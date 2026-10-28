@@ -1,0 +1,416 @@
+{
+  "id": "X19",
+  "slug": "three_live_orders_cancel_address_replace",
+  "title": "Three live orders: cancel one, can't redirect one, replace one",
+  "tricky": "(1) Cancel tonight's Lotus Garden order: no picked_up event, so cancel and refund $30.18. (2) Change the address on the Burger Barn order: its status still says preparing but the courier log shows it was picked up at 19:20, so no change. (3) The Green Bowl order was lost; the customer wants it re-sent; placed today and the restaurant is open until 21:30, so mark it not_delivered, then replace both items, and refund nothing.",
+  "source": {
+    "dataset": "none",
+    "license": "n/a",
+    "what_we_took": "Designed for v3 from the failure modes in LESSONS.md (see V3_DESIGN.md); not derived from a specific conversation. Customer behaviours follow patterns seen in ABCD."
+  },
+  "resolution_summary": "K-6301 cancelled and refunded $30.18. No change to K-6302. K-6303 set to not_delivered and replaced (both items), no refund.",
+  "user": {
+    "persona": "Chloe Dubois, juggling dinner plans for a few people, quick and practical.",
+    "situation": "You have three Forkful orders on the go tonight: a Lotus Garden order (#6301) you no longer want because plans changed; a Burger Barn order (#6302) that you need delivered to your friend's place instead; and a Green Bowl order (#6303) that the app says was lost.",
+    "goal": "Cancel the Lotus Garden order, redirect the Burger Barn order, and get the Green Bowl food re-sent.",
+    "facts": [
+      "Your full name is Chloe Dubois.",
+      "Your phone is 415-555-0319.",
+      "#6301 Lotus Garden: you want to cancel it.",
+      "#6302 Burger Barn: you want it sent to 22 Birch Ln, Oakdale, CA 94619 instead. The app still shows it as 'preparing'.",
+      "#6303 Green Bowl: the app says the order was lost."
+    ],
+    "reveal_rules": [
+      "Deal with the orders one at a time, in this order: cancel #6301, redirect #6302, then #6303.",
+      "For #6303, if asked whether you want a refund or a replacement, say a replacement."
+    ],
+    "behaviors": [
+      "If told the Burger Barn order can't be redirected, say the app still shows 'preparing' once, then accept."
+    ],
+    "opening": "hi, I need help with a few orders tonight",
+    "end_condition": "all three orders have been dealt with and you've acknowledged the outcome."
+  },
+  "expected": {
+    "refunds": {
+      "K-6301": 30.18
+    },
+    "order_changes": {
+      "K-6301": {
+        "status": "cancelled"
+      },
+      "K-6303": {
+        "status": "not_delivered"
+      }
+    },
+    "replacements": [
+      {
+        "order_id": "K-6303",
+        "item_ids": [
+          "K-6303-1",
+          "K-6303-2"
+        ]
+      }
+    ]
+  },
+  "credit_cap": 25,
+  "leak_check": {
+    "amounts": [
+      "30.18"
+    ],
+    "phrases": [
+      "picked up",
+      "not_delivered"
+    ]
+  },
+  "est_turns": 16,
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "phone": "415-555-0319"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "E319",
+        "full_name": "Chloe Dubois",
+        "phone": "415-555-0319"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-6301"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-6301"
+      }
+    },
+    {
+      "tool": "get_payment",
+      "args": {
+        "order_id": "K-6301"
+      }
+    },
+    {
+      "tool": "update_order",
+      "args": {
+        "order_id": "K-6301",
+        "status": "cancelled"
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "K-6301",
+        "amount": 30.18,
+        "reason": "cancelled"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-6302"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-6302"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-6303"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-6303"
+      }
+    },
+    {
+      "tool": "get_restaurant",
+      "args": {
+        "restaurant_id": "S6"
+      }
+    },
+    {
+      "tool": "update_order",
+      "args": {
+        "order_id": "K-6303",
+        "status": "not_delivered"
+      }
+    },
+    {
+      "tool": "create_replacement_order",
+      "args": {
+        "order_id": "K-6303",
+        "item_ids": [
+          "K-6303-1",
+          "K-6303-2"
+        ]
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "redirects the picked-up order",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0319"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E319",
+            "full_name": "Chloe Dubois",
+            "phone": "415-555-0319"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "K-6301",
+            "status": "cancelled"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6301",
+            "amount": 30.18,
+            "reason": "cancelled"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "K-6302",
+            "delivery_address": "22 Birch Ln, Oakdale, CA 94619"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "K-6303",
+            "status": "not_delivered"
+          }
+        },
+        {
+          "tool": "create_replacement_order",
+          "args": {
+            "order_id": "K-6303",
+            "item_ids": [
+              "K-6303-1",
+              "K-6303-2"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "refunds the lost order instead of replacing it",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0319"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E319",
+            "full_name": "Chloe Dubois",
+            "phone": "415-555-0319"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "K-6301",
+            "status": "cancelled"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6301",
+            "amount": 30.18,
+            "reason": "cancelled"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6303",
+            "amount": 28.03,
+            "reason": "whole_order"
+          }
+        }
+      ]
+    },
+    {
+      "name": "replacement plus refund",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0319"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E319",
+            "full_name": "Chloe Dubois",
+            "phone": "415-555-0319"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "K-6301",
+            "status": "cancelled"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6301",
+            "amount": 30.18,
+            "reason": "cancelled"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "K-6303",
+            "status": "not_delivered"
+          }
+        },
+        {
+          "tool": "create_replacement_order",
+          "args": {
+            "order_id": "K-6303",
+            "item_ids": [
+              "K-6303-1",
+              "K-6303-2"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6303",
+            "amount": 28.03,
+            "reason": "whole_order"
+          }
+        }
+      ]
+    },
+    {
+      "name": "cancels without refunding",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0319"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E319",
+            "full_name": "Chloe Dubois",
+            "phone": "415-555-0319"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "K-6301",
+            "status": "cancelled"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "K-6303",
+            "status": "not_delivered"
+          }
+        },
+        {
+          "tool": "create_replacement_order",
+          "args": {
+            "order_id": "K-6303",
+            "item_ids": [
+              "K-6303-1",
+              "K-6303-2"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "replaces only one item",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0319"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E319",
+            "full_name": "Chloe Dubois",
+            "phone": "415-555-0319"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "K-6301",
+            "status": "cancelled"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6301",
+            "amount": 30.18,
+            "reason": "cancelled"
+          }
+        },
+        {
+          "tool": "update_order",
+          "args": {
+            "order_id": "K-6303",
+            "status": "not_delivered"
+          }
+        },
+        {
+          "tool": "create_replacement_order",
+          "args": {
+            "order_id": "K-6303",
+            "item_ids": [
+              "K-6303-1"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

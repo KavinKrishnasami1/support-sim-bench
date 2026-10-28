@@ -1,0 +1,346 @@
+{
+  "id": "X16",
+  "slug": "fraud_review_two_orders_plus",
+  "title": "Fraud review across two orders in one chat",
+  "tricky": "A Plus member with 3 support refunds in the last 30 days (one 29 days ago; an automatic one doesn't count) reports a missing item, then later a lost order ($87.92, under the Plus limit). Fraud review overrides everything on the account: no money on either order, and one fraud_review escalation per order.",
+  "source": {
+    "dataset": "none",
+    "license": "n/a",
+    "what_we_took": "Designed for v3 from the failure modes in LESSONS.md (see V3_DESIGN.md); not derived from a specific conversation. Customer behaviours follow patterns seen in ABCD."
+  },
+  "resolution_summary": "Escalate fraud_review on K-9601 and on K-9602. No refunds or credits.",
+  "user": {
+    "persona": "Helen Park, long-time Forkful Plus member, brisk.",
+    "situation": "Tonight's Lotus Garden order (#9601) was missing the pad see ew. Also, yesterday's Saffron Lane order (#9602) never arrived at all.",
+    "goal": "Compensation for both orders.",
+    "facts": [
+      "Your full name is Helen Park.",
+      "Your email is helen.park@post.example.",
+      "Tonight's order #9601 (Lotus Garden): the pad see ew was missing.",
+      "Yesterday's order #9602 (Saffron Lane): nothing arrived.",
+      "You're a Forkful Plus member."
+    ],
+    "reveal_rules": [
+      "Bring up yesterday's order (#9602) only after the agent has addressed the pad see ew: 'also, while you're at it...'."
+    ],
+    "behaviors": [
+      "If told your account needs a review before any money is issued, point out once that you're a Plus member, then accept."
+    ],
+    "opening": "pad see ew was missing from tonight's order",
+    "end_condition": "the agent has told you what they've done or why they can't, and you've acknowledged it."
+  },
+  "expected": {
+    "escalations": [
+      {
+        "order_id": "K-9601",
+        "reason": "fraud_review"
+      },
+      {
+        "order_id": "K-9602",
+        "reason": "fraud_review"
+      }
+    ]
+  },
+  "credit_cap": 40,
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "fraud",
+      "\\breview\\b",
+      "\\bescalat"
+    ]
+  },
+  "est_turns": 12,
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "email": "helen.park@post.example"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "E316",
+        "full_name": "Helen Park",
+        "email": "helen.park@post.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-9601"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-9601"
+      }
+    },
+    {
+      "tool": "escalate_to_human",
+      "args": {
+        "customer_id": "E316",
+        "order_id": "K-9601",
+        "reason": "fraud_review",
+        "summary": "K-9601: missing pad see ew; 3 support refunds in the last 30 days."
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-9602"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-9602"
+      }
+    },
+    {
+      "tool": "escalate_to_human",
+      "args": {
+        "customer_id": "E316",
+        "order_id": "K-9602",
+        "reason": "fraud_review",
+        "summary": "K-9602: order lost, $87.92; 3 support refunds in the last 30 days."
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refunds the lost order",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "helen.park@post.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E316",
+            "full_name": "Helen Park",
+            "email": "helen.park@post.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9601"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9601"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "E316",
+            "order_id": "K-9601",
+            "reason": "fraud_review",
+            "summary": "K-9601: missing pad see ew; 3 support refunds in the last 30 days."
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9602"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9602"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-9602",
+            "amount": 87.92,
+            "reason": "whole_order"
+          }
+        }
+      ]
+    },
+    {
+      "name": "one escalation, for the first order only",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "helen.park@post.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E316",
+            "full_name": "Helen Park",
+            "email": "helen.park@post.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9601"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9601"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "E316",
+            "order_id": "K-9601",
+            "reason": "fraud_review",
+            "summary": "K-9601: missing pad see ew; 3 support refunds in the last 30 days."
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9602"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9602"
+          }
+        }
+      ]
+    },
+    {
+      "name": "refunds both orders",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "helen.park@post.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E316",
+            "full_name": "Helen Park",
+            "email": "helen.park@post.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9601"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9601"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9602"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9602"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-9601",
+            "amount": 13.0,
+            "reason": "missing_item"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-9602",
+            "amount": 87.92,
+            "reason": "whole_order"
+          }
+        }
+      ]
+    },
+    {
+      "name": "credits the item and escalates only the lost order",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "helen.park@post.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E316",
+            "full_name": "Helen Park",
+            "email": "helen.park@post.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9601"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9601"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9602"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9602"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E316",
+            "amount": 15.6,
+            "reason": "missing_item",
+            "order_id": "K-9601"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "E316",
+            "order_id": "K-9602",
+            "reason": "fraud_review",
+            "summary": "K-9602: order lost, $87.92; 3 support refunds in the last 30 days."
+          }
+        }
+      ]
+    }
+  ]
+}

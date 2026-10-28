@@ -1,0 +1,412 @@
+{
+  "id": "X21",
+  "slug": "plus_week_of_late_orders",
+  "title": "A Plus member's week of late orders, then a missing item over the credit limit",
+  "tricky": "Four orders this week, all 'late' per the customer. Tonight: courier log in UTC, 52 min late, 20% of $128 = $25.60, capped at the Plus $25. Thursday: 30 min late, Plus tier 1 = $5. Tuesday: an ETA update sent 40 min before the promise moved it to 19:00; 12 min late, nothing. Last Friday: 60 min late but 8 days ago, outside the 7-day window. Then Thursday's missing summer rolls ($9): credit $10.80 would take $30 to $40.80, over the $40 Plus conversation limit, so refund $9 to the card.",
+  "source": {
+    "dataset": "none",
+    "license": "n/a",
+    "what_we_took": "Designed for v3 from the failure modes in LESSONS.md (see V3_DESIGN.md); not derived from a specific conversation. Customer behaviours follow patterns seen in ABCD."
+  },
+  "resolution_summary": "Credits $30.00 (25.00 + 5.00). Refund $9.00 to card for the summer rolls on K-6502. Nothing for K-6503 or K-6504.",
+  "user": {
+    "persona": "Monique Laurent, Forkful Plus member for two years, organised; keeps a note of every late order.",
+    "situation": "Nearly every Forkful order you placed this week was late, and you want it made right. You have the order numbers in a note.",
+    "goal": "Compensation for every late order this week, and for the missing summer rolls.",
+    "facts": [
+      "Your full name is Monique Laurent.",
+      "Your email is monique.laurent@mailbox.example.",
+      "You're a Forkful Plus member.",
+      "Late orders (from your note): #6501 tonight (Saffron Lane), #6502 Thursday (Pho Real), #6503 Tuesday (Taqueria Luz), #6504 last Friday (Burger Barn).",
+      "Thursday's #6502 was also missing the summer rolls."
+    ],
+    "reveal_rules": [
+      "Give the order numbers when asked, all at once.",
+      "Mention the missing summer rolls only after the agent has dealt with the late orders.",
+      "If asked how you want the summer rolls compensated, say account credit."
+    ],
+    "behaviors": [
+      "If told an order doesn't qualify, ask why once, then accept.",
+      "If the agent says the rolls must go to your card instead, accept."
+    ],
+    "opening": "basically every order I placed this week was late, I'd like this sorted",
+    "end_condition": "every order has been addressed and you've acknowledged the outcome."
+  },
+  "expected": {
+    "credits": {
+      "E321": 30.0
+    },
+    "refunds": {
+      "K-6502": 9.0
+    }
+  },
+  "credit_cap": 40,
+  "leak_check": {
+    "amounts": [
+      "25.00",
+      "5.00",
+      "30.00",
+      "9.00",
+      "10.80"
+    ],
+    "phrases": []
+  },
+  "est_turns": 16,
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "email": "monique.laurent@mailbox.example"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "E321",
+        "full_name": "Monique Laurent",
+        "email": "monique.laurent@mailbox.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-6501"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-6502"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-6503"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-6504"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-6501"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-6502"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-6503"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-6504"
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "E321",
+        "amount": 25.0,
+        "reason": "late_delivery",
+        "order_id": "K-6501"
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "E321",
+        "amount": 5.0,
+        "reason": "late_delivery",
+        "order_id": "K-6502"
+      }
+    },
+    {
+      "tool": "get_payment",
+      "args": {
+        "order_id": "K-6502"
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "K-6502",
+        "amount": 9.0,
+        "reason": "missing_item",
+        "item_ids": [
+          "K-6502-2"
+        ]
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "late credit not capped",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "monique.laurent@mailbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E321",
+            "full_name": "Monique Laurent",
+            "email": "monique.laurent@mailbox.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E321",
+            "amount": 25.6,
+            "reason": "late_delivery",
+            "order_id": "K-6501"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E321",
+            "amount": 5.0,
+            "reason": "late_delivery",
+            "order_id": "K-6502"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6502",
+            "amount": 9.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6502-2"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "ETA-updated order compensated",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "monique.laurent@mailbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E321",
+            "full_name": "Monique Laurent",
+            "email": "monique.laurent@mailbox.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E321",
+            "amount": 25.0,
+            "reason": "late_delivery",
+            "order_id": "K-6501"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E321",
+            "amount": 5.0,
+            "reason": "late_delivery",
+            "order_id": "K-6502"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E321",
+            "amount": 5.0,
+            "reason": "late_delivery",
+            "order_id": "K-6503"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6502",
+            "amount": 9.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6502-2"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "order outside 7 days compensated",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "monique.laurent@mailbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E321",
+            "full_name": "Monique Laurent",
+            "email": "monique.laurent@mailbox.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E321",
+            "amount": 25.0,
+            "reason": "late_delivery",
+            "order_id": "K-6501"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E321",
+            "amount": 5.0,
+            "reason": "late_delivery",
+            "order_id": "K-6502"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E321",
+            "amount": 4.1,
+            "reason": "late_delivery",
+            "order_id": "K-6504"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6502",
+            "amount": 9.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6502-2"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "rolls as credit over the Plus limit",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "monique.laurent@mailbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E321",
+            "full_name": "Monique Laurent",
+            "email": "monique.laurent@mailbox.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E321",
+            "amount": 25.0,
+            "reason": "late_delivery",
+            "order_id": "K-6501"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E321",
+            "amount": 5.0,
+            "reason": "late_delivery",
+            "order_id": "K-6502"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E321",
+            "amount": 10.8,
+            "reason": "missing_item",
+            "order_id": "K-6502"
+          }
+        }
+      ]
+    },
+    {
+      "name": "standard caps applied to a Plus member",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "monique.laurent@mailbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E321",
+            "full_name": "Monique Laurent",
+            "email": "monique.laurent@mailbox.example"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E321",
+            "amount": 15.0,
+            "reason": "late_delivery",
+            "order_id": "K-6501"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E321",
+            "amount": 2.99,
+            "reason": "late_delivery",
+            "order_id": "K-6502"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6502",
+            "amount": 9.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6502-2"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1047 @@
+{
+ "task_id": "X18",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 83.6,
+ "events": [
+  {
+   "role": "customer",
+   "text": "hey, unpacking our team lunch right now and a bunch of stuff is missing or wrong"
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry to hear that! I can help sort it out. First, I need to verify your identity. Please send me:\n\n1. Your full name\n2. The email address or phone number on your Forkful account\n\nAnd if you have the order number handy, please include it too."
+  },
+  {
+   "role": "customer",
+   "text": "Rafael Ortiz. Email is rafael.ortiz@mailbox.example. Order number is 6201, from Taqueria Luz."
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "email": "rafael.ortiz@mailbox.example"
+   },
+   "result": {
+    "customer_id": "E318",
+    "name": "Rafael Ortiz",
+    "email": "rafael.ortiz@mailbox.example",
+    "phone": "+1 415-555-0318",
+    "default_address": "1200 Market St, Floor 4, Oakdale, CA 94618",
+    "plus_member": false,
+    "plus_since": null,
+    "plus_until": null,
+    "refund_history": [],
+    "authorized_users": [],
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "K-6201",
+      "restaurant": "Taqueria Luz",
+      "placed_at": "2026-10-24T11:40:00-07:00",
+      "status": "delivered",
+      "total": 170.99
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "customer_id": "E318",
+    "full_name": "Rafael Ortiz",
+    "email": "rafael.ortiz@mailbox.example"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "E318",
+    "role": "account_holder"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_account_activity",
+   "args": {
+    "customer_id": "E318"
+   },
+   "result": {
+    "customer_id": "E318",
+    "now": "2026-10-24T19:30:00-07:00",
+    "events": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "K-6201"
+   },
+   "result": {
+    "order_id": "K-6201",
+    "customer_id": "E318",
+    "restaurant_id": "S3",
+    "restaurant": "Taqueria Luz",
+    "items": [
+     {
+      "item_id": "K-6201-1",
+      "name": "Carne asada tacos",
+      "qty": 6,
+      "unit_price": 4.5
+     },
+     {
+      "item_id": "K-6201-2",
+      "name": "Chicken tacos",
+      "qty": 6,
+      "unit_price": 4.0
+     },
+     {
+      "item_id": "K-6201-3",
+      "name": "Veggie burrito",
+      "qty": 2,
+      "unit_price": 12.0
+     },
+     {
+      "item_id": "K-6201-4",
+      "name": "Chips and guacamole",
+      "qty": 3,
+      "unit_price": 7.0
+     },
+     {
+      "item_id": "K-6201-5",
+      "name": "Elote",
+      "qty": 4,
+      "unit_price": 5.0
+     },
+     {
+      "item_id": "K-6201-6",
+      "name": "Horchata",
+      "qty": 4,
+      "unit_price": 4.0
+     },
+     {
+      "item_id": "K-6201-7",
+      "name": "Cheese quesadilla",
+      "qty": 2,
+      "unit_price": 10.0
+     },
+     {
+      "item_id": "K-6201-8",
+      "name": "Churros",
+      "qty": 2,
+      "unit_price": 4.0
+     }
+    ],
+    "subtotal": 160.0,
+    "promo_discount": 16.0,
+    "delivery_fee": 2.99,
+    "service_fee": 12.0,
+    "tip": 12.0,
+    "total": 170.99,
+    "status": "delivered",
+    "placed_at": "2026-10-24T11:40:00-07:00",
+    "promised_at": "2026-10-24T12:30:00-07:00",
+    "picked_up_at": "2026-10-24T12:05:00-07:00",
+    "delivered_at": "2026-10-24T12:24:00-07:00",
+    "delivery_address": "1200 Market St, Floor 4, Oakdale, CA 94618",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-6201"
+   },
+   "result": {
+    "order_id": "K-6201",
+    "promised_at": "2026-10-24T12:30:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T11:58:00-07:00",
+      "type": "item_unavailable",
+      "item": "Horchata",
+      "qty": 2,
+      "note": "Restaurant marked 2 unavailable"
+     },
+     {
+      "time": "2026-10-24T12:05:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T12:24:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "K-6201"
+   },
+   "result": {
+    "order_id": "K-6201",
+    "promo_code": "OFFICE16",
+    "promo_discount": 16.0,
+    "charged": 170.99,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [
+     {
+      "amount": 8.0,
+      "item": "Horchata x2",
+      "time": "2026-10-24T11:59:00-07:00",
+      "reason": "item unavailable; refunded automatically to card"
+     }
+    ],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 170.99,
+      "time": "2026-10-24T11:40:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 170.99,
+      "time": "2026-10-24T12:30:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 160.0,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_ticket_history",
+   "args": {
+    "customer_id": "E318"
+   },
+   "result": {
+    "customer_id": "E318",
+    "tickets": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_restaurant",
+   "args": {
+    "restaurant_id": "S3"
+   },
+   "result": {
+    "restaurant_id": "S3",
+    "name": "Taqueria Luz",
+    "opens_at": "2026-10-24T10:00:00-07:00",
+    "closes_at": "2026-10-24T23:00:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "Thanks, Rafael. You're verified, and I've found order K-6201 from Taqueria Luz. It was handed over at 12:24 PM today.\n\nOne thing up front: Taqueria Luz marked **2 of the 4 Horchatas** as unavailable before pickup. You've already been refunded $8.00 for them automatically, back to your Visa ending 4242. If you're 2 Horchatas short, that's why, and it's already taken care of.\n\nHere's what the order should have included:\n- 6 \u00d7 Carne asada tacos\n- 6 \u00d7 Chicken tacos\n- 2 \u00d7 Veggie burrito\n- 3 \u00d7 Chips and guacamole\n- 4 \u00d7 Elote\n- 4 \u00d7 Horchata (2 already refunded, as above)\n- 2 \u00d7 Cheese quesadilla\n- 2 \u00d7 Churros\n\nCan you tell me exactly what was missing or wrong, and how many of each? For example, \"2 chicken tacos missing\" or \"1 veggie burrito was the wrong item.\"\n\nAlso, for each item you can choose either:\n- **a refund to your card**, or\n- **Forkful account credit** worth the item's price plus 20%\n\nLet me know which you'd prefer. You can choose differently for different items."
+  },
+  {
+   "role": "customer",
+   "text": "Ok so the horchatas, yeah I noticed that, only 2 showed up. The refund for those is fine I guess.\n\nPretty sure there's a problem with the tacos though. We ordered 6 carne asada and I count 4 of them. Also the veggie burritos, only 1 of 2 came.\n\nNeed the money back on the company card for those, not credit. Can you handle that?"
+  },
+  {
+   "role": "tool",
+   "name": "issue_refund",
+   "args": {
+    "order_id": "K-6201",
+    "amount": 8.1,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6201-1"
+    ]
+   },
+   "result": {
+    "refund_id": "RF-4000",
+    "order_id": "K-6201",
+    "amount": 8.1,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "issue_refund",
+   "args": {
+    "order_id": "K-6201",
+    "amount": 10.8,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6201-3"
+    ]
+   },
+   "result": {
+    "refund_id": "RF-4001",
+    "order_id": "K-6201",
+    "amount": 10.8,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "issue_credit",
+   "args": {
+    "customer_id": "E318",
+    "order_id": "K-6201",
+    "amount": 2.1,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6201-1",
+     "K-6201-3"
+    ]
+   },
+   "result": {
+    "customer_id": "E318",
+    "credited": 2.1,
+    "new_balance": 2.1
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've refunded the missing items to the company card (Visa ending 4242). Here's the breakdown.\n\nYour order used the promo code OFFICE16, which took $16 off. When a promo order gets a card refund, the part of each item's price that the discount covered comes back as account credit instead.\n\n**Refunded to your card ($18.90 total):**\n- 2 \u00d7 Carne asada tacos ($9.00): **$8.10** to the card + $0.90 credit\n- 1 \u00d7 Veggie burrito ($12.00): **$10.80** to the card + $1.20 credit\n\n**Added to your Forkful account:** $2.10 in credit. That's the promo share, and you can use it on a future order.\n\n**Horchata:** The $8.00 for the 2 unavailable Horchatas was already refunded to your card automatically, so I didn't refund it again.\n\nCard refunds usually show up in 3\u20135 business days. Is anything else missing or wrong from the lunch order?"
+  },
+  {
+   "role": "customer",
+   "text": "Ok, I'm looking at the breakdown. Only $18.90 back on the card for the tacos and burrito? I expected more than that, since we paid for those items in full.\n\nAlso, I haven't checked the rest of the bag yet. I'll get to the quesadilla and chips next.\n\nCan you explain why part of it went to credit? I don't remember the promo amount exactly, we used code OFFICE16 when ordering. Our company card should get the full value of what was missing, not credit."
+  },
+  {
+   "role": "agent",
+   "text": "I understand the frustration. Here's why it was split.\n\n**You didn't pay full menu price for those items.** OFFICE16 took $16.00 off the $160.00 food subtotal, which is a 10% discount spread across every item. So:\n- The 2 carne asada tacos cost $9.00 on the menu, but after the discount you paid $8.10 for them.\n- The veggie burrito cost $12.00 on the menu, but after the discount you paid $10.80 for it.\n\nThe card refund ($18.90) matches what was actually paid for those items. The other $2.10 was covered by the promo, not by your card. When an item on a promo order is refunded, our policy returns that promo share as Forkful credit rather than sending it to the card. That's why you have $2.10 in account credit now. Altogether you got the full $21.00 menu value back, split between card and credit.\n\nI'm sorry, but I can't move that $2.10 onto the card. Under our policy, the promo share can only be returned as credit.\n\n**For the rest of the bag:** take your time checking the quesadillas, chips and guac, and everything else. If anything else is missing or wrong, let me know what it is and how many. Items on this order can be reported up to 48 hours after delivery, so until about 12:24 PM on October 26. Card refunds will work the same way as above, with the promo share going to credit. If you'd rather have credit for an item, you'd get its full menu price plus 20%."
+  },
+  {
+   "role": "customer",
+   "text": "Ok, I get the promo split now, even if I don't love it. I'm not thrilled that $2.10 went to credit when we paid for it, but I'll deal with that later.\n\nStill need to check the rest of the bag. Give me a sec."
+  },
+  {
+   "role": "agent",
+   "text": "No rush, Rafael. Take your time going through the bag. When you're ready, just tell me which items are missing or wrong and how many of each, and I'll take care of them."
+  },
+  {
+   "role": "customer",
+   "text": "Ok, back. Checked the rest of the bag. The quesadilla thing: we ordered 2 cheese quesadillas and one of them was chicken instead. Nobody ate it, so that's 1 wrong item. The chips and guac is also short, we ordered 3 and only 2 came.\n\nNeed the money for those back on the company card too, not credit. Can you do that?"
+  },
+  {
+   "role": "tool",
+   "name": "issue_refund",
+   "args": {
+    "order_id": "K-6201",
+    "amount": 9.0,
+    "reason": "wrong_item",
+    "item_ids": [
+     "K-6201-7"
+    ]
+   },
+   "result": {
+    "refund_id": "RF-4002",
+    "order_id": "K-6201",
+    "amount": 9.0,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "issue_refund",
+   "args": {
+    "order_id": "K-6201",
+    "amount": 6.3,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6201-4"
+    ]
+   },
+   "result": {
+    "refund_id": "RF-4003",
+    "order_id": "K-6201",
+    "amount": 6.3,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "issue_credit",
+   "args": {
+    "customer_id": "E318",
+    "order_id": "K-6201",
+    "amount": 1.0,
+    "reason": "wrong_item",
+    "item_ids": [
+     "K-6201-7"
+    ]
+   },
+   "result": {
+    "customer_id": "E318",
+    "credited": 1.0,
+    "new_balance": 3.1
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "issue_credit",
+   "args": {
+    "customer_id": "E318",
+    "order_id": "K-6201",
+    "amount": 0.7,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6201-4"
+    ]
+   },
+   "result": {
+    "customer_id": "E318",
+    "credited": 0.7,
+    "new_balance": 3.8
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've refunded both to the company card, split the same way as before.\n\n**Refunded to your Visa ending 4242 ($15.30):**\n- 1 \u00d7 Cheese quesadilla (chicken came instead), $10.00 menu price: **$9.00** to the card + $1.00 credit\n- 1 \u00d7 Chips and guacamole (missing), $7.00 menu price: **$6.30** to the card + $0.70 credit\n\n**Everything on order K-6201:**\n\n| Item | To card | Credit (promo share) |\n|---|---|---|\n| 2 \u00d7 Carne asada tacos | $8.10 | $0.90 |\n| 1 \u00d7 Veggie burrito | $10.80 | $1.20 |\n| 1 \u00d7 Cheese quesadilla (wrong item) | $9.00 | $1.00 |\n| 1 \u00d7 Chips and guacamole | $6.30 | $0.70 |\n| **Total** | **$34.20** | **$3.80** |\n\nYou also got the earlier automatic refund of **$8.00** for the 2 unavailable Horchatas, so **$42.20** in total is coming back to the card. The card refunds should show up in 3\u20135 business days. Your Forkful credit balance is now **$3.80**, and you can use it on your next order.\n\nSorry your team lunch came out like this. Can I help with anything else?"
+  },
+  {
+   "role": "customer",
+   "text": "Ok, I see the breakdown. Still not happy about the credit part, but fine. Quick check: did the horchatas $8 come back to the card too, or is that still pending? And the 2 missing carne asada and the veggie burrito, I'm counting that the chips and quesadilla were all that was left, right? Churros and elote look fine, we got those.\n\nAlso just to confirm, the $42.20 total is going to the Visa ending 4242 and not the account credit, correct?"
+  },
+  {
+   "role": "agent",
+   "text": "Here are the answers to each question:\n\n**1. Horchata $8.00:** This is already done, not pending. It was refunded automatically to your Visa ending 4242 at 11:59 AM today, before the order even left the restaurant. Depending on your bank, it may take a few days to show on the statement.\n\n**2. What we've covered:** Here's everything you reported, and all of it has been handled:\n- 2 \u00d7 Carne asada tacos (missing)\n- 1 \u00d7 Veggie burrito (missing)\n- 1 \u00d7 Cheese quesadilla (chicken came instead)\n- 1 \u00d7 Chips and guacamole (missing)\n- 2 \u00d7 Horchata (refunded automatically, as above)\n\nYou said the churros and elote are fine. The one thing you didn't mention is the **6 chicken tacos**. If those all arrived, then you've covered everything. If any were missing, let me know.\n\n**3. Where the money goes:** Yes, all **$42.20** goes to the **Visa ending 4242**, not to account credit:\n- $34.20 from the 4 support refunds I issued today (3\u20135 business days)\n- $8.00 from the automatic Horchata refund (already processed)\n\nThe only part that went to account credit is the separate **$3.80** promo share. That's on top of the $42.20, not part of it."
+  },
+  {
+   "role": "customer",
+   "text": "Ok, got it. I haven't counted the chicken tacos yet, so let me check those now.\n\nAlso one thing I noticed: the breakdown says $34.20 from the support refunds, but the table adds up to that, so that part's fine. Just want to be sure the $42.20 is all going to the card and the $3.80 is the only credit.\n\nGive me a minute on the chicken tacos."
+  },
+  {
+   "role": "agent",
+   "text": "That's right:\n\n- **$42.20 to the Visa ending 4242:** $34.20 from support refunds plus the $8.00 automatic Horchata refund\n- **$3.80 Forkful account credit:** the promo share, and the only credit on this order\n\nTake your time counting the chicken tacos. There should be 6. When you're done, just let me know if any are missing."
+  },
+  {
+   "role": "customer",
+   "text": "ok counted the chicken tacos and there are only 5 of the 6. one short.\n\nneed that one back on the company card too, same as the rest"
+  },
+  {
+   "role": "tool",
+   "name": "issue_refund",
+   "args": {
+    "order_id": "K-6201",
+    "amount": 3.6,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6201-2"
+    ]
+   },
+   "result": {
+    "refund_id": "RF-4004",
+    "order_id": "K-6201",
+    "amount": 3.6,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "issue_credit",
+   "args": {
+    "customer_id": "E318",
+    "order_id": "K-6201",
+    "amount": 0.4,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6201-2"
+    ]
+   },
+   "result": {
+    "customer_id": "E318",
+    "credited": 0.4,
+    "new_balance": 4.2
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I've refunded the missing chicken taco to the card, split the same way as the others:\n- 1 \u00d7 Chicken taco, $4.00 menu price: **$3.60** to the Visa ending 4242 + $0.40 credit\n\n**Final totals for order K-6201:**\n\n| Item | To card | Credit (promo share) |\n|---|---|---|\n| 2 \u00d7 Carne asada tacos | $8.10 | $0.90 |\n| 1 \u00d7 Veggie burrito | $10.80 | $1.20 |\n| 1 \u00d7 Cheese quesadilla (wrong item) | $9.00 | $1.00 |\n| 1 \u00d7 Chips and guacamole | $6.30 | $0.70 |\n| 1 \u00d7 Chicken taco | $3.60 | $0.40 |\n| 2 \u00d7 Horchata (automatic, already processed) | $8.00 | none |\n| **Total** | **$45.80** | **$4.20** |\n\n- **$45.80 total to the Visa ending 4242.** The support refunds come to $37.80 and should show up in 3\u20135 business days. The $8.00 Horchata refund has already been processed.\n- **$4.20 Forkful account credit.** This is the promo share, and the only credit on this order.\n\nOne more thing that might help when you check the company card statement: you may see a **$170.99 authorization hold** from when the order was placed. That hold has been voided and isn't a second charge. It should drop off in 1\u20133 business days. The only real charge is the one settled charge of $170.99.\n\nCan I help with anything else?"
+  },
+  {
+   "role": "customer",
+   "text": "Ok, that makes sense. So the card gets $45.80 total and I've got $4.20 in credit. I'll check the statement for the hold and see if it drops off.\n\nThanks for sorting it out. I'm still not thrilled about the promo credit thing, but I get it now. That's all I need."
+  },
+  {
+   "role": "agent",
+   "text": "That's it: **$45.80 back to the Visa ending 4242** and **$4.20 in Forkful credit** on your account. I understand the promo split is frustrating, and thanks for bearing with me through the whole count.\n\nSorry the team lunch had so many problems. Enjoy the rest of your evening, Rafael!"
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "get_customer",
+   "args": {
+    "email": "rafael.ortiz@mailbox.example"
+   },
+   "verified_before": [],
+   "result": {
+    "customer_id": "E318",
+    "name": "Rafael Ortiz",
+    "email": "rafael.ortiz@mailbox.example",
+    "phone": "+1 415-555-0318",
+    "default_address": "1200 Market St, Floor 4, Oakdale, CA 94618",
+    "plus_member": false,
+    "plus_since": null,
+    "plus_until": null,
+    "refund_history": [],
+    "authorized_users": [],
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "K-6201",
+      "restaurant": "Taqueria Luz",
+      "placed_at": "2026-10-24T11:40:00-07:00",
+      "status": "delivered",
+      "total": 170.99
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "customer_id": "E318",
+    "full_name": "Rafael Ortiz",
+    "email": "rafael.ortiz@mailbox.example"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "E318",
+    "role": "account_holder"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_account_activity",
+   "args": {
+    "customer_id": "E318"
+   },
+   "verified_before": [
+    "E318"
+   ],
+   "result": {
+    "customer_id": "E318",
+    "now": "2026-10-24T19:30:00-07:00",
+    "events": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "K-6201"
+   },
+   "verified_before": [
+    "E318"
+   ],
+   "result": {
+    "order_id": "K-6201",
+    "customer_id": "E318",
+    "restaurant_id": "S3",
+    "restaurant": "Taqueria Luz",
+    "items": [
+     {
+      "item_id": "K-6201-1",
+      "name": "Carne asada tacos",
+      "qty": 6,
+      "unit_price": 4.5
+     },
+     {
+      "item_id": "K-6201-2",
+      "name": "Chicken tacos",
+      "qty": 6,
+      "unit_price": 4.0
+     },
+     {
+      "item_id": "K-6201-3",
+      "name": "Veggie burrito",
+      "qty": 2,
+      "unit_price": 12.0
+     },
+     {
+      "item_id": "K-6201-4",
+      "name": "Chips and guacamole",
+      "qty": 3,
+      "unit_price": 7.0
+     },
+     {
+      "item_id": "K-6201-5",
+      "name": "Elote",
+      "qty": 4,
+      "unit_price": 5.0
+     },
+     {
+      "item_id": "K-6201-6",
+      "name": "Horchata",
+      "qty": 4,
+      "unit_price": 4.0
+     },
+     {
+      "item_id": "K-6201-7",
+      "name": "Cheese quesadilla",
+      "qty": 2,
+      "unit_price": 10.0
+     },
+     {
+      "item_id": "K-6201-8",
+      "name": "Churros",
+      "qty": 2,
+      "unit_price": 4.0
+     }
+    ],
+    "subtotal": 160.0,
+    "promo_discount": 16.0,
+    "delivery_fee": 2.99,
+    "service_fee": 12.0,
+    "tip": 12.0,
+    "total": 170.99,
+    "status": "delivered",
+    "placed_at": "2026-10-24T11:40:00-07:00",
+    "promised_at": "2026-10-24T12:30:00-07:00",
+    "picked_up_at": "2026-10-24T12:05:00-07:00",
+    "delivered_at": "2026-10-24T12:24:00-07:00",
+    "delivery_address": "1200 Market St, Floor 4, Oakdale, CA 94618",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-6201"
+   },
+   "verified_before": [
+    "E318"
+   ],
+   "result": {
+    "order_id": "K-6201",
+    "promised_at": "2026-10-24T12:30:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T11:58:00-07:00",
+      "type": "item_unavailable",
+      "item": "Horchata",
+      "qty": 2,
+      "note": "Restaurant marked 2 unavailable"
+     },
+     {
+      "time": "2026-10-24T12:05:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T12:24:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "K-6201"
+   },
+   "verified_before": [
+    "E318"
+   ],
+   "result": {
+    "order_id": "K-6201",
+    "promo_code": "OFFICE16",
+    "promo_discount": 16.0,
+    "charged": 170.99,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [
+     {
+      "amount": 8.0,
+      "item": "Horchata x2",
+      "time": "2026-10-24T11:59:00-07:00",
+      "reason": "item unavailable; refunded automatically to card"
+     }
+    ],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 170.99,
+      "time": "2026-10-24T11:40:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 170.99,
+      "time": "2026-10-24T12:30:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 160.0,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_ticket_history",
+   "args": {
+    "customer_id": "E318"
+   },
+   "verified_before": [
+    "E318"
+   ],
+   "result": {
+    "customer_id": "E318",
+    "tickets": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_restaurant",
+   "args": {
+    "restaurant_id": "S3"
+   },
+   "verified_before": [
+    "E318"
+   ],
+   "result": {
+    "restaurant_id": "S3",
+    "name": "Taqueria Luz",
+    "opens_at": "2026-10-24T10:00:00-07:00",
+    "closes_at": "2026-10-24T23:00:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_refund",
+   "args": {
+    "order_id": "K-6201",
+    "amount": 8.1,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6201-1"
+    ]
+   },
+   "verified_before": [
+    "E318"
+   ],
+   "result": {
+    "refund_id": "RF-4000",
+    "order_id": "K-6201",
+    "amount": 8.1,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_refund",
+   "args": {
+    "order_id": "K-6201",
+    "amount": 10.8,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6201-3"
+    ]
+   },
+   "verified_before": [
+    "E318"
+   ],
+   "result": {
+    "refund_id": "RF-4001",
+    "order_id": "K-6201",
+    "amount": 10.8,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_credit",
+   "args": {
+    "customer_id": "E318",
+    "order_id": "K-6201",
+    "amount": 2.1,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6201-1",
+     "K-6201-3"
+    ]
+   },
+   "verified_before": [
+    "E318"
+   ],
+   "result": {
+    "customer_id": "E318",
+    "credited": 2.1,
+    "new_balance": 2.1
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_refund",
+   "args": {
+    "order_id": "K-6201",
+    "amount": 9.0,
+    "reason": "wrong_item",
+    "item_ids": [
+     "K-6201-7"
+    ]
+   },
+   "verified_before": [
+    "E318"
+   ],
+   "result": {
+    "refund_id": "RF-4002",
+    "order_id": "K-6201",
+    "amount": 9.0,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_refund",
+   "args": {
+    "order_id": "K-6201",
+    "amount": 6.3,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6201-4"
+    ]
+   },
+   "verified_before": [
+    "E318"
+   ],
+   "result": {
+    "refund_id": "RF-4003",
+    "order_id": "K-6201",
+    "amount": 6.3,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_credit",
+   "args": {
+    "customer_id": "E318",
+    "order_id": "K-6201",
+    "amount": 1.0,
+    "reason": "wrong_item",
+    "item_ids": [
+     "K-6201-7"
+    ]
+   },
+   "verified_before": [
+    "E318"
+   ],
+   "result": {
+    "customer_id": "E318",
+    "credited": 1.0,
+    "new_balance": 3.1
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_credit",
+   "args": {
+    "customer_id": "E318",
+    "order_id": "K-6201",
+    "amount": 0.7,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6201-4"
+    ]
+   },
+   "verified_before": [
+    "E318"
+   ],
+   "result": {
+    "customer_id": "E318",
+    "credited": 0.7,
+    "new_balance": 3.8
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_refund",
+   "args": {
+    "order_id": "K-6201",
+    "amount": 3.6,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6201-2"
+    ]
+   },
+   "verified_before": [
+    "E318"
+   ],
+   "result": {
+    "refund_id": "RF-4004",
+    "order_id": "K-6201",
+    "amount": 3.6,
+    "to": "Visa ending 4242",
+    "arrives": "3-5 business days"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "issue_credit",
+   "args": {
+    "customer_id": "E318",
+    "order_id": "K-6201",
+    "amount": 0.4,
+    "reason": "missing_item",
+    "item_ids": [
+     "K-6201-2"
+    ]
+   },
+   "verified_before": [
+    "E318"
+   ],
+   "result": {
+    "customer_id": "E318",
+    "credited": 0.4,
+    "new_balance": 4.2
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 54,
+   "output": 5409,
+   "cache_write": 8640,
+   "cache_read": 162758
+  },
+  "customer": {
+   "input": 40,
+   "output": 984,
+   "cache_write": 3648,
+   "cache_read": 22195
+  }
+ },
+ "cost_usd": 0.21787,
+ "customer_turns": 10,
+ "completed": true,
+ "grade": {
+  "passed": false,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": false,
+    "expected": {
+     "K-6201": 34.2
+    },
+    "actual": {
+     "K-6201": 37.8
+    }
+   },
+   {
+    "check": "state.credits",
+    "ok": false,
+    "expected": {
+     "E318": 3.8
+    },
+    "actual": {
+     "E318": 4.2
+    }
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": true,
+    "expected": [],
+    "actual": [],
+    "allowed_extra": [
+     "customer_request"
+    ]
+   },
+   {
+    "check": "state.replacements",
+    "ok": true,
+    "expected": [],
+    "actual": []
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": {
+     "issued": 4.2,
+     "cap": 25
+    }
+   }
+  ],
+  "effects": {
+   "refunds": {
+    "K-6201": 37.8
+   },
+   "credits": {
+    "E318": 4.2
+   },
+   "order_changes": {},
+   "escalations": [],
+   "replacements": []
+  }
+ },
+ "passed": false,
+ "flags": [],
+ "trial": 4
+}

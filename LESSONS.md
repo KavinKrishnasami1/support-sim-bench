@@ -207,3 +207,55 @@ counts, not one run's pass^3.
 $5.00, so re-running was cheap. The time went into reading transcripts to decide whether each failure was the model
 or the benchmark. That reading, not compute, is the real cost of a trustworthy environment, and it's the part that
 is hardest to hand off.
+
+## 7. Trying to make the strongest model fail (v3)
+
+v3 aimed for tasks Opus 5.5 fails 20 to 60% of the time, for real reasons. It didn't get there: Haiku passed 13 of
+15 core tasks, and Sonnet and Opus passed everything, including six long "scale" tasks that Opus ran 5 times each.
+Numbers are in [RESULTS_V3.md](RESULTS_V3.md).
+
+**The v2 lever stopped working.** The most discriminating v2 tasks hid the deciding fact in a record the agent had
+no obvious reason to open. Opus defeats that by opening almost every record before deciding anything: profile,
+account activity, payment, tickets, delivery events, restaurant. A task that tests "did you look?" can't separate
+agents that always look. Haiku still sometimes acts first and looks later (X10), so the lever still separates
+smaller models.
+
+**Volume didn't bite either.** Five issues in one chat, a running credit limit, a 9-line promo order, a 13-entry
+refund history and chained cancel and replace actions: Opus went 30/30. Careful bookkeeping over a 15-turn chat is
+not where it fails.
+
+**Every apparent Opus failure was ours,** for the third suite running. Two runs failed:
+
+- the simulated customer invented a missing item that wasn't in its facts;
+- a policy sentence ("credits already received, for any problem") literally covered credit issued earlier in the
+  same chat, and Opus applied it literally.
+
+The better the agent, the more its "failures" are really tests of the benchmark. A strong model is also a good
+detector of ambiguous policy: it finds the reading the author didn't intend and follows it consistently.
+
+**What made a task genuinely hard versus artificially hard.**
+
+- *Genuinely hard,* and it separated Haiku:
+  - acting before looking when a customer pushes for speed;
+  - applying only half of a rule that has two parts.
+
+  These are failures a careful human agent would also be warned about.
+- *Artificially hard:* anything that relies on ambiguous wording, on the simulator behaving off-script, or on a
+  rule the agent has no way to find. Those produce failures, but the failures measure the benchmark.
+- *Not hard at all, for current frontier models:*
+  - longer chats and more records;
+  - UTC conversion and time windows;
+  - limits that add up;
+  - precedence between rules, when the policy states it clearly.
+
+**The designer's blind spot.** These tasks were designed by the same model family they were testing. Every task
+started from a rule that could be stated clearly and a reference solution that could be written down, which is
+exactly what makes it solvable by the same kind of reasoning. Finding tasks that genuinely trip a frontier model
+probably needs inputs the designer doesn't generate:
+
+- real support transcripts and real, messy policies;
+- people who have watched agents fail in production;
+- generating many variants and keeping the ones models fail.
+
+That's the strongest argument we found for task-building as a service: the hard part isn't the harness, it's the
+source material.

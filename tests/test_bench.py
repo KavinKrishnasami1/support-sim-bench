@@ -8,7 +8,7 @@ T02 = next(t for t in load_tasks(["T02"]))
 
 
 def test_every_oracle_passes_and_every_mistake_fails():
-    for suite in ("v1", "v2"):
+    for suite in ("v1", "v2", "v3"):
         assert [p for t in load_tasks(suite=suite) for p in check_task(t)] == []
 
 
@@ -79,3 +79,31 @@ def test_agent_acts_on_the_customers_closing_message():
     customer = ScriptedProvider(["hi", "Daniel Reyes, 415-555-0172", "naan missing on 5102, refund to card please, thanks bye " + STOP_TOKEN])
     r = run_episode(T02, agent, customer)
     assert r["passed"] and r["events"][-1]["role"] == "agent"
+
+
+def test_v3_authorized_user_and_replacement_order():
+    from supportsim.tools import call_tool
+    from supportsim.world import load_world
+
+    w = load_world(suite="v3")
+    r, err = call_tool(w, "verify_identity", {"customer_id": "E309", "full_name": "Ken Tanaka",
+                                              "email": "ken.tanaka@inbox.example"})
+    assert not err and r["role"] == "authorized_user"
+    r, err = call_tool(w, "create_replacement_order", {"order_id": "K-8701", "item_ids": ["K-8701-1"]})
+    assert err  # the original must be marked not_delivered first
+    call_tool(w, "update_order", {"order_id": "K-8701", "status": "not_delivered"})
+    r, err = call_tool(w, "create_replacement_order", {"order_id": "K-8701", "item_ids": ["K-8701-1"]})
+    assert not err and r["charge"] == 0.0
+
+
+def test_v1_and_v2_tools_unchanged_by_v3():
+    from supportsim.tools import call_tool, tool_specs
+    from supportsim.world import load_world
+
+    assert "get_restaurant" not in {t["name"] for t in tool_specs("v2")}
+    w = load_world(suite="v2")
+    r, _ = call_tool(w, "verify_identity", {"customer_id": "D201", "full_name": "Aisha Rahman",
+                                            "email": "aisha.rahman@inbox.example"})
+    assert r == {"verified": True, "customer_id": "D201"}
+    r, err = call_tool(w, "update_order", {"order_id": "Q-7102", "status": "not_delivered"})
+    assert err

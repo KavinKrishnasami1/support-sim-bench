@@ -16,6 +16,7 @@ from .world import World, normalize_order_id
 ESCALATION_REASONS = ["refund_over_limit", "fraud_review", "unrecognized_charge", "food_safety",
                       "customer_request", "other"]
 ESCALATION_REASONS_V2 = ESCALATION_REASONS[:-1] + ["delivery_dispute", "other"]
+ESCALATION_REASONS_V3 = ESCALATION_REASONS_V2[:-1] + ["restaurant_incident", "account_security", "other"]
 
 TOOLS = [
     {
@@ -104,17 +105,56 @@ V2_TOOLS = [
         "input_schema": {"type": "object", "properties": {"customer_id": {"type": "string"}}, "required": ["customer_id"]},
     },
 ]
-WRITE_TOOLS = {"issue_refund", "issue_credit", "update_order", "escalate_to_human"}
+V3_TOOLS = [
+    {
+        "name": "get_restaurant",
+        "description": "A restaurant's record: today's opening hours (opens_at, closes_at) and any open incidents "
+                       "(e.g. a recall), with the window of order times each incident covers.",
+        "input_schema": {"type": "object", "properties": {"restaurant_id": {"type": "string"}},
+                         "required": ["restaurant_id"]},
+    },
+    {
+        "name": "get_account_activity",
+        "description": "Recent security-relevant changes to a customer account: email, phone and password changes, "
+                       "with timestamps and the device or location they came from.",
+        "input_schema": {"type": "object", "properties": {"customer_id": {"type": "string"}},
+                         "required": ["customer_id"]},
+    },
+    {
+        "name": "create_replacement_order",
+        "description": "Send a free replacement for items from an order that never arrived. The original order must "
+                       "already have status 'not_delivered'.",
+        "input_schema": {"type": "object", "properties": {
+            "order_id": {"type": "string", "description": "The original order"},
+            "item_ids": {"type": "array", "items": {"type": "string"}}},
+            "required": ["order_id", "item_ids"]},
+    },
+]
+WRITE_TOOLS = {"issue_refund", "issue_credit", "update_order", "escalate_to_human", "create_replacement_order"}
 
 
 def tool_specs(suite: str = "v1") -> list[dict]:
     if suite == "v1":
         return TOOLS
-    specs = [dict(t) for t in TOOLS] + V2_TOOLS
+    specs = [dict(t) for t in TOOLS] + V2_TOOLS + (V3_TOOLS if suite == "v3" else [])
+    reasons = ESCALATION_REASONS_V3 if suite == "v3" else ESCALATION_REASONS_V2
     esc = next(t for t in specs if t["name"] == "escalate_to_human")
     esc["input_schema"] = {**esc["input_schema"], "properties": {
-        **esc["input_schema"]["properties"], "reason": {"type": "string", "enum": ESCALATION_REASONS_V2}}}
+        **esc["input_schema"]["properties"], "reason": {"type": "string", "enum": reasons}}}
+    if suite == "v3":
+        upd = next(t for t in specs if t["name"] == "update_order")
+        upd["description"] = ("Change an order's delivery address, cancel it (status 'cancelled'), or mark an order "
+                              "that never arrived as 'not_delivered'.")
+        upd["input_schema"] = {**upd["input_schema"], "properties": {
+            **upd["input_schema"]["properties"], "status": {"type": "string", "enum": ["cancelled", "not_delivered"]}}}
+        ver = next(t for t in specs if t["name"] == "verify_identity")
+        ver["description"] = ("Verify the person in the chat: the account holder, or an authorized user listed on the "
+                              "account. Requires their full name and their email or phone number. Returns their role.")
     return specs
+
+
+def _v3(w: World) -> bool:
+    return w.data.get("suite") == "v3"
 
 
 def _digits(s: str) -> str:
@@ -144,6 +184,12 @@ def get_customer(w: World, customer_id=None, email=None, phone=None, full_name=N
                 (phone and _digits(phone) and _digits(c["phone"]) == _digits(phone)) or \
                 (full_name and _norm(c["name"]) == _norm(full_name)):
             return _profile(w, c)
+    for c in w.data["customers"]:
+        for u in c.get("authorized_users", []):
+            if (email and _norm(u.get("email")) == _norm(email)) or \
+                    (phone and _digits(phone) and _digits(u.get("phone")) == _digits(phone)) or \
+                    (full_name and _norm(u["name"]) == _norm(full_name)):
+                return {**_profile(w, c), "matched_authorized_user": u["name"]}
     raise ToolError("No customer found with those details.")
 
 
@@ -155,7 +201,13 @@ def verify_identity(w: World, customer_id, full_name, email=None, phone=None) ->
         (email and _norm(email) == _norm(c["email"])) or (phone and _digits(phone) == _digits(c["phone"])))
     if ok:
         w.verified.add(customer_id)
-        return {"verified": True, "customer_id": customer_id}
+        return {"verified": True, "customer_id": customer_id, **({"role": "account_holder"} if _v3(w) else {})}
+    for u in c.get("authorized_users", []):
+        if _norm(full_name) == _norm(u["name"]) and (
+                (email and _norm(email) == _norm(u.get("email"))) or
+                (phone and _digits(phone) and _digits(phone) == _digits(u.get("phone")))):
+            w.verified.add(customer_id)
+            return {"verified": True, "customer_id": customer_id, "role": "authorized_user", "name": u["name"]}
     w.failed_verifications[customer_id] = w.failed_verifications.get(customer_id, 0) + 1
     return {"verified": False, "reason": "The details do not match the account.",
             "failed_attempts": w.failed_verifications[customer_id]}
@@ -208,8 +260,9 @@ def update_order(w: World, order_id, delivery_address=None, status=None) -> dict
         raise ToolError(f"No order {order_id}.")
     if not delivery_address and not status:
         raise ToolError("Nothing to update: give delivery_address or status.")
-    if status and status != "cancelled":
-        raise ToolError("status can only be set to 'cancelled'.")
+    allowed = ("cancelled", "not_delivered") if _v3(w) else ("cancelled",)
+    if status and status not in allowed:
+        raise ToolError(f"status can only be set to {' or '.join(repr(x) for x in allowed)}.")
     if delivery_address:
         o["delivery_address"] = delivery_address.strip()
     if status:
@@ -220,7 +273,8 @@ def update_order(w: World, order_id, delivery_address=None, status=None) -> dict
 def escalate_to_human(w: World, customer_id, reason, summary, order_id=None) -> dict:
     if not w.customer(customer_id):
         raise ToolError(f"Unknown customer_id {customer_id}.")
-    allowed = ESCALATION_REASONS_V2 if "delivery_events" in w.data else ESCALATION_REASONS
+    allowed = ESCALATION_REASONS_V3 if _v3(w) else ESCALATION_REASONS_V2 if "delivery_events" in w.data \
+        else ESCALATION_REASONS
     if reason not in allowed:
         raise ToolError(f"reason must be one of {allowed}.")
     esc = {"escalation_id": f"ESC-{700 + len(w.data['escalations'])}", "customer_id": customer_id,
@@ -252,7 +306,39 @@ def get_ticket_history(w: World, customer_id) -> dict:
             "tickets": [t for t in w.data.get("tickets", []) if t["customer_id"] == customer_id]}
 
 
-IMPL = {"get_delivery_events": get_delivery_events, "get_payment": get_payment, "get_ticket_history": get_ticket_history,
+def get_restaurant(w: World, restaurant_id) -> dict:
+    r = next((r for r in w.data["restaurants"] if r["restaurant_id"] == str(restaurant_id).strip()), None)
+    if not r:
+        raise ToolError(f"No restaurant {restaurant_id}.")
+    return r
+
+
+def get_account_activity(w: World, customer_id) -> dict:
+    if not w.customer(customer_id):
+        raise ToolError(f"Unknown customer_id {customer_id}.")
+    return {"customer_id": customer_id, "now": w.data["now"],
+            "events": w.data.get("account_activity", {}).get(customer_id, [])}
+
+
+def create_replacement_order(w: World, order_id, item_ids) -> dict:
+    o = w.order(order_id)
+    if not o:
+        raise ToolError(f"No order {order_id}.")
+    if o["status"] != "not_delivered":
+        raise ToolError("The original order must have status 'not_delivered' before a replacement can be created.")
+    known = {it["item_id"] for it in o["items"]}
+    unknown = [i for i in item_ids if i not in known]
+    if not item_ids or unknown:
+        raise ToolError(f"item_ids must be items of {o['order_id']}: {sorted(known)}.")
+    reps = w.data.setdefault("replacements", [])
+    rep = {"replacement_id": f"RP-{900 + len(reps)}", "original_order_id": o["order_id"],
+           "item_ids": sorted(set(item_ids)), "created_at": w.data["now"]}
+    reps.append(rep)
+    return {**rep, "charge": 0.0, "eta": "45-60 minutes"}
+
+
+IMPL = {"get_restaurant": get_restaurant, "get_account_activity": get_account_activity,
+        "create_replacement_order": create_replacement_order, "get_delivery_events": get_delivery_events, "get_payment": get_payment, "get_ticket_history": get_ticket_history,
         "get_customer": get_customer, "verify_identity": verify_identity, "get_order": get_order,
         "issue_refund": issue_refund, "issue_credit": issue_credit, "update_order": update_order,
         "escalate_to_human": escalate_to_human}

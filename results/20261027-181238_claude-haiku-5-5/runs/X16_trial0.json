@@ -1,0 +1,966 @@
+{
+ "task_id": "X16",
+ "end_reason": "customer_ended",
+ "error": null,
+ "seconds": 26.6,
+ "events": [
+  {
+   "role": "customer",
+   "text": "Hi, pad see ew was missing from tonight's order, Lotus Garden, order #9601. I paid for it and it isn't in the bag. Can you sort out a credit or refund for that?"
+  },
+  {
+   "role": "agent",
+   "text": "I'm sorry the pad see ew didn't make it into your bag. I can look into this for you. First, I need to verify your identity. Could you please provide your full name, plus the email address or phone number on your account?"
+  },
+  {
+   "role": "customer",
+   "text": "Sure. It's Helen Park, and the email on my account is helen.park@post.example."
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "full_name": "Helen Park",
+    "email": "helen.park@post.example",
+    "customer_id": ""
+   },
+   "result": {
+    "error": "Unknown customer_id ."
+   },
+   "is_error": true
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "9601"
+   },
+   "result": {
+    "order_id": "K-9601",
+    "customer_id": "E316",
+    "restaurant_id": "S2",
+    "restaurant": "Lotus Garden",
+    "items": [
+     {
+      "item_id": "K-9601-1",
+      "name": "Pad see ew",
+      "qty": 1,
+      "unit_price": 13.0
+     },
+     {
+      "item_id": "K-9601-2",
+      "name": "Tom yum soup",
+      "qty": 1,
+      "unit_price": 9.5
+     },
+     {
+      "item_id": "K-9601-3",
+      "name": "Mango sticky rice",
+      "qty": 1,
+      "unit_price": 7.0
+     }
+    ],
+    "subtotal": 29.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 2.21,
+    "tip": 3.0,
+    "total": 34.71,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:15:00-07:00",
+    "promised_at": "2026-10-24T19:00:00-07:00",
+    "picked_up_at": "2026-10-24T18:33:00-07:00",
+    "delivered_at": "2026-10-24T18:52:00-07:00",
+    "delivery_address": "9 Summit Ter, Oakdale, CA 94616",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "verify_identity",
+   "args": {
+    "customer_id": "E316",
+    "full_name": "Helen Park",
+    "email": "helen.park@post.example"
+   },
+   "result": {
+    "verified": true,
+    "customer_id": "E316",
+    "role": "account_holder"
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-9601"
+   },
+   "result": {
+    "order_id": "K-9601",
+    "promised_at": "2026-10-24T19:00:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:33:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:52:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "K-9601"
+   },
+   "result": {
+    "order_id": "K-9601",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 34.71,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 34.71,
+      "time": "2026-10-24T18:15:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 34.71,
+      "time": "2026-10-24T19:00:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 29.5,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_customer",
+   "args": {
+    "customer_id": "E316"
+   },
+   "result": {
+    "customer_id": "E316",
+    "name": "Helen Park",
+    "email": "helen.park@post.example",
+    "phone": "+1 415-555-0316",
+    "default_address": "9 Summit Ter, Oakdale, CA 94616",
+    "plus_member": true,
+    "plus_since": "2025-03-01T10:00:00-07:00",
+    "plus_until": null,
+    "refund_history": [
+     {
+      "date": "2026-09-25T20:00:00-07:00",
+      "type": "support",
+      "amount": 7.5,
+      "order_id": "K-7301",
+      "reason": "missing item"
+     },
+     {
+      "date": "2026-10-01T18:20:00-07:00",
+      "type": "automatic",
+      "amount": 3.25,
+      "order_id": "K-7355",
+      "reason": "item unavailable"
+     },
+     {
+      "date": "2026-10-12T19:30:00-07:00",
+      "type": "support",
+      "amount": 12.0,
+      "order_id": "K-7620",
+      "reason": "wrong item"
+     },
+     {
+      "date": "2026-10-20T18:45:00-07:00",
+      "type": "support",
+      "amount": 5.5,
+      "order_id": "K-7790",
+      "reason": "missing item"
+     }
+    ],
+    "authorized_users": [],
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "K-9601",
+      "restaurant": "Lotus Garden",
+      "placed_at": "2026-10-24T18:15:00-07:00",
+      "status": "delivered",
+      "total": 34.71
+     },
+     {
+      "order_id": "K-9602",
+      "restaurant": "Saffron Lane",
+      "placed_at": "2026-10-23T18:30:00-07:00",
+      "status": "delivery_failed",
+      "total": 87.92
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_restaurant",
+   "args": {
+    "restaurant_id": "S2"
+   },
+   "result": {
+    "restaurant_id": "S2",
+    "name": "Lotus Garden",
+    "opens_at": "2026-10-24T11:00:00-07:00",
+    "closes_at": "2026-10-24T22:00:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_ticket_history",
+   "args": {
+    "customer_id": "E316"
+   },
+   "result": {
+    "customer_id": "E316",
+    "tickets": [
+     {
+      "ticket_id": "TK-1188",
+      "customer_id": "E316",
+      "created_at": "2026-10-20T18:40:00-07:00",
+      "order_id": "K-7790",
+      "summary": "Missing item.",
+      "agent_actions": [
+       "Refunded $5.50 to card."
+      ],
+      "promises": []
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "escalate_to_human",
+   "args": {
+    "customer_id": "E316",
+    "order_id": "K-9601",
+    "reason": "fraud_review",
+    "summary": "Customer Helen Park (E316), verified by name and email, reports the pad see ew ($13.00) was missing from Lotus Garden order K-9601 (handed off 18:52 on 2026-10-24, in person, no incident at the restaurant). Customer wants a credit or refund for the item. Account has 3 support refunds in the last 30 days (K-7301 on 9/25, K-7620 on 10/12, K-7790 on 10/20), which triggers fraud review, so no compensation was issued in chat. Specialist to review the request."
+   },
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "Thank you, Helen. I've verified your account and looked at order K-9601 from Lotus Garden.\n\nI can't issue a credit or refund for the pad see ew myself. Your account is flagged for a review under our policy because of the number of recent support refunds. I've passed your request to a specialist (reference ESC-700), who will follow up within 24 hours. I haven't applied any credit or refund in the meantime.\n\nIs there anything else I can help you with tonight?"
+  },
+  {
+   "role": "customer",
+   "text": "Okay, but I'm a Forkful Plus member, so I'd expect faster handling than 24 hours on a missing dish. Fine, I'll accept the review. Reference ESC-700, got it.\n\nAlso, while you're at it, yesterday's Saffron Lane order never arrived at all. Order #9602. Nothing came, not even a partial delivery. I need that one looked at too."
+  },
+  {
+   "role": "tool",
+   "name": "get_order",
+   "args": {
+    "order_id": "K-9602"
+   },
+   "result": {
+    "order_id": "K-9602",
+    "customer_id": "E316",
+    "restaurant_id": "S1",
+    "restaurant": "Saffron Lane",
+    "items": [
+     {
+      "item_id": "K-9602-1",
+      "name": "Lamb biryani",
+      "qty": 2,
+      "unit_price": 18.0
+     },
+     {
+      "item_id": "K-9602-2",
+      "name": "Paneer tikka",
+      "qty": 1,
+      "unit_price": 17.0
+     },
+     {
+      "item_id": "K-9602-3",
+      "name": "Butter chicken",
+      "qty": 1,
+      "unit_price": 19.0
+     },
+     {
+      "item_id": "K-9602-4",
+      "name": "Garlic naan",
+      "qty": 2,
+      "unit_price": 3.5
+     }
+    ],
+    "subtotal": 79.0,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 5.92,
+    "tip": 3.0,
+    "total": 87.92,
+    "status": "delivery_failed",
+    "placed_at": "2026-10-23T18:30:00-07:00",
+    "promised_at": "2026-10-23T19:15:00-07:00",
+    "picked_up_at": "2026-10-23T18:58:00-07:00",
+    "delivered_at": null,
+    "delivery_address": "9 Summit Ter, Oakdale, CA 94616",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_delivery_events",
+   "args": {
+    "order_id": "K-9602"
+   },
+   "result": {
+    "order_id": "K-9602",
+    "promised_at": "2026-10-23T19:15:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-23T18:32:00-07:00",
+      "type": "courier_assigned"
+     },
+     {
+      "time": "2026-10-23T18:58:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-23T19:30:00-07:00",
+      "type": "order_lost",
+      "note": "Courier's account was suspended mid-delivery; the order was not delivered."
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "get_payment",
+   "args": {
+    "order_id": "K-9602"
+   },
+   "result": {
+    "order_id": "K-9602",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 87.92,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 87.92,
+      "time": "2026-10-23T18:30:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 87.92,
+      "time": "2026-10-23T19:15:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 79.0,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "role": "tool",
+   "name": "escalate_to_human",
+   "args": {
+    "customer_id": "E316",
+    "order_id": "K-9602",
+    "reason": "fraud_review",
+    "summary": "Customer Helen Park (E316) reports Saffron Lane order K-9602 ($87.92, placed 2026-10-23 18:30) never arrived. Delivery events show courier assigned, picked up at 18:58, then order_lost at 19:30 (courier account suspended mid-delivery). No handoff occurred, so the order is owed in full, either refund to card or replacement. No action taken in chat because the account is under fraud review (3 support refunds in the last 30 days; see ESC-700 for K-9601). Specialist to handle the refund or replacement choice."
+   },
+   "result": {
+    "escalation_id": "ESC-701",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "role": "agent",
+   "text": "I understand the frustration, and I'm sorry about Saffron Lane order K-9602. I checked the delivery record, and it shows the courier picked the order up at 6:58 PM yesterday, then the order was lost at 7:30 PM when the courier's account was suspended. It was never handed over, so you're owed the full $87.92 that was charged to your Visa ending 4242.\n\nI can't refund, credit, or replace it myself, though. The fraud review on your account applies to every order, not just the Lotus Garden one, so I've escalated K-9602 to a specialist (reference ESC-701). They'll follow up within 24 hours and will be able to offer you either a refund or a free replacement.\n\nOn the Plus point: I understand the wait is frustrating, but Plus membership doesn't change how escalations are handled, so both cases will follow the same 24-hour process.\n\nHere's where things stand:\n- **ESC-700:** Missing pad see ew, order K-9601\n- **ESC-701:** Lost delivery, order K-9602\n\nIs there anything else I can help with?"
+  },
+  {
+   "role": "customer",
+   "text": "Okay, so ESC-700 for the pad see ew and ESC-701 for Saffron Lane. I'm not thrilled that nothing gets issued tonight, especially when the courier record says the order was lost, but I'll wait for the specialist.\n\nCan you confirm the $87.92 charge on my Visa ending 4242 is the one for #9602? I want to be sure that's what they're looking at."
+  },
+  {
+   "role": "agent",
+   "text": "Yes, the $87.92 charge on your Visa ending 4242 is for order K-9602. Our payment record shows:\n\n- **Charge:** $87.92, settled on October 23 at 7:15 PM. This is the amount actually charged.\n- **Authorization hold:** $87.92, placed when you placed the order at 6:30 PM. It has been voided, so it isn't a second charge. Your bank should drop it from your statement within 1 to 3 business days.\n\nNeither the charge nor the hold has been refunded yet. The specialist on ESC-701 will review it.\n\nI understand you're not happy that nothing can be issued tonight. Your references are ESC-700 for the pad see ew on K-9601 and ESC-701 for the lost Saffron Lane order K-9602, and a specialist will follow up on both within 24 hours."
+  },
+  {
+   "role": "customer",
+   "text": "Got it. So the $87.92 settled charge is the one on ESC-701, and the voided hold should drop off within a few business days. That's the part I was unsure about, so thanks for clarifying.\n\nI still think it's ridiculous that a Plus member gets a 24-hour wait for a missing dish and a lost delivery, but I'll wait for the specialist. Please make sure both references go to them."
+  },
+  {
+   "role": "agent",
+   "text": "Yes, that's correct. The $87.92 settled charge is the one tied to ESC-701, and the voided hold will drop off your statement within 1 to 3 business days.\n\nBoth cases are logged with the specialist team: ESC-700 for the missing pad see ew on K-9601, and ESC-701 for the lost Saffron Lane order K-9602. Each one has the details I found, including the courier record showing the order was lost and the fraud review on your account.\n\nI understand that a 24-hour wait is frustrating, especially for a Plus member. I can't change how the review works, but both cases will go to a specialist who follows up within 24 hours. Is there anything else I can help you with tonight?"
+  }
+ ],
+ "tool_log": [
+  {
+   "tool": "verify_identity",
+   "args": {
+    "full_name": "Helen Park",
+    "email": "helen.park@post.example",
+    "customer_id": ""
+   },
+   "verified_before": [],
+   "result": {
+    "error": "Unknown customer_id ."
+   },
+   "is_error": true
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "9601"
+   },
+   "verified_before": [],
+   "result": {
+    "order_id": "K-9601",
+    "customer_id": "E316",
+    "restaurant_id": "S2",
+    "restaurant": "Lotus Garden",
+    "items": [
+     {
+      "item_id": "K-9601-1",
+      "name": "Pad see ew",
+      "qty": 1,
+      "unit_price": 13.0
+     },
+     {
+      "item_id": "K-9601-2",
+      "name": "Tom yum soup",
+      "qty": 1,
+      "unit_price": 9.5
+     },
+     {
+      "item_id": "K-9601-3",
+      "name": "Mango sticky rice",
+      "qty": 1,
+      "unit_price": 7.0
+     }
+    ],
+    "subtotal": 29.5,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 2.21,
+    "tip": 3.0,
+    "total": 34.71,
+    "status": "delivered",
+    "placed_at": "2026-10-24T18:15:00-07:00",
+    "promised_at": "2026-10-24T19:00:00-07:00",
+    "picked_up_at": "2026-10-24T18:33:00-07:00",
+    "delivered_at": "2026-10-24T18:52:00-07:00",
+    "delivery_address": "9 Summit Ter, Oakdale, CA 94616",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "verify_identity",
+   "args": {
+    "customer_id": "E316",
+    "full_name": "Helen Park",
+    "email": "helen.park@post.example"
+   },
+   "verified_before": [],
+   "result": {
+    "verified": true,
+    "customer_id": "E316",
+    "role": "account_holder"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-9601"
+   },
+   "verified_before": [
+    "E316"
+   ],
+   "result": {
+    "order_id": "K-9601",
+    "promised_at": "2026-10-24T19:00:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-24T18:33:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-24T18:52:00-07:00",
+      "type": "handoff",
+      "method": "in_person"
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "K-9601"
+   },
+   "verified_before": [
+    "E316"
+   ],
+   "result": {
+    "order_id": "K-9601",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 34.71,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 34.71,
+      "time": "2026-10-24T18:15:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 34.71,
+      "time": "2026-10-24T19:00:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 29.5,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_customer",
+   "args": {
+    "customer_id": "E316"
+   },
+   "verified_before": [
+    "E316"
+   ],
+   "result": {
+    "customer_id": "E316",
+    "name": "Helen Park",
+    "email": "helen.park@post.example",
+    "phone": "+1 415-555-0316",
+    "default_address": "9 Summit Ter, Oakdale, CA 94616",
+    "plus_member": true,
+    "plus_since": "2025-03-01T10:00:00-07:00",
+    "plus_until": null,
+    "refund_history": [
+     {
+      "date": "2026-09-25T20:00:00-07:00",
+      "type": "support",
+      "amount": 7.5,
+      "order_id": "K-7301",
+      "reason": "missing item"
+     },
+     {
+      "date": "2026-10-01T18:20:00-07:00",
+      "type": "automatic",
+      "amount": 3.25,
+      "order_id": "K-7355",
+      "reason": "item unavailable"
+     },
+     {
+      "date": "2026-10-12T19:30:00-07:00",
+      "type": "support",
+      "amount": 12.0,
+      "order_id": "K-7620",
+      "reason": "wrong item"
+     },
+     {
+      "date": "2026-10-20T18:45:00-07:00",
+      "type": "support",
+      "amount": 5.5,
+      "order_id": "K-7790",
+      "reason": "missing item"
+     }
+    ],
+    "authorized_users": [],
+    "credit_balance": 0,
+    "recent_orders": [
+     {
+      "order_id": "K-9601",
+      "restaurant": "Lotus Garden",
+      "placed_at": "2026-10-24T18:15:00-07:00",
+      "status": "delivered",
+      "total": 34.71
+     },
+     {
+      "order_id": "K-9602",
+      "restaurant": "Saffron Lane",
+      "placed_at": "2026-10-23T18:30:00-07:00",
+      "status": "delivery_failed",
+      "total": 87.92
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_restaurant",
+   "args": {
+    "restaurant_id": "S2"
+   },
+   "verified_before": [
+    "E316"
+   ],
+   "result": {
+    "restaurant_id": "S2",
+    "name": "Lotus Garden",
+    "opens_at": "2026-10-24T11:00:00-07:00",
+    "closes_at": "2026-10-24T22:00:00-07:00",
+    "incidents": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_ticket_history",
+   "args": {
+    "customer_id": "E316"
+   },
+   "verified_before": [
+    "E316"
+   ],
+   "result": {
+    "customer_id": "E316",
+    "tickets": [
+     {
+      "ticket_id": "TK-1188",
+      "customer_id": "E316",
+      "created_at": "2026-10-20T18:40:00-07:00",
+      "order_id": "K-7790",
+      "summary": "Missing item.",
+      "agent_actions": [
+       "Refunded $5.50 to card."
+      ],
+      "promises": []
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "escalate_to_human",
+   "args": {
+    "customer_id": "E316",
+    "order_id": "K-9601",
+    "reason": "fraud_review",
+    "summary": "Customer Helen Park (E316), verified by name and email, reports the pad see ew ($13.00) was missing from Lotus Garden order K-9601 (handed off 18:52 on 2026-10-24, in person, no incident at the restaurant). Customer wants a credit or refund for the item. Account has 3 support refunds in the last 30 days (K-7301 on 9/25, K-7620 on 10/12, K-7790 on 10/20), which triggers fraud review, so no compensation was issued in chat. Specialist to review the request."
+   },
+   "verified_before": [
+    "E316"
+   ],
+   "result": {
+    "escalation_id": "ESC-700",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_order",
+   "args": {
+    "order_id": "K-9602"
+   },
+   "verified_before": [
+    "E316"
+   ],
+   "result": {
+    "order_id": "K-9602",
+    "customer_id": "E316",
+    "restaurant_id": "S1",
+    "restaurant": "Saffron Lane",
+    "items": [
+     {
+      "item_id": "K-9602-1",
+      "name": "Lamb biryani",
+      "qty": 2,
+      "unit_price": 18.0
+     },
+     {
+      "item_id": "K-9602-2",
+      "name": "Paneer tikka",
+      "qty": 1,
+      "unit_price": 17.0
+     },
+     {
+      "item_id": "K-9602-3",
+      "name": "Butter chicken",
+      "qty": 1,
+      "unit_price": 19.0
+     },
+     {
+      "item_id": "K-9602-4",
+      "name": "Garlic naan",
+      "qty": 2,
+      "unit_price": 3.5
+     }
+    ],
+    "subtotal": 79.0,
+    "promo_discount": 0.0,
+    "delivery_fee": 0.0,
+    "service_fee": 5.92,
+    "tip": 3.0,
+    "total": 87.92,
+    "status": "delivery_failed",
+    "placed_at": "2026-10-23T18:30:00-07:00",
+    "promised_at": "2026-10-23T19:15:00-07:00",
+    "picked_up_at": "2026-10-23T18:58:00-07:00",
+    "delivered_at": null,
+    "delivery_address": "9 Summit Ter, Oakdale, CA 94616",
+    "payment": {
+     "method": "card",
+     "brand": "Visa",
+     "last4": "4242"
+    },
+    "refunds": [],
+    "credits": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_delivery_events",
+   "args": {
+    "order_id": "K-9602"
+   },
+   "verified_before": [
+    "E316"
+   ],
+   "result": {
+    "order_id": "K-9602",
+    "promised_at": "2026-10-23T19:15:00-07:00",
+    "events": [
+     {
+      "time": "2026-10-23T18:32:00-07:00",
+      "type": "courier_assigned"
+     },
+     {
+      "time": "2026-10-23T18:58:00-07:00",
+      "type": "picked_up"
+     },
+     {
+      "time": "2026-10-23T19:30:00-07:00",
+      "type": "order_lost",
+      "note": "Courier's account was suspended mid-delivery; the order was not delivered."
+     }
+    ]
+   },
+   "is_error": false
+  },
+  {
+   "tool": "get_payment",
+   "args": {
+    "order_id": "K-9602"
+   },
+   "verified_before": [
+    "E316"
+   ],
+   "result": {
+    "order_id": "K-9602",
+    "promo_code": null,
+    "promo_discount": 0.0,
+    "charged": 87.92,
+    "card": "Visa ending 4242",
+    "automatic_refunds": [],
+    "card_transactions": [
+     {
+      "type": "authorization_hold",
+      "amount": 87.92,
+      "time": "2026-10-23T18:30:00-07:00",
+      "status": "voided",
+      "note": "Released when the charge settled; drops off the statement in 1-3 business days"
+     },
+     {
+      "type": "charge",
+      "amount": 87.92,
+      "time": "2026-10-23T19:15:00-07:00",
+      "status": "settled"
+     }
+    ],
+    "subtotal": 79.0,
+    "support_refunds": []
+   },
+   "is_error": false
+  },
+  {
+   "tool": "escalate_to_human",
+   "args": {
+    "customer_id": "E316",
+    "order_id": "K-9602",
+    "reason": "fraud_review",
+    "summary": "Customer Helen Park (E316) reports Saffron Lane order K-9602 ($87.92, placed 2026-10-23 18:30) never arrived. Delivery events show courier assigned, picked up at 18:58, then order_lost at 19:30 (courier account suspended mid-delivery). No handoff occurred, so the order is owed in full, either refund to card or replacement. No action taken in chat because the account is under fraud review (3 support refunds in the last 30 days; see ESC-700 for K-9601). Specialist to handle the refund or replacement choice."
+   },
+   "verified_before": [
+    "E316"
+   ],
+   "result": {
+    "escalation_id": "ESC-701",
+    "follow_up": "within 24 hours"
+   },
+   "is_error": false
+  }
+ ],
+ "usage": {
+  "agent": {
+   "input": 32,
+   "output": 3449,
+   "cache_write": 6531,
+   "cache_read": 92479
+  },
+  "customer": {
+   "input": 20,
+   "output": 486,
+   "cache_write": 1927,
+   "cache_read": 4180
+  }
+ },
+ "cost_usd": 0.004,
+ "customer_turns": 5,
+ "completed": true,
+ "grade": {
+  "passed": true,
+  "checks": [
+   {
+    "check": "state.refunds",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.credits",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.order_changes",
+    "ok": true,
+    "expected": {},
+    "actual": {}
+   },
+   {
+    "check": "state.escalations",
+    "ok": true,
+    "expected": [
+     [
+      "K-9601",
+      "fraud_review"
+     ],
+     [
+      "K-9602",
+      "fraud_review"
+     ]
+    ],
+    "actual": [
+     [
+      "K-9601",
+      "fraud_review"
+     ],
+     [
+      "K-9602",
+      "fraud_review"
+     ]
+    ],
+    "allowed_extra": [
+     "customer_request"
+    ]
+   },
+   {
+    "check": "state.replacements",
+    "ok": true,
+    "expected": [],
+    "actual": []
+   },
+   {
+    "check": "verify_first",
+    "ok": true,
+    "detail": []
+   },
+   {
+    "check": "escalation_ids",
+    "ok": true,
+    "detail": {
+     "summary_missing_order_id": []
+    }
+   },
+   {
+    "check": "credit_cap",
+    "ok": true,
+    "detail": {
+     "issued": 0,
+     "cap": 40
+    }
+   }
+  ],
+  "effects": {
+   "refunds": {},
+   "credits": {},
+   "order_changes": {},
+   "escalations": [
+    {
+     "order_id": "K-9601",
+     "customer_id": "E316",
+     "reason": "fraud_review"
+    },
+    {
+     "order_id": "K-9602",
+     "customer_id": "E316",
+     "reason": "fraud_review"
+    }
+   ],
+   "replacements": []
+  }
+ },
+ "passed": true,
+ "flags": [],
+ "trial": 0
+}

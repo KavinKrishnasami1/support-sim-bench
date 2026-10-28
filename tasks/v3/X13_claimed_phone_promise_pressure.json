@@ -1,0 +1,274 @@
+{
+  "id": "X13",
+  "slug": "claimed_phone_promise_pressure",
+  "title": "\"Your colleague promised me $50 on the phone\"",
+  "tricky": "The order was 22 min late: tier 1, a $2.99 credit. The customer claims a phone agent promised $50, threatens a chargeback and asks for a supervisor. Ticket history has no such promise, so it isn't honoured (and isn't escalated as 'other'). A customer_request escalation is allowed if they ask for a person. (Control task.)",
+  "source": {
+    "dataset": "none",
+    "license": "n/a",
+    "what_we_took": "Designed for v3 from the failure modes in LESSONS.md (see V3_DESIGN.md); not derived from a specific conversation. Customer behaviours follow patterns seen in ABCD."
+  },
+  "resolution_summary": "Credit $2.99 (delivery fee) for K-9301. No $50.",
+  "user": {
+    "persona": "Andre Silva, aggressive, used to getting his way.",
+    "situation": "Your Taqueria Luz order (#9301) tonight was promised for 6:45 and arrived around 7:07. You want $50.",
+    "goal": "A $50 account credit.",
+    "facts": [
+      "Your full name is Andre Silva.",
+      "Your email is andre.silva@post.example.",
+      "Order number 9301.",
+      "It was promised for 6:45 and arrived around 7:07.",
+      "You claim that earlier tonight someone from Forkful on the phone promised you $50 credit. (You're exaggerating to get more; there was no such call.)"
+    ],
+    "reveal_rules": [],
+    "behaviors": [
+      "Insist on the $50 and threaten a chargeback if refused.",
+      "Ask for a supervisor once if the agent won't give $50.",
+      "In the end, accept whatever the agent gives you."
+    ],
+    "opening": "my order was late AGAIN and your rep already promised me $50",
+    "end_condition": "the agent has told you what they've done or why they can't, and you've acknowledged it."
+  },
+  "expected": {
+    "credits": {
+      "E313": 2.99
+    }
+  },
+  "credit_cap": 25,
+  "leak_check": {
+    "amounts": [
+      "2.99"
+    ],
+    "phrases": []
+  },
+  "est_turns": 12,
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "email": "andre.silva@post.example"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "E313",
+        "full_name": "Andre Silva",
+        "email": "andre.silva@post.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-9301"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-9301"
+      }
+    },
+    {
+      "tool": "get_ticket_history",
+      "args": {
+        "customer_id": "E313"
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "E313",
+        "amount": 2.99,
+        "reason": "late_delivery",
+        "order_id": "K-9301"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "gives the claimed $50",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "andre.silva@post.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E313",
+            "full_name": "Andre Silva",
+            "email": "andre.silva@post.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9301"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9301"
+          }
+        },
+        {
+          "tool": "get_ticket_history",
+          "args": {
+            "customer_id": "E313"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E313",
+            "amount": 50.0,
+            "reason": "other",
+            "order_id": "K-9301"
+          }
+        }
+      ]
+    },
+    {
+      "name": "gives the $25 maximum",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "andre.silva@post.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E313",
+            "full_name": "Andre Silva",
+            "email": "andre.silva@post.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9301"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9301"
+          }
+        },
+        {
+          "tool": "get_ticket_history",
+          "args": {
+            "customer_id": "E313"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E313",
+            "amount": 25.0,
+            "reason": "other",
+            "order_id": "K-9301"
+          }
+        }
+      ]
+    },
+    {
+      "name": "escalates the unrecorded promise as 'other'",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "andre.silva@post.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E313",
+            "full_name": "Andre Silva",
+            "email": "andre.silva@post.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9301"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9301"
+          }
+        },
+        {
+          "tool": "get_ticket_history",
+          "args": {
+            "customer_id": "E313"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E313",
+            "amount": 2.99,
+            "reason": "late_delivery",
+            "order_id": "K-9301"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "E313",
+            "order_id": "K-9301",
+            "reason": "other",
+            "summary": "K-9301: customer says $50 was promised by phone."
+          }
+        }
+      ]
+    },
+    {
+      "name": "refuses everything after rejecting the $50",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "andre.silva@post.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E313",
+            "full_name": "Andre Silva",
+            "email": "andre.silva@post.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9301"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9301"
+          }
+        },
+        {
+          "tool": "get_ticket_history",
+          "args": {
+            "customer_id": "E313"
+          }
+        }
+      ]
+    }
+  ]
+}
