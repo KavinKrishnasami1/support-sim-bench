@@ -1,6 +1,7 @@
 # support-sim-bench
 
-A small multi-turn benchmark for customer-support agents, in the spirit of tau-bench (our own code). An agent
+A small multi-turn benchmark for support agents, in the spirit of tau-bench (our own code). v1, v2 and v3food are
+food-delivery customer support; v3 is an internal IT service desk. In the food suites, an agent
 handles food-delivery support chats: late orders, missing and wrong items, refunds versus credits, address changes,
 cancellations and escalations. A model plays the customer from a hidden scenario. The agent has tools that read
 and write a small database and a written policy it must follow. Each run is graded on the database it leaves
@@ -12,12 +13,17 @@ Two suites, each task run k times and reported as pass rate and pass^k (the chan
 - **v2**: 12 harder tasks, a longer policy and 10 tools. Records conflict (a courier event log versus the order
   record), there are promo splits, earlier promises in ticket history, Plus membership limits, a fraud review that
   overrides everything, customers who are wrong, and several issues in one chat.
-- **v3**: 21 tasks aimed at the strongest models, a 13-section policy and 13 tools. Rules that override each other,
-  account security and authorized users, restaurant incidents, replacements, UTC courier logs, updated ETAs, and
-  long multi-issue chats. Opus 5.5 and Sonnet 5.5 pass all of it; see [RESULTS_V3.md](RESULTS_V3.md) and
-  [V3_DESIGN.md](V3_DESIGN.md).
+- **v3food**: 21 food-delivery tasks aimed at the strongest models, a 13-section policy and 13 tools. Sonnet 5.5 and
+  Opus 5.5 pass all of it; see [RESULTS_V3_FOOD.md](RESULTS_V3_FOOD.md) and
+  [V3_FOOD_DELIVERY_DRAFT.md](V3_FOOD_DELIVERY_DRAFT.md).
+- **v3**: an IT service desk for a fictional ~300-person company, Quillmark Labs. 16 tasks covering access
+  requests, approvals and delegation, nested groups, segregation of duties, licenses, laptops, change freezes, MFA
+  resets, impersonation and signs of compromise; a 15-section policy and 25 tools. Built from general, public IT
+  service desk practice; every company, person and record is fictional. Security violations (e.g. privileged access
+  without approval, an MFA reset without verification) are graded and reported as their own metric. Design in
+  [V3_DESIGN.md](V3_DESIGN.md), results in [RESULTS_V3.md](RESULTS_V3.md).
 
-Current results are in [RESULTS.md](RESULTS.md) (v1, v2) and [RESULTS_V3.md](RESULTS_V3.md); what we learned building it is in [LESSONS.md](LESSONS.md).
+Current results are in [RESULTS.md](RESULTS.md) (v1, v2), [RESULTS_V3_FOOD.md](RESULTS_V3_FOOD.md) and [RESULTS_V3.md](RESULTS_V3.md); what we learned building it is in [LESSONS.md](LESSONS.md).
 
 ## Quick start
 
@@ -132,12 +138,14 @@ expected effects. If you change the world, edit `scripts/build_world.py` and rer
 ## Files
 
 ```
-world/            base.json, policy.md (v1); v2/base.json, v2/policy.md
-tasks/            T01..T13 (v1); v2/V01..V12
+world/            base.json, policy.md (v1); v2/, v3food/ (food delivery); v3/ (IT service desk)
+tasks/            T01..T13 (v1); v2/V01..V12; v3food/X01..X22; v3/S01..S16
 src/supportsim/   world, tools, grader, simuser, flags, providers, runner, report, viewer, cli
-scripts/          build_world.py, build_world_v2.py, download_abcd.sh, show_source.py, write_provenance.py
+src/supportsim/itsd/  v3 only: rules (approvers, nesting, approval validity), tools, grader (incl. security violations)
+scripts/          build_world.py, build_world_v2.py, build_world_v3food.py, build_world_v3.py, download_abcd.sh, ...
 results/          one folder per run: config.json, runs/*.json, summary.json, view.html; superseded/ holds
                   runs from before the fixes listed in RESULTS.md
-RESULTS.md        results from running two models on both suites
+RESULTS.md        results from running two models on v1 and v2
+RESULTS_V3_FOOD.md, RESULTS_V3.md   v3food and v3 results
 LESSONS.md        what was hard: simulator realism, grader loopholes, ambiguous policy
 ```

@@ -47,7 +47,7 @@ def _e(s) -> str:
     return html.escape(str(s))
 
 
-def _run_html(r: dict) -> str:
+def _run_html(r: dict, user_label: str = "customer") -> str:
     status = "pass" if r["passed"] else ("fail" if r["completed"] else "other")
     label = "PASS" if r["passed"] else ("FAIL" if r["completed"] else r["end_reason"])
     flags_by_event: dict[int, list[dict]] = {}
@@ -56,7 +56,8 @@ def _run_html(r: dict) -> str:
     parts = []
     for i, ev in enumerate(r["events"]):
         if ev["role"] in ("customer", "agent"):
-            parts.append(f'<div class="msg {ev["role"]}"><div class="who">{ev["role"]}</div>{_e(ev["text"])}</div>')
+            who = user_label if ev["role"] == "customer" else ev["role"]
+            parts.append(f'<div class="msg {ev["role"]}"><div class="who">{who}</div>{_e(ev["text"])}</div>')
         else:
             parts.append(f'<div class="tool{" err" if ev["is_error"] else ""}">{_e(ev["name"])}('
                          f'{_e(json.dumps(ev["args"]))})\n→ {_e(json.dumps(ev["result"])[:1200])}</div>')
@@ -71,10 +72,19 @@ def _run_html(r: dict) -> str:
                                               f' / actual {_e(json.dumps(c.get("actual", "")))}</span>') + "</li>"
                         for c in r["grade"]["checks"])
         checks = f'<h4>Grader</h4><ul class="checks">{items}</ul>'
+        svs = r["grade"].get("security_violations", [])
+        if svs:
+            checks += ('<h4 class="fail">Security violations</h4><ul class="checks">'
+                       + "".join(f'<li class="fail"><code>{_e(v["code"])}</code> '
+                                 f'{"step " + str(v["step"]) + " · " if v.get("step") is not None else ""}{_e(v["detail"])}</li>'
+                                 for v in svs) + "</ul>")
     err = f'<p class="fail">Error: {_e(r["error"])}</p>' if r.get("error") else ""
-    return (f'<details class="run" data-fail="{int(r["completed"] and not r["passed"])}" data-flagged="{int(bool(r["flags"]))}">'
-            f'<summary><span class="badge {status}">{_e(label)}</span><b>{_e(r["task_id"])}</b> trial {r["trial"]}'
-            f'<span class="muted">{r["customer_turns"]} customer turns · ${r["cost_usd"]:.3f} · ended: {_e(r["end_reason"])}'
+    n_sv = len((r.get("grade") or {}).get("security_violations", []))
+    sv_badge = f'<span class="badge fail">⚠ security ×{n_sv}</span>' if n_sv else ""
+    return (f'<details class="run" data-fail="{int(r["completed"] and not r["passed"])}" data-flagged="{int(bool(r["flags"]))}" '
+            f'data-sv="{int(bool(n_sv))}">'
+            f'<summary><span class="badge {status}">{_e(label)}</span>{sv_badge}<b>{_e(r["task_id"])}</b> trial {r["trial"]}'
+            f'<span class="muted">{r["customer_turns"]} {user_label} turns · ${r["cost_usd"]:.3f} · ended: {_e(r["end_reason"])}'
             f'{" · ⚑ " + str(len(r["flags"])) if r["flags"] else ""}</span></summary>'
             f'<div class="body">{err}{"".join(parts)}{checks}</div></details>')
 
@@ -84,22 +94,26 @@ def render(run_dir: Path) -> Path:
     runs = sorted(load_runs(run_dir), key=lambda r: (r["task_id"], r["trial"]))
     c = s["config"]
     k = s["k"]
-    head = "".join(f"<th>pass^{j}</th>" for j in range(1, k + 1))
+    v3 = c.get("suite") == "v3"
+    user_label = "employee" if v3 else "customer"
+    head = "".join(f"<th>pass^{j}</th>" for j in range(1, k + 1)) + ("<th>Security violations</th>" if v3 else "")
     rows = "".join(f'<tr><td>{tid}</td><td>{t["n"]}</td><td>{t["passed"]}</td>'
                    + "".join(f"<td>{_pct(t[f'pass^{j}'])}</td>" for j in range(1, k + 1))
+                   + (f'<td>{t.get("sv_runs", 0)}</td>' if v3 else "")
                    + f'<td>{t["flagged_runs"]}</td></tr>' for tid, t in s["tasks"].items())
     total = (f'<tr><th>All</th><th>{s["graded_runs"]}</th><th></th>'
              + "".join(f"<th>{_pct(s['overall'][f'pass^{j}'])}</th>" for j in range(1, k + 1))
+             + (f'<th>{_pct(s["overall"].get("security_violation_rate"))}</th>' if v3 else "")
              + f'<th>{s["flagged_runs"]}</th></tr>')
     page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Support sim runs</title><style>{CSS}</style></head>
 <body><main><h1>{_e(c.get("agent_model"))} as agent</h1>
-<p class="muted">Customer simulator {_e(c.get("user_model"))} · k={k} · {s["graded_runs"]}/{s["runs"]} runs graded ·
+<p class="muted">{user_label.capitalize()} simulator {_e(c.get("user_model"))} · k={k} · {s["graded_runs"]}/{s["runs"]} runs graded ·
 cost ${s["cost_usd"]:.2f} · end reasons {_e(s["end_reasons"])}</p>
 <table><tr><th>Task</th><th>Trials</th><th>Passed</th>{head}<th>Flagged</th></tr>{rows}{total}</table>
 <div class="filters"><button class="on" data-filter="all">All runs</button><button data-filter="fail">Failed</button>
-<button data-filter="flagged">Flagged simulator</button></div>
-{"".join(_run_html(r) for r in runs)}
+<button data-filter="flagged">Flagged simulator</button>{'<button data-filter="sv">Security violations</button>' if v3 else ""}</div>
+{"".join(_run_html(r, user_label) for r in runs)}
 </main><script>{JS}</script></body></html>"""
     out = run_dir / "view.html"
     out.write_text(page)
@@ -119,3 +133,5 @@ def show_run(path: Path) -> None:
                 print(f"    !! FLAG {f['type']}: {f.get('match', '')}")
     if r["grade"]:
         print("\nchecks: " + ", ".join(f"{c['check']}={'ok' if c['ok'] else 'FAIL'}" for c in r["grade"]["checks"]))
+        for v in r["grade"].get("security_violations", []):
+            print(f"  SECURITY {v['code']}: {v['detail']}")

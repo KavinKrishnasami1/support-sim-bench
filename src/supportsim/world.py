@@ -18,9 +18,16 @@ SUITES = {
     "v1": {"world": ROOT / "world" / "base.json", "policy": ROOT / "world" / "policy.md", "tasks": ROOT / "tasks"},
     "v2": {"world": ROOT / "world" / "v2" / "base.json", "policy": ROOT / "world" / "v2" / "policy.md",
            "tasks": ROOT / "tasks" / "v2"},
+    "v3food": {"world": ROOT / "world" / "v3food" / "base.json", "policy": ROOT / "world" / "v3food" / "policy.md",
+           "tasks": ROOT / "tasks" / "v3food"},
+    # v3 is a different domain: an IT service desk (src/supportsim/itsd/).
     "v3": {"world": ROOT / "world" / "v3" / "base.json", "policy": ROOT / "world" / "v3" / "policy.md",
-           "tasks": ROOT / "tasks" / "v3"},
+           "tasks": ROOT / "tasks" / "v3", "domain": "itsd"},
 }
+
+
+def domain(suite: str) -> str:
+    return SUITES[suite].get("domain", "food")
 
 
 @dataclass

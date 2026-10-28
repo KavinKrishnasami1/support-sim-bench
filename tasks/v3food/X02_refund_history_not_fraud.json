@@ -1,0 +1,243 @@
+{
+  "id": "X02",
+  "slug": "refund_history_not_fraud",
+  "title": "Refund history looks like a fraud review but isn't",
+  "tricky": "The profile lists three refunds, but one is 31 days old and one is automatic (item unavailable), so only one support refund falls in the 30-day window. No fraud review: refund the wrong burrito to the card.",
+  "source": {
+    "dataset": "none",
+    "license": "n/a",
+    "what_we_took": "Designed for v3 from the failure modes in LESSONS.md (see V3_FOOD_DELIVERY_DRAFT.md); not derived from a specific conversation. Customer behaviours follow patterns seen in ABCD."
+  },
+  "resolution_summary": "Refund $14.00 to card for the wrong burrito on K-8201. No escalation.",
+  "policy_sections": [
+    5,
+    9
+  ],
+  "user": {
+    "persona": "Tom Novak, standard Forkful customer, a little weary.",
+    "situation": "Your Taqueria Luz order (#8201) came with a chicken burrito instead of the veggie burrito you ordered.",
+    "goal": "Your money back for the burrito.",
+    "facts": [
+      "Your full name is Tom Novak.",
+      "Your phone is 415-555-0302.",
+      "Order number 8201.",
+      "You got a chicken burrito instead of a veggie burrito. The chips and horchata were fine.",
+      "You've had a few problems with orders over the past couple of months."
+    ],
+    "reveal_rules": [],
+    "behaviors": [
+      "If asked, you prefer a refund to your card.",
+      "If the agent says your account needs a review, ask why once, then accept whatever they decide."
+    ],
+    "opening": "they sent me a chicken burrito, i ordered veggie",
+    "end_condition": "the agent has told you what they've done or why they can't, and you've acknowledged it."
+  },
+  "expected": {
+    "refunds": {
+      "K-8201": 14.0
+    }
+  },
+  "credit_cap": 25,
+  "leak_check": {
+    "amounts": [
+      "14.00"
+    ],
+    "phrases": [
+      "fraud"
+    ]
+  },
+  "est_turns": 10,
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "phone": "415-555-0302"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "E302",
+        "full_name": "Tom Novak",
+        "phone": "415-555-0302"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-8201"
+      }
+    },
+    {
+      "tool": "get_restaurant",
+      "args": {
+        "restaurant_id": "S3"
+      }
+    },
+    {
+      "tool": "get_payment",
+      "args": {
+        "order_id": "K-8201"
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "K-8201",
+        "amount": 14.0,
+        "reason": "wrong_item",
+        "item_ids": [
+          "K-8201-1"
+        ]
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "fraud review from the raw count",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0302"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E302",
+            "full_name": "Tom Novak",
+            "phone": "415-555-0302"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-8201"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S3"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-8201"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "E302",
+            "order_id": "K-8201",
+            "reason": "fraud_review",
+            "summary": "K-8201: wrong item; 3 refunds on the profile."
+          }
+        }
+      ]
+    },
+    {
+      "name": "refund plus fraud review",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0302"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E302",
+            "full_name": "Tom Novak",
+            "phone": "415-555-0302"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-8201"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S3"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-8201"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-8201",
+            "amount": 14.0,
+            "reason": "wrong_item"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "E302",
+            "order_id": "K-8201",
+            "reason": "fraud_review",
+            "summary": "K-8201: wrong item; 3 refunds on the profile."
+          }
+        }
+      ]
+    },
+    {
+      "name": "credit instead of the card refund the customer asked for",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0302"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E302",
+            "full_name": "Tom Novak",
+            "phone": "415-555-0302"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-8201"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S3"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-8201"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E302",
+            "amount": 16.8,
+            "reason": "wrong_item",
+            "order_id": "K-8201"
+          }
+        }
+      ]
+    }
+  ]
+}

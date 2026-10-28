@@ -136,6 +136,10 @@ def _matches(entry: dict, rule: dict) -> bool:
 
 
 def grade(task: dict, initial: dict, world: World) -> dict:
+    if task.get("suite") == "v3":
+        from .itsd.grader import grade as itsd_grade
+
+        return itsd_grade(task, initial, world)
     checks = check_state(task, initial, world.data) + check_actions(task, world)
     return {"passed": all(c["ok"] for c in checks), "checks": checks,
             "effects": effects(initial, world.data)}

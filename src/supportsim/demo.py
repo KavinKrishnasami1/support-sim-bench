@@ -344,9 +344,9 @@ def index(results_dirs: list[Path], pages: list[tuple[str, str, str]]) -> str:
                          if runs else "<td class='num muted'>not run</td>")
         rows.append(f"<tr><td><strong>{esc(s)}</strong> <span class='muted'>{len(load_tasks(suite=s))} tasks</span></td>{''.join(cells)}</tr>")
     headline = f"<div class='tablewrap'><table><thead><tr><th>Suite</th>{head}</tr></thead><tbody>{''.join(rows)}</tbody></table></div>"
-    # v3 per task
-    v3 = data.get("v3", {})
-    tasks = {t["id"]: t for t in load_tasks(suite="v3")} if "v3" in data else {}
+    # v3food per task
+    v3 = data.get("v3food", {})
+    tasks = {t["id"]: t for t in load_tasks(suite="v3food")} if "v3food" in data else {}
     trows = []
     for tid, t in tasks.items():
         cells = []
@@ -385,11 +385,11 @@ card and the other as credit.</p>
 <ul style="list-style:none;margin-left:0">{links}</ul>
 
 <h2>Results by suite</h2>
-<p class="muted">Share of graded runs that passed. v1 and v2: 3 trials per task. v3: 1 trial per task for Haiku and
+<p class="muted">Share of graded runs that passed. v1 and v2: 3 trials per task. v3food (the food-delivery v3): 1 trial per task for Haiku and
 Sonnet; Opus ran the 16 core tasks once and the 6 scale tasks 5 times each.</p>
 {headline}
 
-<h2>v3, task by task</h2>
+<h2>v3food, task by task</h2>
 <p class="muted">Passed / runs. X08 was merged into X07 during design.</p>
 {per_task}
 

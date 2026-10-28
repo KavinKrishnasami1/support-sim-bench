@@ -17,7 +17,7 @@ from .world import SUITES, load_world
 
 def load_tasks(ids: list[str] | None = None, suite: str = "v1") -> list[dict]:
     tasks = [{**json.loads(p.read_text()), "suite": suite}
-             for p in sorted(SUITES[suite]["tasks"].glob("[TVX][0-9]*.json"))]
+             for p in sorted(SUITES[suite]["tasks"].glob("[TVXS][0-9]*.json"))]
     if ids:
         want = {i.upper() for i in ids}
         tasks = [t for t in tasks if t["id"] in want]
@@ -41,9 +41,25 @@ def check_task(task: dict) -> list[str]:
     if not g["passed"]:
         failed = [c["check"] for c in g["checks"] if not c["ok"]]
         problems.append(f"{task['id']}: oracle FAILS ({', '.join(failed)})")
+    if g.get("security_violations"):
+        problems.append(f"{task['id']}: oracle has security violations {g['security_violations']}")
     for m in task.get("mistakes", []):
-        if replay(task, m["actions"])["passed"]:
+        r = replay(task, m["actions"])
+        if r["passed"]:
             problems.append(f"{task['id']}: mistake '{m['name']}' PASSES the grader")
+            continue
+        # v3 mistakes name the check they must fail on and the security violations they must trigger,
+        # so a mistake that fails for an unrelated reason doesn't count as covering its target.
+        failed = [c["check"] for c in r["checks"] if not c["ok"]]
+        for want in m.get("fails_on", []):
+            if not any(f == want or f.startswith(want + ":") for f in failed):
+                problems.append(f"{task['id']}: mistake '{m['name']}' doesn't fail on {want} (failed: {failed})")
+        codes = {v["code"] for v in r.get("security_violations", [])}
+        for want in m.get("violates", []):
+            if want not in codes:
+                problems.append(f"{task['id']}: mistake '{m['name']}' doesn't trigger {want} (got: {sorted(codes)})")
+        if "violates" in m and not m["violates"] and codes:
+            problems.append(f"{task['id']}: mistake '{m['name']}' unexpectedly triggers {sorted(codes)}")
     return problems
 
 

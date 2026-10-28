@@ -134,14 +134,18 @@ WRITE_TOOLS = {"issue_refund", "issue_credit", "update_order", "escalate_to_huma
 
 
 def tool_specs(suite: str = "v1") -> list[dict]:
+    if suite == "v3":
+        from .itsd.tools import TOOL_SPECS
+
+        return TOOL_SPECS
     if suite == "v1":
         return TOOLS
-    specs = [dict(t) for t in TOOLS] + V2_TOOLS + (V3_TOOLS if suite == "v3" else [])
-    reasons = ESCALATION_REASONS_V3 if suite == "v3" else ESCALATION_REASONS_V2
+    specs = [dict(t) for t in TOOLS] + V2_TOOLS + (V3_TOOLS if suite == "v3food" else [])
+    reasons = ESCALATION_REASONS_V3 if suite == "v3food" else ESCALATION_REASONS_V2
     esc = next(t for t in specs if t["name"] == "escalate_to_human")
     esc["input_schema"] = {**esc["input_schema"], "properties": {
         **esc["input_schema"]["properties"], "reason": {"type": "string", "enum": reasons}}}
-    if suite == "v3":
+    if suite == "v3food":
         upd = next(t for t in specs if t["name"] == "update_order")
         upd["description"] = ("Change an order's delivery address, cancel it (status 'cancelled'), or mark an order "
                               "that never arrived as 'not_delivered'.")
@@ -154,7 +158,7 @@ def tool_specs(suite: str = "v1") -> list[dict]:
 
 
 def _v3(w: World) -> bool:
-    return w.data.get("suite") == "v3"
+    return w.data.get("suite") == "v3food"
 
 
 def _digits(s: str) -> str:
@@ -346,6 +350,10 @@ IMPL = {"get_restaurant": get_restaurant, "get_account_activity": get_account_ac
 
 def call_tool(w: World, name: str, args: dict) -> tuple[dict, bool]:
     """Run a tool and log it. Returns (result, is_error)."""
+    if w.data.get("domain") == "itsd":
+        from .itsd.tools import call_tool as itsd_call
+
+        return itsd_call(w, name, args)
     entry = {"tool": name, "args": args, "verified_before": sorted(w.verified)}
     try:
         if name not in IMPL:

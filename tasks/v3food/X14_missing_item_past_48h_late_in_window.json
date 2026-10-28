@@ -1,0 +1,260 @@
+{
+  "id": "X14",
+  "slug": "missing_item_past_48h_late_in_window",
+  "title": "Missing item past 48 hours; the late claim is still in its window",
+  "tricky": "Handoff was 01:10Z on the 23rd (18:10 local on the 22nd): 49 h 20 min ago, past the 48-hour window for the missing borscht. But the order was also 50 min late, and late claims have 7 days: 20% of $40 = $8.00 credit.",
+  "source": {
+    "dataset": "none",
+    "license": "n/a",
+    "what_we_took": "Designed for v3 from the failure modes in LESSONS.md (see V3_FOOD_DELIVERY_DRAFT.md); not derived from a specific conversation. Customer behaviours follow patterns seen in ABCD."
+  },
+  "resolution_summary": "No compensation for the borscht (outside 48 hours). Credit $8.00 for the late delivery of K-9401.",
+  "policy_sections": [
+    4,
+    5
+  ],
+  "user": {
+    "persona": "Nadia Petrov, busy, apologetic about contacting support late.",
+    "situation": "Your Babcia's Kitchen order (#9401) from Thursday evening was missing the borscht. It was also very late: promised for 5:20 and arrived around 6:10. You're only getting round to contacting support now.",
+    "goal": "Compensation for the missing borscht, and for the lateness once you remember it.",
+    "facts": [
+      "Your full name is Nadia Petrov.",
+      "Your phone is 415-555-0314.",
+      "Order number 9401 (Thursday evening).",
+      "The borscht was missing; the pierogi and cabbage rolls came.",
+      "It was promised for 5:20pm and arrived around 6:10pm."
+    ],
+    "reveal_rules": [
+      "Mention that the order was also very late only after the agent has dealt with the borscht."
+    ],
+    "behaviors": [
+      "If told the borscht is too old to compensate, push back once, then accept.",
+      "You'd prefer your card if asked, but accept credit for the lateness."
+    ],
+    "opening": "hi, my order on thursday was missing the borscht",
+    "end_condition": "the agent has told you what they've done or why they can't, and you've acknowledged it."
+  },
+  "expected": {
+    "credits": {
+      "E314": 8.0
+    }
+  },
+  "credit_cap": 25,
+  "leak_check": {
+    "amounts": [
+      "8.00",
+      "11.00"
+    ],
+    "phrases": [
+      "48 hours"
+    ]
+  },
+  "est_turns": 12,
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "phone": "415-555-0314"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "E314",
+        "full_name": "Nadia Petrov",
+        "phone": "415-555-0314"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-9401"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-9401"
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "E314",
+        "amount": 8.0,
+        "reason": "late_delivery",
+        "order_id": "K-9401"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refunds the borscht anyway",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0314"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E314",
+            "full_name": "Nadia Petrov",
+            "phone": "415-555-0314"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9401"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9401"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-9401",
+            "amount": 11.0,
+            "reason": "missing_item"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E314",
+            "amount": 8.0,
+            "reason": "late_delivery",
+            "order_id": "K-9401"
+          }
+        }
+      ]
+    },
+    {
+      "name": "declines everything as too old",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0314"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E314",
+            "full_name": "Nadia Petrov",
+            "phone": "415-555-0314"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9401"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9401"
+          }
+        }
+      ]
+    },
+    {
+      "name": "late credit at tier 1",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0314"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E314",
+            "full_name": "Nadia Petrov",
+            "phone": "415-555-0314"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9401"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9401"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E314",
+            "amount": 2.99,
+            "reason": "late_delivery",
+            "order_id": "K-9401"
+          }
+        }
+      ]
+    },
+    {
+      "name": "credits the borscht",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "phone": "415-555-0314"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E314",
+            "full_name": "Nadia Petrov",
+            "phone": "415-555-0314"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9401"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-9401"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E314",
+            "amount": 13.2,
+            "reason": "missing_item",
+            "order_id": "K-9401"
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E314",
+            "amount": 8.0,
+            "reason": "late_delivery",
+            "order_id": "K-9401"
+          }
+        }
+      ]
+    }
+  ]
+}

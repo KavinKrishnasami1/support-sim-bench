@@ -1,0 +1,192 @@
+{
+  "id": "X15",
+  "slug": "voided_hold_looks_like_double_charge",
+  "title": "\"You charged me twice\"",
+  "tricky": "The bank shows two $33.67 lines. The payment record has a voided authorization hold and one settled charge. A voided hold isn't a charge: nothing to refund or escalate. (Control task.)",
+  "source": {
+    "dataset": "none",
+    "license": "n/a",
+    "what_we_took": "Designed for v3 from the failure modes in LESSONS.md (see V3_FOOD_DELIVERY_DRAFT.md); not derived from a specific conversation. Customer behaviours follow patterns seen in ABCD."
+  },
+  "resolution_summary": "No refund, no escalation. Explain the voided hold.",
+  "policy_sections": [
+    11
+  ],
+  "user": {
+    "persona": "Ben Carter, careful with money, mildly worried.",
+    "situation": "Your bank app shows two $33.67 transactions from Forkful for tonight's Pho Real order (#9501). You think you were charged twice.",
+    "goal": "Get the duplicate charge refunded.",
+    "facts": [
+      "Your full name is Ben Carter.",
+      "Your email is ben.carter@mailbox.example.",
+      "Order number 9501.",
+      "Your bank app shows two transactions of $33.67 from Forkful tonight."
+    ],
+    "reveal_rules": [],
+    "behaviors": [
+      "If the agent explains one is a temporary hold that will drop off, ask once how long it takes, then accept."
+    ],
+    "opening": "you charged me twice for my pho order",
+    "end_condition": "the agent has told you what they've done or why they can't, and you've acknowledged it."
+  },
+  "expected": {},
+  "credit_cap": 25,
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "\\bhold\\b",
+      "authori[sz]ation",
+      "\\bvoid"
+    ]
+  },
+  "est_turns": 10,
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "email": "ben.carter@mailbox.example"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "E315",
+        "full_name": "Ben Carter",
+        "email": "ben.carter@mailbox.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-9501"
+      }
+    },
+    {
+      "tool": "get_payment",
+      "args": {
+        "order_id": "K-9501"
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refunds the 'duplicate'",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "ben.carter@mailbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E315",
+            "full_name": "Ben Carter",
+            "email": "ben.carter@mailbox.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9501"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-9501"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-9501",
+            "amount": 33.67,
+            "reason": "other"
+          }
+        }
+      ]
+    },
+    {
+      "name": "escalates as an unrecognized charge",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "ben.carter@mailbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E315",
+            "full_name": "Ben Carter",
+            "email": "ben.carter@mailbox.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9501"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-9501"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "E315",
+            "order_id": "K-9501",
+            "reason": "unrecognized_charge",
+            "summary": "K-9501: customer reports a double charge."
+          }
+        }
+      ]
+    },
+    {
+      "name": "escalates as 'other'",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "ben.carter@mailbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E315",
+            "full_name": "Ben Carter",
+            "email": "ben.carter@mailbox.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-9501"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-9501"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "E315",
+            "order_id": "K-9501",
+            "reason": "other",
+            "summary": "K-9501: double charge question."
+          }
+        }
+      ]
+    }
+  ]
+}

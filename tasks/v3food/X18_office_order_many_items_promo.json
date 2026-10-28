@@ -1,0 +1,776 @@
+{
+  "id": "X18",
+  "slug": "office_order_many_items_promo",
+  "title": "Big office order: four items missing or wrong, a promo, and auto-refunds",
+  "tricky": "A $160 office order with a $16 promo (10%). The customer finds problems while unpacking: 2 of 6 carne asada tacos ($9), 1 of 2 veggie burritos ($12), a wrong quesadilla ($10), 1 of 3 chips and guacamole ($7), and 2 horchatas that were already auto-refunded. Card refunds are each item minus 10%: $34.20 in total, plus $3.80 of promo-share credit. Nothing for the horchatas.",
+  "source": {
+    "dataset": "none",
+    "license": "n/a",
+    "what_we_took": "Designed for v3 from the failure modes in LESSONS.md (see V3_FOOD_DELIVERY_DRAFT.md); not derived from a specific conversation. Customer behaviours follow patterns seen in ABCD."
+  },
+  "resolution_summary": "Refund $34.20 to card on K-6201 (8.10 + 10.80 + 9.00 + 6.30) and credit $3.80 promo shares (0.90 + 1.20 + 1.00 + 0.70). Nothing for the horchatas.",
+  "policy_sections": [
+    5
+  ],
+  "user": {
+    "persona": "Rafael Ortiz, office manager who ordered lunch for the team; busy, unpacking as he types.",
+    "situation": "You ordered a big team lunch from Taqueria Luz (#6201) with the promo code OFFICE16. As you unpack, you keep finding problems.",
+    "goal": "Get the money back on the company card for everything that's wrong.",
+    "facts": [
+      "Your full name is Rafael Ortiz.",
+      "Your email is rafael.ortiz@mailbox.example.",
+      "Order number 6201.",
+      "Only 4 of the 6 carne asada tacos came.",
+      "Only 1 of the 2 veggie burritos came.",
+      "One of the 2 cheese quesadillas was a chicken quesadilla instead (wrong item). Nobody ate it.",
+      "Only 2 of the 3 chips and guacamole came.",
+      "Only 2 of the 4 horchatas came.",
+      "Everything else arrived in full: all 6 chicken tacos, all 4 elote and both churros. If the agent asks you to check anything else, you check and confirm it's all there.",
+      "You used the promo code OFFICE16; you don't remember how much it took off."
+    ],
+    "reveal_rules": [
+      "Report the problems a couple at a time as you 'find' them while unpacking: first the tacos and the burrito, then the quesadilla and the chips, and the horchatas last.",
+      "Mention the promo code only if the agent asks about it or mentions a discount."
+    ],
+    "behaviors": [
+      "You want refunds to the card for everything, not credit.",
+      "Accept any split refund or explanation the agent gives about the promo."
+    ],
+    "opening": "hey, unpacking our team lunch and stuff is missing",
+    "end_condition": "every item has been addressed and you've acknowledged the outcome."
+  },
+  "expected": {
+    "refunds": {
+      "K-6201": 34.2
+    },
+    "credits": {
+      "E318": 3.8
+    }
+  },
+  "credit_cap": 25,
+  "leak_check": {
+    "amounts": [
+      "34.20",
+      "3.80",
+      "8.10",
+      "10.80",
+      "6.30"
+    ],
+    "phrases": []
+  },
+  "est_turns": 16,
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "email": "rafael.ortiz@mailbox.example"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "E318",
+        "full_name": "Rafael Ortiz",
+        "email": "rafael.ortiz@mailbox.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-6201"
+      }
+    },
+    {
+      "tool": "get_delivery_events",
+      "args": {
+        "order_id": "K-6201"
+      }
+    },
+    {
+      "tool": "get_restaurant",
+      "args": {
+        "restaurant_id": "S3"
+      }
+    },
+    {
+      "tool": "get_payment",
+      "args": {
+        "order_id": "K-6201"
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "K-6201",
+        "amount": 8.1,
+        "reason": "missing_item",
+        "item_ids": [
+          "K-6201-1"
+        ]
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "E318",
+        "amount": 0.9,
+        "reason": "other",
+        "order_id": "K-6201",
+        "item_ids": [
+          "K-6201-1"
+        ]
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "K-6201",
+        "amount": 10.8,
+        "reason": "missing_item",
+        "item_ids": [
+          "K-6201-3"
+        ]
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "E318",
+        "amount": 1.2,
+        "reason": "other",
+        "order_id": "K-6201",
+        "item_ids": [
+          "K-6201-3"
+        ]
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "K-6201",
+        "amount": 9.0,
+        "reason": "missing_item",
+        "item_ids": [
+          "K-6201-7"
+        ]
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "E318",
+        "amount": 1.0,
+        "reason": "other",
+        "order_id": "K-6201",
+        "item_ids": [
+          "K-6201-7"
+        ]
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "K-6201",
+        "amount": 6.3,
+        "reason": "missing_item",
+        "item_ids": [
+          "K-6201-4"
+        ]
+      }
+    },
+    {
+      "tool": "issue_credit",
+      "args": {
+        "customer_id": "E318",
+        "amount": 0.7,
+        "reason": "other",
+        "order_id": "K-6201",
+        "item_ids": [
+          "K-6201-4"
+        ]
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "refunds the auto-refunded horchatas too",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "rafael.ortiz@mailbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E318",
+            "full_name": "Rafael Ortiz",
+            "email": "rafael.ortiz@mailbox.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-6201"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-6201"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S3"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-6201"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 8.1,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-1"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E318",
+            "amount": 0.9,
+            "reason": "other",
+            "order_id": "K-6201",
+            "item_ids": [
+              "K-6201-1"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 10.8,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-3"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E318",
+            "amount": 1.2,
+            "reason": "other",
+            "order_id": "K-6201",
+            "item_ids": [
+              "K-6201-3"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 9.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-7"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E318",
+            "amount": 1.0,
+            "reason": "other",
+            "order_id": "K-6201",
+            "item_ids": [
+              "K-6201-7"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 6.3,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-4"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E318",
+            "amount": 0.7,
+            "reason": "other",
+            "order_id": "K-6201",
+            "item_ids": [
+              "K-6201-4"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 7.2,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-6"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E318",
+            "amount": 0.8,
+            "reason": "other",
+            "order_id": "K-6201",
+            "item_ids": [
+              "K-6201-6"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "no promo split",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "rafael.ortiz@mailbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E318",
+            "full_name": "Rafael Ortiz",
+            "email": "rafael.ortiz@mailbox.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-6201"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-6201"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S3"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-6201"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 9.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-1"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 12.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-3"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 10.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-7"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 7.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-4"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "promo shares never credited",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "rafael.ortiz@mailbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E318",
+            "full_name": "Rafael Ortiz",
+            "email": "rafael.ortiz@mailbox.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-6201"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-6201"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S3"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-6201"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 8.1,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-1"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 10.8,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-3"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 9.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-7"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 6.3,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-4"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "whole quantity refunded instead of the missing units",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "rafael.ortiz@mailbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E318",
+            "full_name": "Rafael Ortiz",
+            "email": "rafael.ortiz@mailbox.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-6201"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-6201"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S3"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-6201"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 24.3,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-1"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E318",
+            "amount": 2.7,
+            "reason": "other",
+            "order_id": "K-6201",
+            "item_ids": [
+              "K-6201-1"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 10.8,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-3"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E318",
+            "amount": 1.2,
+            "reason": "other",
+            "order_id": "K-6201",
+            "item_ids": [
+              "K-6201-3"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 9.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-7"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E318",
+            "amount": 1.0,
+            "reason": "other",
+            "order_id": "K-6201",
+            "item_ids": [
+              "K-6201-7"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 6.3,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-4"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E318",
+            "amount": 0.7,
+            "reason": "other",
+            "order_id": "K-6201",
+            "item_ids": [
+              "K-6201-4"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "one item missed",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "rafael.ortiz@mailbox.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E318",
+            "full_name": "Rafael Ortiz",
+            "email": "rafael.ortiz@mailbox.example"
+          }
+        },
+        {
+          "tool": "get_order",
+          "args": {
+            "order_id": "K-6201"
+          }
+        },
+        {
+          "tool": "get_delivery_events",
+          "args": {
+            "order_id": "K-6201"
+          }
+        },
+        {
+          "tool": "get_restaurant",
+          "args": {
+            "restaurant_id": "S3"
+          }
+        },
+        {
+          "tool": "get_payment",
+          "args": {
+            "order_id": "K-6201"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 8.1,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-1"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E318",
+            "amount": 0.9,
+            "reason": "other",
+            "order_id": "K-6201",
+            "item_ids": [
+              "K-6201-1"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 10.8,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-3"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E318",
+            "amount": 1.2,
+            "reason": "other",
+            "order_id": "K-6201",
+            "item_ids": [
+              "K-6201-3"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6201",
+            "amount": 9.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6201-7"
+            ]
+          }
+        },
+        {
+          "tool": "issue_credit",
+          "args": {
+            "customer_id": "E318",
+            "amount": 1.0,
+            "reason": "other",
+            "order_id": "K-6201",
+            "item_ids": [
+              "K-6201-7"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "credit_cap_exempt": 3.8
+}

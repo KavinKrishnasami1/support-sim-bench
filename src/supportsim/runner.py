@@ -20,13 +20,21 @@ from .flags import judge_flags, rule_flags
 from .grader import grade
 from .providers import BudgetExceeded, ModelRefused, Provider, Usage
 from .tools import call_tool, tool_specs
-from .world import ROOT, load_world, policy_text
+from .world import ROOT, domain, load_world, policy_text
 
 RESULTS = ROOT / "results"
 COMPLETED = {"customer_ended", "max_turns", "agent_tool_loop", "agent_refused"}
 
 
 def agent_system_prompt(now: str, suite: str = "v1") -> str:
+    if domain(suite) == "itsd":
+        return (f"You are the IT service desk agent for Quillmark Labs, chatting live with an employee in the workplace "
+                f"chat app.\nThe current date and time is {now}.\n"
+                "The first message starts with a line in square brackets added by the chat system: it shows whether the "
+                "sender is signed in, and the ticket for this conversation. The employee sees only your chat messages, "
+                "not your tool calls or their results. Use the tools to look things up and take actions, then tell the "
+                "employee what you did.\n\n"
+                f"<policy>\n{policy_text(suite)}\n</policy>")
     return (f"You are a customer support agent for Forkful, a food-delivery app, chatting live with a customer.\n"
             f"The current date and time is {now}.\n"
             "The customer sees only your chat messages, not your tool calls or their results. Use the tools to look "
@@ -61,13 +69,26 @@ class SideRefused(Exception):
         self.side = side
 
 
+def channel_header(task: dict) -> str | None:
+    """v3: the bracketed line the chat system adds to the first message (who is signed in, which ticket)."""
+    ch = task.get("channel")
+    if not ch:
+        return None
+    who = (f"signed in as {ch['name']} ({ch['employee_id']})" if ch["type"] == "signed_in"
+           else f"guest kiosk, {ch.get('where', 'office lobby')} · not signed in")
+    return f"[IT Help chat · {who} · ticket {task['ticket_id']}]"
+
+
 def run_episode(task: dict, agent: Provider, user: Provider, max_turns: int = 20,
                 max_tool_steps: int = 12) -> dict:
     suite = task.get("suite", "v1")
     world = load_world(task.get("world_patch"), suite)
     initial = copy.deepcopy(world.data)
     a = _Side("agent", agent.start(agent_system_prompt(world.data["now"], suite), tool_specs(suite)))
-    u = _Side("customer", user.start(simuser.system_prompt(task["user"])))
+    u = _Side("customer", user.start(simuser.system_prompt(task["user"], domain(suite))))
+    header = channel_header(task)
+    if domain(suite) == "itsd":
+        max_tool_steps = max(max_tool_steps, 20)  # IT tasks can need many lookups in one turn
     events: list[dict] = []
     end_reason, error = None, None
     t0 = time.time()
@@ -76,6 +97,8 @@ def run_episode(task: dict, agent: Provider, user: Provider, max_turns: int = 20
         for _ in range(max_turns):
             stop = simuser.STOP_TOKEN in msg
             text = msg.replace(simuser.STOP_TOKEN, "").strip()
+            if text and header:  # v3: the chat system's line goes on the employee's first message
+                text, header = f"{header}\n{text}", None
             if text:
                 events.append({"role": "customer", "text": text})
             if stop and not text:
@@ -147,7 +170,7 @@ def estimate(tasks: list[dict], k: int, agent_model: str, user_model: str, judge
     likely = 0.0  # same token counts, with the repeated prefix read from cache at 0.1x
     for t in tasks:
         T = t.get("est_turns", 8)
-        user_base = _tokens(simuser.system_prompt(t["user"]))
+        user_base = _tokens(simuser.system_prompt(t["user"], domain(suite)))
         n_agent = 2 * T
         agent_in = n_agent * agent_base + 450 * n_agent * (n_agent + 1) / 2
         agent_out = 600 * n_agent

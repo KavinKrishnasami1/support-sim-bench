@@ -1,0 +1,342 @@
+{
+  "id": "X22",
+  "slug": "incident_window_boundary_three_orders",
+  "title": "Three orders; the incident window splits two from the same restaurant",
+  "tricky": "Spice Route's open incident covers orders placed 17:00-19:00. Order 6601 (placed 18:58, wrong item) is inside: escalate restaurant_incident, no money. Order 6602 from the same restaurant (placed 19:02, a naan missing) is outside: refund $4. Order 6603 from Lotus Garden (spring rolls missing): refund $7.",
+  "source": {
+    "dataset": "none",
+    "license": "n/a",
+    "what_we_took": "Designed for v3 from the failure modes in LESSONS.md (see V3_FOOD_DELIVERY_DRAFT.md); not derived from a specific conversation. Customer behaviours follow patterns seen in ABCD."
+  },
+  "resolution_summary": "Escalate restaurant_incident on K-6601. Refund $4.00 on K-6602 and $7.00 on K-6603.",
+  "policy_sections": [
+    5,
+    9
+  ],
+  "user": {
+    "persona": "Yusuf Demir, hosting friends tonight, a bit frazzled.",
+    "situation": "You ordered dinner for friends tonight in three orders. Spice Route order #6601 came with chicken makhani instead of paneer makhani. You placed a second, small Spice Route order (#6602) a few minutes later for extra naan, and one of the two naans was missing. And the Lotus Garden order (#6603) was missing the spring rolls.",
+    "goal": "Get your money back for everything that went wrong.",
+    "facts": [
+      "Your full name is Yusuf Demir.",
+      "Your email is yusuf.demir@post.example.",
+      "#6601 Spice Route: chicken makhani instead of paneer makhani. Nobody ate it; everyone's fine.",
+      "#6602 Spice Route (ordered a few minutes after the first): one of the two garlic naans missing.",
+      "#6603 Lotus Garden: the spring rolls were missing."
+    ],
+    "reveal_rules": [
+      "Raise the orders one at a time: #6601, then #6602, then #6603."
+    ],
+    "behaviors": [
+      "You want refunds to your card wherever possible.",
+      "If told someone else will handle one order, ask once whether you'll still be refunded, then accept."
+    ],
+    "opening": "ugh, a few things went wrong with my orders tonight",
+    "end_condition": "every order has been addressed and you've acknowledged the outcome."
+  },
+  "expected": {
+    "escalations": [
+      {
+        "order_id": "K-6601",
+        "reason": "restaurant_incident"
+      }
+    ],
+    "refunds": {
+      "K-6602": 4.0,
+      "K-6603": 7.0
+    }
+  },
+  "credit_cap": 25,
+  "leak_check": {
+    "amounts": [
+      "4.00",
+      "7.00"
+    ],
+    "phrases": [
+      "incident",
+      "recall"
+    ]
+  },
+  "est_turns": 14,
+  "oracle": [
+    {
+      "tool": "get_customer",
+      "args": {
+        "email": "yusuf.demir@post.example"
+      }
+    },
+    {
+      "tool": "verify_identity",
+      "args": {
+        "customer_id": "E322",
+        "full_name": "Yusuf Demir",
+        "email": "yusuf.demir@post.example"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-6601"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-6602"
+      }
+    },
+    {
+      "tool": "get_order",
+      "args": {
+        "order_id": "K-6603"
+      }
+    },
+    {
+      "tool": "get_restaurant",
+      "args": {
+        "restaurant_id": "S4"
+      }
+    },
+    {
+      "tool": "get_restaurant",
+      "args": {
+        "restaurant_id": "S2"
+      }
+    },
+    {
+      "tool": "escalate_to_human",
+      "args": {
+        "customer_id": "E322",
+        "order_id": "K-6601",
+        "reason": "restaurant_incident",
+        "summary": "K-6601 placed 18:58, inside INC-311 (17:00-19:00). Wrong item."
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "K-6602",
+        "amount": 4.0,
+        "reason": "missing_item",
+        "item_ids": [
+          "K-6602-1"
+        ]
+      }
+    },
+    {
+      "tool": "issue_refund",
+      "args": {
+        "order_id": "K-6603",
+        "amount": 7.0,
+        "reason": "missing_item",
+        "item_ids": [
+          "K-6603-2"
+        ]
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "incident applied to the order placed after the window",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "yusuf.demir@post.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E322",
+            "full_name": "Yusuf Demir",
+            "email": "yusuf.demir@post.example"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "E322",
+            "order_id": "K-6601",
+            "reason": "restaurant_incident",
+            "summary": "K-6601 placed 18:58, inside INC-311 (17:00-19:00). Wrong item."
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "E322",
+            "order_id": "K-6602",
+            "reason": "restaurant_incident",
+            "summary": "K-6602 Spice Route."
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6603",
+            "amount": 7.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6603-2"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "first order refunded despite the incident",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "yusuf.demir@post.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E322",
+            "full_name": "Yusuf Demir",
+            "email": "yusuf.demir@post.example"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6601",
+            "amount": 15.0,
+            "reason": "wrong_item"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6602",
+            "amount": 4.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6602-1"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6603",
+            "amount": 7.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6603-2"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "both Spice Route orders refunded and escalated",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "yusuf.demir@post.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E322",
+            "full_name": "Yusuf Demir",
+            "email": "yusuf.demir@post.example"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6601",
+            "amount": 15.0,
+            "reason": "wrong_item"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "E322",
+            "order_id": "K-6601",
+            "reason": "restaurant_incident",
+            "summary": "K-6601 placed 18:58, inside INC-311 (17:00-19:00). Wrong item."
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6602",
+            "amount": 4.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6602-1"
+            ]
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6603",
+            "amount": 7.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6603-2"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "whole naan quantity refunded",
+      "actions": [
+        {
+          "tool": "get_customer",
+          "args": {
+            "email": "yusuf.demir@post.example"
+          }
+        },
+        {
+          "tool": "verify_identity",
+          "args": {
+            "customer_id": "E322",
+            "full_name": "Yusuf Demir",
+            "email": "yusuf.demir@post.example"
+          }
+        },
+        {
+          "tool": "escalate_to_human",
+          "args": {
+            "customer_id": "E322",
+            "order_id": "K-6601",
+            "reason": "restaurant_incident",
+            "summary": "K-6601 placed 18:58, inside INC-311 (17:00-19:00). Wrong item."
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6602",
+            "amount": 8.0,
+            "reason": "missing_item"
+          }
+        },
+        {
+          "tool": "issue_refund",
+          "args": {
+            "order_id": "K-6603",
+            "amount": 7.0,
+            "reason": "missing_item",
+            "item_ids": [
+              "K-6603-2"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -19,9 +19,24 @@ def _bullets(items: list[str]) -> str:
     return "\n".join(f"- {x}" for x in items) if items else "- (none)"
 
 
-def system_prompt(user: dict) -> str:
-    return f"""You are role-playing a customer chatting with support for Forkful, a food-delivery app.
-You are the customer, not an assistant. Stay in character for the whole conversation.
+INTRO = {
+    "food": "You are role-playing a customer chatting with support for Forkful, a food-delivery app.\n"
+            "You are the customer, not an assistant. Stay in character for the whole conversation.",
+    "itsd": "You are role-playing a person chatting with IT Help, the internal IT service desk of Quillmark Labs, in "
+            "the company's workplace chat app.\nYou are this person, not an assistant. Stay in character for the "
+            "whole conversation.\n"
+            "You can't see any IT systems. If the agent says it sent you a sign-in prompt (an MFA push), or that one "
+            "was approved, then you did get it and you approved it, unless your facts say you can't; the same goes "
+            "for a call. If the agent says someone approved or confirmed "
+            "something in the approval system, accept that it happened: approvers often answer within seconds, and "
+            "you can't see their queue. The mobile number and personal email IT has on file are yours. Don't dispute "
+            "what the agent reports about the systems unless your facts contradict it. Don't invent travel, "
+            "locations, devices or sign-ins that aren't in your facts.",
+}
+
+
+def system_prompt(user: dict, domain: str = "food") -> str:
+    return f"""{INTRO[domain]}
 
 # Who you are
 {user["persona"]}
