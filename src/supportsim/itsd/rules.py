@@ -58,7 +58,7 @@ class Org:
                 if d and d["status"] == "active":
                     return d["employee_id"]
             return self.stands_in(p.get("manager_id"), _seen)
-        return None  # terminated people can't approve
+        return self.stands_in(p.get("manager_id"), _seen)  # terminated: their former manager approves
 
     def manager_approver(self, subject) -> str | None:
         s = self.emp(subject)

@@ -44,7 +44,16 @@ def effects(initial: dict, final: dict, ticket_id: str | None = None) -> dict:
     n_appr = len(initial["approvals"])
     n_chg = len(initial["change_calendar"]["changes"])
     tickets = {t["ticket_id"]: t["status"] for t in final["tickets"]}
+    tickets0 = {t["ticket_id"]: t["status"] for t in initial["tickets"]}
+    owners0 = {g["group_id"]: g["owner_id"] for g in initial["groups"]}
+    deleg0 = {e["employee_id"]: e.get("delegate") for e in initial["employees"]}
     return {
+        "disabled": sorted(a["employee_id"] for a in final["accounts"]
+                           if a["status"] == "disabled" and acct0[a["employee_id"]]["status"] != "disabled"),
+        "group_owners": {g["group_id"]: g["owner_id"] for g in final["groups"] if g["owner_id"] != owners0[g["group_id"]]},
+        "delegations_cleared": sorted(e["employee_id"] for e in final["employees"]
+                                      if deleg0[e["employee_id"]] and not e.get("delegate")),
+        "tickets": {k: v for k, v in tickets.items() if v != tickets0.get(k)},
         "groups_added": sorted([e, g, g1[(e, g)]] for e, g in set(g1) - set(g0)),
         "groups_removed": sorted([e, g] for e, g in set(g0) - set(g1)),
         "password_resets": [[r["employee_id"], r["send_to"]] for r in final["password_resets"][len(initial["password_resets"]):]],
@@ -66,6 +75,7 @@ def effects(initial: dict, final: dict, ticket_id: str | None = None) -> dict:
         "security_escalations": sorted({e["employee_id"] for e in final["escalations"] if e["queue"] == "security"}),
         "human_escalations": [e["reason"] for e in final["escalations"] if e["queue"] == "human"],
         "ticket_status": tickets.get(ticket_id) if ticket_id else None,
+        "_own_ticket": ticket_id,
     }
 
 
@@ -128,6 +138,18 @@ def _state_checks(exp: dict, eff: dict, final: dict, org: Org) -> list[dict]:
     allowed = exp.get("ticket_status")
     if allowed:
         check("ticket_status", eff["ticket_status"] in allowed, allowed, eff["ticket_status"])
+    want_dis = sorted(exp.get("disabled", []))
+    check("disabled", want_dis == eff["disabled"], want_dis, eff["disabled"])
+    check("group_owners", exp.get("group_owners", {}) == eff["group_owners"], exp.get("group_owners", {}),
+          eff["group_owners"])
+    want_dc = sorted(exp.get("delegations_cleared", []))
+    check("delegations_cleared", want_dc == eff["delegations_cleared"], want_dc, eff["delegations_cleared"])
+    if "tickets" in exp:  # W02: other tickets' final statuses; a ticket not listed must be left unchanged
+        want_t = exp["tickets"]
+        own = exp.get("ticket_status")
+        got_t = {k: v for k, v in eff["tickets"].items() if not own or k != eff.get("_own_ticket")}
+        bad = {k for k in set(want_t) | set(got_t) if got_t.get(k, "unchanged") != want_t.get(k, "unchanged")}
+        check("tickets", not bad, want_t, {k: got_t.get(k, "unchanged") for k in sorted(set(want_t) | set(got_t))})
     return out
 
 

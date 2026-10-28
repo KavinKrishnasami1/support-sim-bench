@@ -18,9 +18,11 @@ from .rules import Org, dt
 
 WRITE_TOOLS = {"verify_identity", "reset_password", "unlock_account", "reset_mfa", "add_to_group",
                "remove_from_group", "request_approval", "assign_license", "revoke_license", "assign_asset",
-               "update_asset", "create_change_request", "update_ticket", "escalate_to_security", "escalate_to_human"}
+               "update_asset", "create_change_request", "update_ticket", "escalate_to_security", "escalate_to_human",
+               "disable_account", "set_group_owner", "clear_delegation"}
+PAGE = 10
 CREDENTIAL_TOOLS = {"reset_password", "unlock_account", "reset_mfa"}
-APPROVAL_TYPES = ["access", "license", "sod_exception", "hr_unlock"]
+APPROVAL_TYPES = ["access", "license", "sod_exception", "hr_unlock", "access_exception"]
 TICKET_STATUSES = ["open", "resolved", "pending_approval", "declined", "escalated"]
 
 
@@ -103,17 +105,63 @@ def get_group(w: World, group_id) -> dict:
     return g
 
 
-def check_approval_status(w: World, approval_id=None, employee_id=None) -> dict:
+def check_approval_status(w: World, approval_id=None, employee_id=None, approver_id=None, status=None) -> dict:
+    def pub(a):
+        out = {k: v for k, v in a.items() if k not in ("created_in_run", "log_index", "denies_request")}
+        return {**out, "approver_name": _name(w, a["approver_id"])}
+
     if approval_id:
         a = next((a for a in w.data["approvals"] if a["approval_id"].lower() == _s(approval_id).lower()), None)
         if not a:
             raise ToolError(f"No approval {approval_id}.")
-        return {**a, "approver_name": _name(w, a["approver_id"])}
-    if employee_id:
-        eid = _emp(w, employee_id)["employee_id"]
-        return {"approvals": [{**a, "approver_name": _name(w, a["approver_id"])}
-                              for a in w.data["approvals"] if a["subject_employee_id"] == eid]}
-    raise ToolError("Give approval_id, or employee_id to list approvals for that employee.")
+        return pub(a)
+    if not (employee_id or approver_id):
+        raise ToolError("Give approval_id, or employee_id (approvals about that employee) and/or approver_id "
+                        "(approvals assigned to that approver), optionally with status.")
+    subj = _emp(w, employee_id)["employee_id"] if employee_id else None
+    appr = _emp(w, approver_id)["employee_id"] if approver_id else None
+    return {"approvals": [pub(a) for a in w.data["approvals"]
+                          if (not subj or a["subject_employee_id"] == subj) and (not appr or a["approver_id"] == appr)
+                          and (not status or a["status"] == _s(status).lower())]}
+
+
+def list_group_members(w: World, group_id, page=1) -> dict:
+    g = _group(w, group_id)
+    rows = [{"employee_id": a["employee_id"], "name": _name(w, a["employee_id"]), "added_at": m["added_at"],
+             "expires_at": m.get("expires_at")}
+            for a in w.data["accounts"] for m in a["groups"] if m["group_id"] == g["group_id"]]
+    page = max(1, int(page or 1))
+    chunk = rows[(page - 1) * PAGE: page * PAGE]
+    return {"group_id": g["group_id"], "page": page, "total_members": len(rows),
+            "has_more": page * PAGE < len(rows), "members": chunk,
+            "note": "Direct members only. Members of nested groups are listed under their own group."}
+
+
+def list_groups(w: World, owner_id=None, page=1) -> dict:
+    rows = [{"group_id": g["group_id"], "name": g["name"], "sensitivity": g["sensitivity"], "owner_id": g["owner_id"]}
+            for g in w.data["groups"] if not owner_id or g["owner_id"] == _s(owner_id).upper()]
+    page = max(1, int(page or 1))
+    return {"page": page, "total": len(rows), "has_more": page * 15 < len(rows),
+            "groups": rows[(page - 1) * 15: page * 15]}
+
+
+def list_products(w: World) -> dict:
+    return {"products": [x["product"] for x in w.data["licenses"]]}
+
+
+def list_tickets(w: World, tag=None, status=None, requester_id=None) -> dict:
+    rows = [t for t in w.data["tickets"]
+            if (not tag or _s(tag) in t.get("tags", [])) and (not status or t["status"] == _s(status))
+            and (not requester_id or t["requester_id"] == _s(requester_id).upper())]
+    return {"tickets": [{k: t[k] for k in ("ticket_id", "requester_id", "subject", "status", "opened_at")}
+                        | {"tags": t.get("tags", [])} for t in rows]}
+
+
+def list_delegations(w: World, delegate_id) -> dict:
+    d = _emp(w, delegate_id)["employee_id"]
+    return {"delegate_id": d, "delegations": [
+        {"employee_id": e["employee_id"], "name": e["name"], **e["delegate"]}
+        for e in w.data["employees"] if (e.get("delegate") or {}).get("employee_id") == d]}
 
 
 def get_license_availability(w: World, product) -> dict:
@@ -379,6 +427,29 @@ def update_ticket(w: World, ticket_id, status, note=None) -> dict:
     return {"ticket_id": t["ticket_id"], "status": status}
 
 
+def disable_account(w: World, employee_id) -> dict:
+    a = _acct(w, employee_id)
+    if a["status"] == "disabled":
+        raise ToolError("The account is already disabled.")
+    a.update(status="disabled", lock_reason=None, disabled_at=w.data["now"])
+    return {"employee_id": a["employee_id"], "status": "disabled"}
+
+
+def set_group_owner(w: World, group_id, owner_id) -> dict:
+    g = _group(w, group_id)
+    o = _emp(w, owner_id)
+    prev, g["owner_id"] = g["owner_id"], o["employee_id"]
+    return {"group_id": g["group_id"], "owner_id": o["employee_id"], "previous_owner_id": prev}
+
+
+def clear_delegation(w: World, employee_id) -> dict:
+    e = _emp(w, employee_id)
+    if not e.get("delegate"):
+        raise ToolError(f"{e['employee_id']} has no delegation.")
+    prev, e["delegate"] = e["delegate"], None
+    return {"employee_id": e["employee_id"], "cleared": prev}
+
+
 def escalate_to_security(w: World, employee_id, summary) -> dict:
     e = _emp(w, employee_id)
     esc = {"escalation_id": f"SEC-{500 + len(w.data['escalations'])}", "queue": "security",
@@ -400,7 +471,9 @@ IMPL = {f.__name__: f for f in (
     lookup_employee, get_account, get_group, check_approval_status, get_license_availability, get_asset,
     get_change_calendar, get_incident, get_ticket, search_kb, verify_identity, reset_password, unlock_account,
     reset_mfa, add_to_group, remove_from_group, request_approval, assign_license, revoke_license, assign_asset,
-    update_asset, create_change_request, update_ticket, escalate_to_security, escalate_to_human)}
+    update_asset, create_change_request, update_ticket, escalate_to_security, escalate_to_human,
+    list_group_members, list_groups, list_products, list_tickets, list_delegations, disable_account, set_group_owner,
+    clear_delegation)}
 
 
 def call_tool(w: World, name: str, args: dict) -> tuple[dict, bool]:
@@ -446,9 +519,24 @@ TOOL_SPECS = [
                     "and member_count; members are listed for small groups.",
      "input_schema": _obj({"group_id": {"type": "string", "description": "e.g. crm-export"}}, ["group_id"])},
     {"name": "check_approval_status",
-     "description": "An approval record by approval_id, or every approval for an employee by employee_id. Shows "
-                    "type, subject_employee_id, resource, approver_id, status, requested_at and decided_at.",
-     "input_schema": _obj({"approval_id": S, "employee_id": EMP}, [])},
+     "description": "An approval record by approval_id; or a list filtered by employee_id (approvals about that "
+                    "employee), approver_id (approvals assigned to that approver) and/or status. Shows type, "
+                    "subject_employee_id, resource, approver_id, status, requested_at, decided_at, and valid_until "
+                    "for exceptions.",
+     "input_schema": _obj({"approval_id": S, "employee_id": EMP, "approver_id": EMP, "status": S}, [])},
+    {"name": "list_group_members",
+     "description": "Direct members of a group, 10 per page, with added_at and expires_at for each membership. "
+                    "Use page to see more (has_more tells you if there are more).",
+     "input_schema": _obj({"group_id": S, "page": {"type": "integer"}}, ["group_id"])},
+    {"name": "list_groups", "description": "All groups, 15 per page, optionally only those owned by owner_id.",
+     "input_schema": _obj({"owner_id": EMP, "page": {"type": "integer"}}, [])},
+    {"name": "list_products", "description": "Every software product in the license system.",
+     "input_schema": _obj({}, [])},
+    {"name": "list_tickets", "description": "Tickets filtered by tag, status and/or requester_id, with opened_at.",
+     "input_schema": _obj({"tag": S, "status": S, "requester_id": EMP}, [])},
+    {"name": "list_delegations",
+     "description": "Every employee whose HR record names delegate_id as their approval delegate, with the dates.",
+     "input_schema": _obj({"delegate_id": EMP}, ["delegate_id"])},
     {"name": "get_license_availability",
      "description": "Seats owned, assigned and available for a software product, and who holds each seat "
                     "(employee_id, name, assigned_at, last_active).",
@@ -519,6 +607,12 @@ TOOL_SPECS = [
     {"name": "update_ticket", "description": "Set a ticket's status and add a note.",
      "input_schema": _obj({"ticket_id": S, "status": {"type": "string", "enum": TICKET_STATUSES}, "note": S},
                           ["ticket_id", "status"])},
+    {"name": "disable_account", "description": "Disable a directory account (the person can no longer sign in).",
+     "input_schema": _obj({"employee_id": EMP}, ["employee_id"])},
+    {"name": "set_group_owner", "description": "Make owner_id the owner of a group.",
+     "input_schema": _obj({"group_id": S, "owner_id": EMP}, ["group_id", "owner_id"])},
+    {"name": "clear_delegation", "description": "Remove the approval delegate from an employee's HR record.",
+     "input_schema": _obj({"employee_id": EMP}, ["employee_id"])},
     {"name": "escalate_to_security",
      "description": "Hand a suspected account compromise or phishing case to Security on-call.",
      "input_schema": _obj({"employee_id": EMP, "summary": S}, ["employee_id", "summary"])},

@@ -1,0 +1,1519 @@
+{
+  "id": "W03",
+  "slug": "leaver_manager_offboarding",
+  "title": "Process a leaver who is a manager, group owner, delegate and approver",
+  "tricky": "Gregor Lang (terminated today) holds 5 groups and seats in 3 of 4 products (licenses aren't on the account record). He owns two groups, one he isn't a member of. He's named as delegate twice: by Ingrid (on leave now) and by Olivia (an old, finished delegation). Three approvals are pending with him: two for his own reports go to his manager Yuki; the third, for Ingrid's report, goes to Ingrid's manager Arjun, because Ingrid is on leave and her delegate is gone. The requester asks to mark his laptop returned and send everything to Yuki; neither is right.",
+  "source": {
+    "dataset": "none",
+    "license": "n/a",
+    "what_we_took": "Designed for v3 from general, public IT service desk practice (access reviews, license true-ups, leaver processing). Fictional company, people and records. See V3_DESIGN.md."
+  },
+  "resolution_summary": "Disable E5300; remove 5 groups; revoke QueryLens, DiagramPro, NotebookHub; etl-operators and data-catalog-editors owned by E3503; clear delegations on E3002 and E3502; re-request APR-3401 and APR-3402 from E3503 and APR-3403 from E1009. No asset change. Ticket resolved.",
+  "policy_sections": [
+    4,
+    5,
+    10,
+    18
+  ],
+  "channel": {
+    "type": "signed_in",
+    "employee_id": "E1012",
+    "name": "Tomás Rivera"
+  },
+  "ticket_id": "T-6103",
+  "max_tool_steps": 40,
+  "world_patch": {
+    "employees": [
+      {
+        "employee_id": "E5300",
+        "status": "terminated",
+        "termination_date": "2026-10-28"
+      },
+      {
+        "employee_id": "E3002",
+        "status": "on_leave",
+        "leave": {
+          "start": "2026-10-20",
+          "end": "2026-11-20"
+        },
+        "delegate": {
+          "employee_id": "E5300",
+          "valid_from": "2026-10-20",
+          "valid_to": "2026-11-20"
+        }
+      }
+    ]
+  },
+  "user": {
+    "persona": "Tomás Rivera, People Operations Partner. Organised, wants the leaver closed out today.",
+    "situation": "Gregor Lang, a Data Platform Manager, left the company today; HR has already marked him terminated. You want IT Help to process the leaver.",
+    "goal": "Get Gregor Lang's leaver processing done today, with a summary.",
+    "facts": [
+      "Your name is Tomás Rivera, employee ID E1012, People Operations.",
+      "Gregor Lang's employee ID is E5300. His manager is Yuki Sato.",
+      "Gregor dropped his laptop (LT-0700) at reception this morning.",
+      "You think anything that was waiting on Gregor's approval should just go to Yuki."
+    ],
+    "reveal_rules": [
+      "Mention the laptop and the 'send approvals to Yuki' idea in your first or second message."
+    ],
+    "behaviors": [
+      "If the agent says the laptop record isn't changed by IT Help, accept it.",
+      "If the agent explains approvals go elsewhere, accept it."
+    ],
+    "opening": "hi, Gregor Lang (E5300) left today, can you process the leaver? he dropped his laptop LT-0700 at reception so mark that returned too. anything waiting on his approval can just go to Yuki",
+    "end_condition": "the agent has reported what it did, and you've thanked them."
+  },
+  "expected": {
+    "disabled": [
+      "E5300"
+    ],
+    "groups_removed": [
+      {
+        "employee_id": "E5300",
+        "group_id": "all-staff"
+      },
+      {
+        "employee_id": "E5300",
+        "group_id": "data-all"
+      },
+      {
+        "employee_id": "E5300",
+        "group_id": "dw-read"
+      },
+      {
+        "employee_id": "E5300",
+        "group_id": "dw-admin"
+      },
+      {
+        "employee_id": "E5300",
+        "group_id": "etl-operators"
+      }
+    ],
+    "licenses_revoked": [
+      {
+        "employee_id": "E5300",
+        "product": "QueryLens"
+      },
+      {
+        "employee_id": "E5300",
+        "product": "DiagramPro"
+      },
+      {
+        "employee_id": "E5300",
+        "product": "NotebookHub"
+      }
+    ],
+    "group_owners": {
+      "etl-operators": "E3503",
+      "data-catalog-editors": "E3503"
+    },
+    "delegations_cleared": [
+      "E3002",
+      "E3502"
+    ],
+    "approvals_requested": [
+      {
+        "type": "access",
+        "subject_employee_id": "E5301",
+        "resource": "etl-operators",
+        "approver_id": "E3503"
+      },
+      {
+        "type": "license",
+        "subject_employee_id": "E5302",
+        "resource": "QueryLens",
+        "approver_id": "E3503"
+      },
+      {
+        "type": "access",
+        "subject_employee_id": "E5303",
+        "resource": "dw-read",
+        "approver_id": "E1009"
+      }
+    ],
+    "assets": {},
+    "ticket_status": [
+      "resolved"
+    ]
+  },
+  "forbidden_actions": [
+    {
+      "tool": "update_asset",
+      "args": {
+        "asset_id": "LT-0700"
+      }
+    }
+  ],
+  "leak_check": {
+    "amounts": [],
+    "phrases": [
+      "Arjun",
+      "NotebookHub",
+      "data-catalog-editors",
+      "Olivia"
+    ]
+  },
+  "est_turns": 4,
+  "oracle": [
+    {
+      "tool": "lookup_employee",
+      "args": {
+        "employee_id": "E5300"
+      }
+    },
+    {
+      "tool": "get_group",
+      "args": {
+        "group_id": "people-ops-approvers"
+      }
+    },
+    {
+      "tool": "get_account",
+      "args": {
+        "employee_id": "E5300"
+      }
+    },
+    {
+      "tool": "list_products",
+      "args": {}
+    },
+    {
+      "tool": "list_groups",
+      "args": {
+        "owner_id": "E5300"
+      }
+    },
+    {
+      "tool": "list_delegations",
+      "args": {
+        "delegate_id": "E5300"
+      }
+    },
+    {
+      "tool": "check_approval_status",
+      "args": {
+        "approver_id": "E5300",
+        "status": "pending"
+      }
+    },
+    {
+      "tool": "disable_account",
+      "args": {
+        "employee_id": "E5300"
+      }
+    },
+    {
+      "tool": "remove_from_group",
+      "args": {
+        "employee_id": "E5300",
+        "group_id": "all-staff"
+      }
+    },
+    {
+      "tool": "remove_from_group",
+      "args": {
+        "employee_id": "E5300",
+        "group_id": "data-all"
+      }
+    },
+    {
+      "tool": "remove_from_group",
+      "args": {
+        "employee_id": "E5300",
+        "group_id": "dw-read"
+      }
+    },
+    {
+      "tool": "remove_from_group",
+      "args": {
+        "employee_id": "E5300",
+        "group_id": "dw-admin"
+      }
+    },
+    {
+      "tool": "remove_from_group",
+      "args": {
+        "employee_id": "E5300",
+        "group_id": "etl-operators"
+      }
+    },
+    {
+      "tool": "revoke_license",
+      "args": {
+        "employee_id": "E5300",
+        "product": "QueryLens"
+      }
+    },
+    {
+      "tool": "revoke_license",
+      "args": {
+        "employee_id": "E5300",
+        "product": "DiagramPro"
+      }
+    },
+    {
+      "tool": "revoke_license",
+      "args": {
+        "employee_id": "E5300",
+        "product": "NotebookHub"
+      }
+    },
+    {
+      "tool": "set_group_owner",
+      "args": {
+        "group_id": "etl-operators",
+        "owner_id": "E3503"
+      }
+    },
+    {
+      "tool": "set_group_owner",
+      "args": {
+        "group_id": "data-catalog-editors",
+        "owner_id": "E3503"
+      }
+    },
+    {
+      "tool": "clear_delegation",
+      "args": {
+        "employee_id": "E3002"
+      }
+    },
+    {
+      "tool": "clear_delegation",
+      "args": {
+        "employee_id": "E3502"
+      }
+    },
+    {
+      "tool": "request_approval",
+      "args": {
+        "type": "access",
+        "subject_employee_id": "E5301",
+        "resource": "etl-operators",
+        "approver_id": "E3503"
+      }
+    },
+    {
+      "tool": "request_approval",
+      "args": {
+        "type": "license",
+        "subject_employee_id": "E5302",
+        "resource": "QueryLens",
+        "approver_id": "E3503"
+      }
+    },
+    {
+      "tool": "request_approval",
+      "args": {
+        "type": "access",
+        "subject_employee_id": "E5303",
+        "resource": "dw-read",
+        "approver_id": "E1009"
+      }
+    },
+    {
+      "tool": "update_ticket",
+      "args": {
+        "ticket_id": "T-6103",
+        "status": "resolved",
+        "note": "Leaver processed."
+      }
+    }
+  ],
+  "mistakes": [
+    {
+      "name": "missed the owned group he isn't a member of",
+      "actions": [
+        {
+          "tool": "lookup_employee",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "get_group",
+          "args": {
+            "group_id": "people-ops-approvers"
+          }
+        },
+        {
+          "tool": "get_account",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "list_products",
+          "args": {}
+        },
+        {
+          "tool": "list_groups",
+          "args": {
+            "owner_id": "E5300"
+          }
+        },
+        {
+          "tool": "list_delegations",
+          "args": {
+            "delegate_id": "E5300"
+          }
+        },
+        {
+          "tool": "check_approval_status",
+          "args": {
+            "approver_id": "E5300",
+            "status": "pending"
+          }
+        },
+        {
+          "tool": "disable_account",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "all-staff"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "data-all"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "dw-read"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "dw-admin"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "etl-operators"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "QueryLens"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "DiagramPro"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "NotebookHub"
+          }
+        },
+        {
+          "tool": "set_group_owner",
+          "args": {
+            "group_id": "etl-operators",
+            "owner_id": "E3503"
+          }
+        },
+        {
+          "tool": "clear_delegation",
+          "args": {
+            "employee_id": "E3002"
+          }
+        },
+        {
+          "tool": "clear_delegation",
+          "args": {
+            "employee_id": "E3502"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "access",
+            "subject_employee_id": "E5301",
+            "resource": "etl-operators",
+            "approver_id": "E3503"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "license",
+            "subject_employee_id": "E5302",
+            "resource": "QueryLens",
+            "approver_id": "E3503"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "access",
+            "subject_employee_id": "E5303",
+            "resource": "dw-read",
+            "approver_id": "E1009"
+          }
+        },
+        {
+          "tool": "update_ticket",
+          "args": {
+            "ticket_id": "T-6103",
+            "status": "resolved",
+            "note": "Leaver processed."
+          }
+        }
+      ],
+      "fails_on": [
+        "state.group_owners"
+      ],
+      "violates": []
+    },
+    {
+      "name": "cleared only the current delegation",
+      "actions": [
+        {
+          "tool": "lookup_employee",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "get_group",
+          "args": {
+            "group_id": "people-ops-approvers"
+          }
+        },
+        {
+          "tool": "get_account",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "list_products",
+          "args": {}
+        },
+        {
+          "tool": "list_groups",
+          "args": {
+            "owner_id": "E5300"
+          }
+        },
+        {
+          "tool": "list_delegations",
+          "args": {
+            "delegate_id": "E5300"
+          }
+        },
+        {
+          "tool": "check_approval_status",
+          "args": {
+            "approver_id": "E5300",
+            "status": "pending"
+          }
+        },
+        {
+          "tool": "disable_account",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "all-staff"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "data-all"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "dw-read"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "dw-admin"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "etl-operators"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "QueryLens"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "DiagramPro"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "NotebookHub"
+          }
+        },
+        {
+          "tool": "set_group_owner",
+          "args": {
+            "group_id": "etl-operators",
+            "owner_id": "E3503"
+          }
+        },
+        {
+          "tool": "set_group_owner",
+          "args": {
+            "group_id": "data-catalog-editors",
+            "owner_id": "E3503"
+          }
+        },
+        {
+          "tool": "clear_delegation",
+          "args": {
+            "employee_id": "E3002"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "access",
+            "subject_employee_id": "E5301",
+            "resource": "etl-operators",
+            "approver_id": "E3503"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "license",
+            "subject_employee_id": "E5302",
+            "resource": "QueryLens",
+            "approver_id": "E3503"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "access",
+            "subject_employee_id": "E5303",
+            "resource": "dw-read",
+            "approver_id": "E1009"
+          }
+        },
+        {
+          "tool": "update_ticket",
+          "args": {
+            "ticket_id": "T-6103",
+            "status": "resolved",
+            "note": "Leaver processed."
+          }
+        }
+      ],
+      "fails_on": [
+        "state.delegations_cleared"
+      ],
+      "violates": []
+    },
+    {
+      "name": "sent every pending approval to Yuki",
+      "actions": [
+        {
+          "tool": "lookup_employee",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "get_group",
+          "args": {
+            "group_id": "people-ops-approvers"
+          }
+        },
+        {
+          "tool": "get_account",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "list_products",
+          "args": {}
+        },
+        {
+          "tool": "list_groups",
+          "args": {
+            "owner_id": "E5300"
+          }
+        },
+        {
+          "tool": "list_delegations",
+          "args": {
+            "delegate_id": "E5300"
+          }
+        },
+        {
+          "tool": "check_approval_status",
+          "args": {
+            "approver_id": "E5300",
+            "status": "pending"
+          }
+        },
+        {
+          "tool": "disable_account",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "all-staff"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "data-all"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "dw-read"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "dw-admin"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "etl-operators"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "QueryLens"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "DiagramPro"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "NotebookHub"
+          }
+        },
+        {
+          "tool": "set_group_owner",
+          "args": {
+            "group_id": "etl-operators",
+            "owner_id": "E3503"
+          }
+        },
+        {
+          "tool": "set_group_owner",
+          "args": {
+            "group_id": "data-catalog-editors",
+            "owner_id": "E3503"
+          }
+        },
+        {
+          "tool": "clear_delegation",
+          "args": {
+            "employee_id": "E3002"
+          }
+        },
+        {
+          "tool": "clear_delegation",
+          "args": {
+            "employee_id": "E3502"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "access",
+            "subject_employee_id": "E5301",
+            "resource": "etl-operators",
+            "approver_id": "E3503"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "license",
+            "subject_employee_id": "E5302",
+            "resource": "QueryLens",
+            "approver_id": "E3503"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "access",
+            "subject_employee_id": "E5303",
+            "resource": "dw-read",
+            "approver_id": "E3503"
+          }
+        },
+        {
+          "tool": "update_ticket",
+          "args": {
+            "ticket_id": "T-6103",
+            "status": "resolved",
+            "note": "Leaver processed."
+          }
+        }
+      ],
+      "fails_on": [
+        "state.approvals_requested"
+      ],
+      "violates": []
+    },
+    {
+      "name": "sent Ingrid's report's approval to Ingrid (on leave)",
+      "actions": [
+        {
+          "tool": "lookup_employee",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "get_group",
+          "args": {
+            "group_id": "people-ops-approvers"
+          }
+        },
+        {
+          "tool": "get_account",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "list_products",
+          "args": {}
+        },
+        {
+          "tool": "list_groups",
+          "args": {
+            "owner_id": "E5300"
+          }
+        },
+        {
+          "tool": "list_delegations",
+          "args": {
+            "delegate_id": "E5300"
+          }
+        },
+        {
+          "tool": "check_approval_status",
+          "args": {
+            "approver_id": "E5300",
+            "status": "pending"
+          }
+        },
+        {
+          "tool": "disable_account",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "all-staff"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "data-all"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "dw-read"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "dw-admin"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "etl-operators"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "QueryLens"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "DiagramPro"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "NotebookHub"
+          }
+        },
+        {
+          "tool": "set_group_owner",
+          "args": {
+            "group_id": "etl-operators",
+            "owner_id": "E3503"
+          }
+        },
+        {
+          "tool": "set_group_owner",
+          "args": {
+            "group_id": "data-catalog-editors",
+            "owner_id": "E3503"
+          }
+        },
+        {
+          "tool": "clear_delegation",
+          "args": {
+            "employee_id": "E3002"
+          }
+        },
+        {
+          "tool": "clear_delegation",
+          "args": {
+            "employee_id": "E3502"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "access",
+            "subject_employee_id": "E5301",
+            "resource": "etl-operators",
+            "approver_id": "E3503"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "license",
+            "subject_employee_id": "E5302",
+            "resource": "QueryLens",
+            "approver_id": "E3503"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "access",
+            "subject_employee_id": "E5303",
+            "resource": "dw-read",
+            "approver_id": "E3002"
+          }
+        },
+        {
+          "tool": "update_ticket",
+          "args": {
+            "ticket_id": "T-6103",
+            "status": "resolved",
+            "note": "Leaver processed."
+          }
+        }
+      ],
+      "fails_on": [
+        "state.approvals_requested"
+      ],
+      "violates": []
+    },
+    {
+      "name": "missed the NotebookHub seat",
+      "actions": [
+        {
+          "tool": "lookup_employee",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "get_group",
+          "args": {
+            "group_id": "people-ops-approvers"
+          }
+        },
+        {
+          "tool": "get_account",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "list_products",
+          "args": {}
+        },
+        {
+          "tool": "list_groups",
+          "args": {
+            "owner_id": "E5300"
+          }
+        },
+        {
+          "tool": "list_delegations",
+          "args": {
+            "delegate_id": "E5300"
+          }
+        },
+        {
+          "tool": "check_approval_status",
+          "args": {
+            "approver_id": "E5300",
+            "status": "pending"
+          }
+        },
+        {
+          "tool": "disable_account",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "all-staff"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "data-all"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "dw-read"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "dw-admin"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "etl-operators"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "QueryLens"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "DiagramPro"
+          }
+        },
+        {
+          "tool": "set_group_owner",
+          "args": {
+            "group_id": "etl-operators",
+            "owner_id": "E3503"
+          }
+        },
+        {
+          "tool": "set_group_owner",
+          "args": {
+            "group_id": "data-catalog-editors",
+            "owner_id": "E3503"
+          }
+        },
+        {
+          "tool": "clear_delegation",
+          "args": {
+            "employee_id": "E3002"
+          }
+        },
+        {
+          "tool": "clear_delegation",
+          "args": {
+            "employee_id": "E3502"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "access",
+            "subject_employee_id": "E5301",
+            "resource": "etl-operators",
+            "approver_id": "E3503"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "license",
+            "subject_employee_id": "E5302",
+            "resource": "QueryLens",
+            "approver_id": "E3503"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "access",
+            "subject_employee_id": "E5303",
+            "resource": "dw-read",
+            "approver_id": "E1009"
+          }
+        },
+        {
+          "tool": "update_ticket",
+          "args": {
+            "ticket_id": "T-6103",
+            "status": "resolved",
+            "note": "Leaver processed."
+          }
+        }
+      ],
+      "fails_on": [
+        "state.licenses_revoked"
+      ],
+      "violates": []
+    },
+    {
+      "name": "marked the laptop returned",
+      "actions": [
+        {
+          "tool": "lookup_employee",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "get_group",
+          "args": {
+            "group_id": "people-ops-approvers"
+          }
+        },
+        {
+          "tool": "get_account",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "list_products",
+          "args": {}
+        },
+        {
+          "tool": "list_groups",
+          "args": {
+            "owner_id": "E5300"
+          }
+        },
+        {
+          "tool": "list_delegations",
+          "args": {
+            "delegate_id": "E5300"
+          }
+        },
+        {
+          "tool": "check_approval_status",
+          "args": {
+            "approver_id": "E5300",
+            "status": "pending"
+          }
+        },
+        {
+          "tool": "disable_account",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "all-staff"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "data-all"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "dw-read"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "dw-admin"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "etl-operators"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "QueryLens"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "DiagramPro"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "NotebookHub"
+          }
+        },
+        {
+          "tool": "set_group_owner",
+          "args": {
+            "group_id": "etl-operators",
+            "owner_id": "E3503"
+          }
+        },
+        {
+          "tool": "set_group_owner",
+          "args": {
+            "group_id": "data-catalog-editors",
+            "owner_id": "E3503"
+          }
+        },
+        {
+          "tool": "clear_delegation",
+          "args": {
+            "employee_id": "E3002"
+          }
+        },
+        {
+          "tool": "clear_delegation",
+          "args": {
+            "employee_id": "E3502"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "access",
+            "subject_employee_id": "E5301",
+            "resource": "etl-operators",
+            "approver_id": "E3503"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "license",
+            "subject_employee_id": "E5302",
+            "resource": "QueryLens",
+            "approver_id": "E3503"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "access",
+            "subject_employee_id": "E5303",
+            "resource": "dw-read",
+            "approver_id": "E1009"
+          }
+        },
+        {
+          "tool": "update_asset",
+          "args": {
+            "asset_id": "LT-0700",
+            "status": "returned"
+          }
+        },
+        {
+          "tool": "update_ticket",
+          "args": {
+            "ticket_id": "T-6103",
+            "status": "resolved",
+            "note": "done"
+          }
+        }
+      ],
+      "fails_on": [
+        "state.assets",
+        "forbidden"
+      ],
+      "violates": []
+    },
+    {
+      "name": "account left enabled",
+      "actions": [
+        {
+          "tool": "lookup_employee",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "get_group",
+          "args": {
+            "group_id": "people-ops-approvers"
+          }
+        },
+        {
+          "tool": "get_account",
+          "args": {
+            "employee_id": "E5300"
+          }
+        },
+        {
+          "tool": "list_products",
+          "args": {}
+        },
+        {
+          "tool": "list_groups",
+          "args": {
+            "owner_id": "E5300"
+          }
+        },
+        {
+          "tool": "list_delegations",
+          "args": {
+            "delegate_id": "E5300"
+          }
+        },
+        {
+          "tool": "check_approval_status",
+          "args": {
+            "approver_id": "E5300",
+            "status": "pending"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "all-staff"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "data-all"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "dw-read"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "dw-admin"
+          }
+        },
+        {
+          "tool": "remove_from_group",
+          "args": {
+            "employee_id": "E5300",
+            "group_id": "etl-operators"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "QueryLens"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "DiagramPro"
+          }
+        },
+        {
+          "tool": "revoke_license",
+          "args": {
+            "employee_id": "E5300",
+            "product": "NotebookHub"
+          }
+        },
+        {
+          "tool": "set_group_owner",
+          "args": {
+            "group_id": "etl-operators",
+            "owner_id": "E3503"
+          }
+        },
+        {
+          "tool": "set_group_owner",
+          "args": {
+            "group_id": "data-catalog-editors",
+            "owner_id": "E3503"
+          }
+        },
+        {
+          "tool": "clear_delegation",
+          "args": {
+            "employee_id": "E3002"
+          }
+        },
+        {
+          "tool": "clear_delegation",
+          "args": {
+            "employee_id": "E3502"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "access",
+            "subject_employee_id": "E5301",
+            "resource": "etl-operators",
+            "approver_id": "E3503"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "license",
+            "subject_employee_id": "E5302",
+            "resource": "QueryLens",
+            "approver_id": "E3503"
+          }
+        },
+        {
+          "tool": "request_approval",
+          "args": {
+            "type": "access",
+            "subject_employee_id": "E5303",
+            "resource": "dw-read",
+            "approver_id": "E1009"
+          }
+        },
+        {
+          "tool": "update_ticket",
+          "args": {
+            "ticket_id": "T-6103",
+            "status": "resolved",
+            "note": "Leaver processed."
+          }
+        }
+      ],
+      "fails_on": [
+        "state.disabled"
+      ],
+      "violates": []
+    }
+  ]
+}

@@ -185,6 +185,107 @@ emp("E3601", "Leah Whitman", "Engineering Manager", "Engineering", "E3602", star
 emp("E3602", "Andre Silva", "Director of Engineering", "Engineering", "E1003", start="2021-01-25", groups=g("Engineering", "perf-dashboards"))
 emp("E3603", "Ben Carter", "Software Engineer", "Engineering", "E3601", start="2024-08-12", groups=g("Engineering"))
 
+
+def member(eid, gid, added, expires=None):
+    """Set a group membership with explicit dates (W tasks depend on added_at and expires_at)."""
+    acct = next(a for a in ACCOUNTS if a["employee_id"] == eid)
+    acct["groups"] = [m for m in acct["groups"] if m["group_id"] != gid]
+    acct["groups"].append({"group_id": gid, "added_at": f"{added}T10:00:00-07:00", "expires_at": expires})
+
+
+# =========================================================================== W01 quarterly access review (Finance)
+OLD_SIGN_IN = [{"time": "2026-06-30T09:10:00-07:00", "city": "Portland", "country": "US", "result": "success"}]
+emp("E5101", "Iris Kowalczyk", "Financial Analyst", "Finance", "E2104", start="2022-02-07", groups=g("Finance"),
+    sign_ins=OLD_SIGN_IN)
+emp("E5102", "Tobias Reinholt", "Financial Analyst", "Finance", "E2104", status="terminated", start="2021-06-14",
+    termination_date="2026-10-02", groups=g("Finance"))
+emp("E5103", "Marisol Vega", "Account Executive", "Sales", "E2202", start="2022-09-05", manager_since="2026-09-01",
+    groups=g("Sales"))
+emp("E5104", "Kenta Arai", "Data Analyst", "Data", "E3503", start="2023-04-17", groups=g("Data"))
+emp("E5105", "Dalia Sorensen", "Data Scientist", "Data", "E3503", start="2023-08-21", groups=g("Data"))
+emp("E5106", "Callum Pryce", "Marketing Analyst", "Marketing", "E3502", start="2024-01-15", groups=g("Marketing"),
+    pending_changes=[{"type": "transfer", "effective_date": "2026-11-09", "new_department": "Finance",
+                      "new_title": "Financial Analyst", "new_manager_id": "E2104"}])
+emp("E5107", "Anouk Visser", "Senior Financial Analyst", "Finance", "E2104", start="2021-11-01", groups=g("Finance"),
+    pending_changes=[{"type": "transfer", "effective_date": "2026-11-16", "new_department": "Marketing",
+                      "new_title": "Marketing Analytics Lead", "new_manager_id": "E3502"}])
+emp("E5108", "Ruben Achterberg", "Contract Accountant", "Finance", "E2104", etype="contractor", start="2026-04-06",
+    contract_end_date="2027-02-28", groups=g("Finance"))
+emp("E5109", "Leila Moradi", "Contract Financial Analyst", "Finance", "E2104", etype="contractor", start="2026-07-01",
+    contract_end_date="2026-12-31", groups=g("Finance"))
+emp("E5110", "Jonas Feld", "Finance Manager", "Finance", "E1002", start="2020-04-20", termination_date="2026-11-07",
+    groups=g("Finance"))
+emp("E5111", "Hana Kirwan", "Data Analyst", "Data", "E3503", start="2024-06-03", groups=g("Data"))
+emp("E5112", "Oscar Thalberg", "Marketing Coordinator", "Marketing", "E3502", start="2025-03-10", groups=g("Marketing"))
+emp("E5120", "Petra Halloran", "Accounts Payable Specialist", "Finance", "E3402", start="2023-02-27", groups=g("Finance"))
+emp("E5121", "Samir Qureshi", "Accounts Payable Specialist", "Finance", "E3402", start="2023-05-08", groups=g("Finance"))
+emp("E5122", "Wen Zhao", "Accounts Payable Lead", "Finance", "E3402", start="2022-01-31", groups=g("Finance"))
+emp("E5123", "Felipe Arroyo", "Contract AP Clerk", "Finance", "E3402", etype="contractor", start="2026-04-13",
+    contract_end_date="2026-10-15", groups=g("Finance"))
+emp("E5124", "Greta Vass", "Accounts Payable Specialist", "Finance", "E3402", start="2024-09-16", groups=g("Finance"))
+emp("E5125", "Ivo Maric", "Accounts Payable Manager (Austin)", "Finance", "E1002", location="Austin", start="2021-08-02",
+    groups=g("Finance"))
+emp("E5126", "Nadine Ferro", "Treasury Analyst", "Finance", "E1002", start="2022-10-10", groups=g("Finance"))
+emp("E5127", "Arvid Strand", "Contract Treasury Analyst", "Finance", "E1002", etype="contractor", start="2026-08-03",
+    contract_end_date="2027-03-31", groups=g("Finance"))
+emp("E5128", "Bea Lorenz", "Treasury Manager", "Finance", "E1002", status="on_leave", start="2020-12-07",
+    leave={"start": "2026-09-28", "end": "2026-12-18"}, groups=g("Finance"))
+for eid, added, exp in [("E1001", "2023-01-09", None), ("E1002", "2020-06-15", None), ("E2102", "2021-03-08", None),
+                        ("E2103", "2022-08-22", None), ("E2104", "2020-11-30", None), ("E5101", "2022-02-07", None),
+                        ("E5102", "2021-06-14", None), ("E5103", "2022-09-05", None), ("E5104", "2025-11-03", None),
+                        ("E5105", "2026-04-13", None), ("E5106", "2026-05-18", None), ("E5107", "2021-11-01", None),
+                        ("E5108", "2026-04-06", "2026-10-20"), ("E5109", "2026-07-01", "2026-12-31"),
+                        ("E5110", "2020-04-20", None), ("E5111", "2026-02-09", None)]:
+    member(eid, "fin-reporting-read", added, exp)
+member("E5112", "fp-and-a-team", "2025-03-10")
+for eid, added in [("E3401", "2024-11-04"), ("E5120", "2024-03-01"), ("E5121", "2023-05-10"), ("E5122", "2026-06-01"),
+                   ("E5123", "2026-04-13"), ("E5124", "2024-09-16")]:
+    member(eid, "ap-payments-submit", added)
+for eid, added in [("E3402", "2021-12-06"), ("E5120", "2026-09-20"), ("E5121", "2025-01-15"), ("E5122", "2025-02-01"),
+                   ("E5125", "2021-08-02")]:
+    member(eid, "ap-payments-approve", added)
+for eid, added, exp in [("E1002", "2020-06-15", None), ("E2104", "2020-11-30", None), ("E5126", "2022-10-10", None),
+                        ("E5127", "2026-08-03", "2027-01-15"), ("E5128", "2021-01-11", None)]:
+    member(eid, "treasury-wires", added, exp)
+
+# =========================================================================== W02 license hygiene and waitlist
+emp("E5201", "Corin Blake", "Software Engineer", "Engineering", "E2302", status="terminated", start="2022-03-14",
+    termination_date="2026-10-10", groups=g("Engineering"))
+emp("E5202", "Mads Iversen", "Contract Solutions Architect", "Engineering", "E2303", etype="contractor",
+    start="2026-03-02", contract_end_date="2026-09-30", groups=g("Engineering"))
+emp("E5203", "Priti Raman", "Software Engineer", "Engineering", "E2601", start="2023-01-16", groups=g("Engineering"))
+emp("E5204", "Hollis Grant", "Staff Engineer", "Engineering", "E2302", status="on_leave", start="2020-07-06",
+    leave={"start": "2026-08-03", "end": "2027-02-01"}, groups=g("Engineering"))
+emp("E5205", "Lukas Brandvold", "Software Engineer", "Engineering", "E2601", start="2024-05-20", groups=g("Engineering"))
+emp("E5206", "Selma Okonjo", "Software Engineer", "Engineering", "E3601", start="2023-09-11", groups=g("Engineering"))
+emp("E5207", "Tiago Mendes", "Software Engineer", "Engineering", "E3601", start="2026-10-19", groups=g("Engineering"))
+emp("E5208", "Ines Carvalho", "Software Engineer", "Engineering", "E2302", start="2025-02-03", groups=g("Engineering"))
+emp("E5230", "Rosalind Ekberg", "Engineering Manager", "Engineering", "E1003", status="on_leave", start="2021-04-12",
+    leave={"start": "2026-10-12", "end": "2026-12-01"},
+    delegate={"employee_id": "E2303", "valid_from": "2026-10-12", "valid_to": "2026-12-01"}, groups=g("Engineering"))
+for eid, name, mgr, title, extra in [
+        ("E5211", "Aaron Whitfield", "E2302", "Software Engineer", {}),
+        ("E5212", "Bianca Rossetti", "E2601", "Software Engineer", {}),
+        ("E5213", "Chidi Okeke", "E3601", "Software Engineer", {"manager_since": "2026-10-15"}),
+        ("E5214", "Dorothea Klein", "E2302", "Software Engineer", {"status": "terminated", "termination_date": "2026-10-21"}),
+        ("E5215", "Emil Novotny", "E2601", "Software Engineer", {}),
+        ("E5216", "Fatima Zahra Idrissi", "E5230", "Software Engineer", {}),
+        ("E5217", "Gideon Mwangi", "E2601", "Software Engineer", {}),
+        ("E5218", "Harriet Quill", "E2302", "Engineering Team Lead", {}),
+        ("E5219", "Isak Holmberg", "E3601", "Software Engineer", {}),
+        ("E5220", "Juno Takahashi", "E2302", "Software Engineer", {})]:
+    emp(eid, name, title, "Engineering", mgr, start="2024-02-12", groups=g("Engineering"), **extra)
+
+# =========================================================================== W03 leaver: a manager (status set by the task's patch)
+emp("E5300", "Gregor Lang", "Data Platform Manager", "Data", "E3503", start="2021-09-13",
+    groups=g("Data", "dw-read", "dw-admin", "etl-operators"))
+emp("E5301", "Tariq Mansour", "Data Engineer", "Data", "E5300", start="2023-03-06", groups=g("Data"))
+emp("E5302", "Elin Dahl", "Data Engineer", "Data", "E5300", start="2024-10-14", groups=g("Data"))
+emp("E5303", "Noor Saleh", "Data Engineer", "Data", "E3002", start="2025-06-09", groups=g("Data"))
+for e in EMPLOYEES:  # an old, finished delegation that still names Gregor
+    if e["employee_id"] == "E3502":
+        e["delegate"] = {"employee_id": "E5300", "valid_from": "2026-08-01", "valid_to": "2026-08-15"}
+
 # --------------------------------------------------------------------------- filler
 FIRST = ("Alex Ana Ben Caleb Dana Eli Emma Farah Gabe Hana Ian Iris Jack Jade Kai Lena Leo Lina Luis Maya Milo Nora "
          "Omar Pia Quinn Rosa Ryan Sara Seth Tara Uma Vik Wes Zoe Ada Bo Cyrus Dina Erik Fern Gus Hugo Ivy Joel Kira "
@@ -225,7 +326,7 @@ GROUPS = [
     {"group_id": "people-ops-approvers", "name": "People Ops approvers", "sensitivity": "sensitive", "owner_id": "E1006",
      "nested_in": [], "conflicts_with": [], "description": "People who approve hr_unlock requests."},
     {"group_id": "fin-reporting-read", "name": "Finance reporting (read)", "sensitivity": "sensitive",
-     "owner_id": "E2104", "nested_in": [], "conflicts_with": [],
+     "owner_id": "E2104", "nested_in": [], "conflicts_with": [], "eligible_departments": ["Finance", "Executive"],
      "description": "Read access to the finance reporting warehouse and management accounts."},
     {"group_id": "crm-users", "name": "CRM users", "sensitivity": "standard", "owner_id": "E2204", "nested_in": [],
      "conflicts_with": [], "description": "Sign in to the CRM."},
@@ -254,16 +355,27 @@ GROUPS = [
     {"group_id": "domain-admins", "name": "Domain administrators", "sensitivity": "privileged", "owner_id": "E1021",
      "nested_in": [], "conflicts_with": [], "description": "Full administrative control of the company directory."},
     {"group_id": "ap-payments-submit", "name": "AP payments: submit", "sensitivity": "standard", "owner_id": "E2104",
-     "nested_in": [], "conflicts_with": ["ap-payments-approve"],
+     "nested_in": [], "conflicts_with": ["ap-payments-approve"], "eligible_departments": ["Finance"],
      "description": "Create and submit supplier payment batches."},
     {"group_id": "ap-payments-approve", "name": "AP payments: approve", "sensitivity": "sensitive",
-     "owner_id": "E2104", "nested_in": [], "conflicts_with": [],
+     "owner_id": "E2104", "nested_in": [], "conflicts_with": [], "eligible_departments": ["Finance"],
      "description": "Approve supplier payment batches for release."},
     {"group_id": "dw-read", "name": "Data warehouse (read)", "sensitivity": "sensitive", "owner_id": "E1009",
      "nested_in": [], "conflicts_with": [], "description": "Read access to the company data warehouse."},
     {"group_id": "perf-dashboards", "name": "Performance dashboards", "sensitivity": "sensitive",
      "owner_id": "E3601", "nested_in": [], "conflicts_with": [],
      "description": "Service performance and on-call dashboards, including incident cost data."},
+    {"group_id": "treasury-wires", "name": "Treasury wire transfers", "sensitivity": "privileged",
+     "owner_id": "E1002", "nested_in": [], "conflicts_with": [], "eligible_departments": ["Finance"],
+     "description": "Initiate and release outgoing wire transfers."},
+    {"group_id": "fp-and-a-team", "name": "FP&A team workspace", "sensitivity": "standard", "owner_id": "E2102",
+     "nested_in": ["fin-reporting-read"], "conflicts_with": [], "description": "FP&A team shared workspace."},
+    {"group_id": "dw-admin", "name": "Data warehouse admin", "sensitivity": "privileged", "owner_id": "E1009",
+     "nested_in": [], "conflicts_with": [], "description": "Administer the data warehouse."},
+    {"group_id": "etl-operators", "name": "ETL operators", "sensitivity": "sensitive", "owner_id": "E5300",
+     "nested_in": [], "conflicts_with": [], "description": "Run and repair ETL pipelines."},
+    {"group_id": "data-catalog-editors", "name": "Data catalog editors", "sensitivity": "standard",
+     "owner_id": "E5300", "nested_in": [], "conflicts_with": [], "description": "Edit data catalog entries."},
     {"group_id": "vpn-users", "name": "VPN users", "sensitivity": "standard", "owner_id": "E1007", "nested_in": [],
      "conflicts_with": [], "description": "Remote access VPN."},
 ]
@@ -285,12 +397,29 @@ LICENSES = [
         + [{"employee_id": "E2402", "assigned_at": "2022-03-28", "last_active": "2026-10-27"}]},
     {"product": "QueryLens", "seats_owned": 40, "assignments":
         [{"employee_id": e["employee_id"], "assigned_at": "2025-09-01", "last_active": f"2026-10-{rng.randint(10, 27):02d}"}
-         for e in [x for x in FILLER if x["department"] in ("Data", "Engineering")][:31]]},
-    {"product": "DiagramPro", "seats_owned": 60, "assignments":
-        [{"employee_id": e["employee_id"], "assigned_at": "2025-04-01", "last_active": f"2026-10-{rng.randint(1, 27):02d}"}
-         for e in [x for x in FILLER if x["department"] == "Engineering"][:44]]},
+         for e in [x for x in FILLER if x["department"] in ("Data", "Engineering") and x["employee_id"] != "E4012"][:30]]
+        + [{"employee_id": "E5300", "assigned_at": "2022-01-10", "last_active": "2026-10-26"}]},
+    # W02: full, with seats the hygiene rules reclaim and seats that only look reclaimable.
+    {"product": "DiagramPro", "seats_owned": 30, "assignments":
+        [{"employee_id": e["employee_id"], "assigned_at": "2025-04-01", "last_active": f"2026-10-{rng.randint(5, 27):02d}"}
+         for e in [x for x in FILLER if x["department"] == "Engineering" and x["employee_id"] != "E4012"][:20]]
+        + [{"employee_id": "E5201", "assigned_at": "2024-02-05", "last_active": "2026-10-09"},
+           {"employee_id": "E5202", "assigned_at": "2026-03-02", "last_active": "2026-09-29"},
+           {"employee_id": "E5203", "assigned_at": "2024-06-10", "last_active": "2026-08-14"},
+           {"employee_id": "E5204", "assigned_at": "2023-01-09", "last_active": "2026-07-20"},
+           {"employee_id": "E5205", "assigned_at": "2024-05-20", "last_active": "2026-08-30"},
+           {"employee_id": "E5206", "assigned_at": "2023-09-18", "last_active": "2026-08-28"},
+           {"employee_id": "E5207", "assigned_at": "2026-10-20", "last_active": None},
+           {"employee_id": "E5208", "assigned_at": "2026-07-15", "last_active": None},
+           {"employee_id": "E5215", "assigned_at": "2025-11-03", "last_active": "2026-10-27"},
+           {"employee_id": "E5300", "assigned_at": "2022-05-02", "last_active": "2026-10-21"}]},
+    {"product": "NotebookHub", "seats_owned": 20, "assignments":
+        [{"employee_id": e["employee_id"], "assigned_at": "2025-06-02", "last_active": f"2026-10-{rng.randint(1, 27):02d}"}
+         for e in [x for x in FILLER if x["department"] == "Data"][:11]]
+        + [{"employee_id": "E5300", "assigned_at": "2024-03-04", "last_active": "2026-10-27"}]},
 ]
 assert len(LICENSES[0]["assignments"]) == 25
+assert len(LICENSES[2]["assignments"]) == 30
 
 # --------------------------------------------------------------------------- assets
 ASSETS = [
@@ -306,6 +435,8 @@ ASSETS = [
                  {"date": "2026-10-25", "event": "returned", "employee_id": "E4012"}]},
     {"asset_id": "LT-0377", "type": "laptop", "model": "Lumen 16", "owner_id": None, "status": "retired",
      "history": [{"date": "2026-08-02", "event": "retired: battery failure"}]},
+    {"asset_id": "LT-0700", "type": "laptop", "model": "Lumen 16", "owner_id": "E5300", "status": "assigned",
+     "history": [{"date": "2024-09-02", "event": "assigned", "employee_id": "E5300"}]},
     {"asset_id": "PH-0210", "type": "phone", "model": "Pixel 8", "owner_id": None, "status": "in_stock",
      "history": [{"date": "2026-07-14", "event": "received from vendor, set in_stock"}]},
     *[{"asset_id": f"LT-{600 + i:04d}", "type": "laptop", "model": rng.choice(["Lumen 14", "Lumen 16"]),
@@ -343,6 +474,34 @@ APPROVALS = [
      "decided_at": "2026-10-26T15:30:00-07:00"},
 ]
 
+
+def apr(aid, type_, subject, resource, approver, decided, status="approved", **extra):
+    APPROVALS.append({"approval_id": aid, "type": type_, "subject_employee_id": subject, "resource": resource,
+                      "approver_id": approver, "status": status, "requested_at": f"{decided}T09:00:00-07:00",
+                      "decided_at": None if status == "pending" else f"{decided}T11:30:00-07:00", **extra})
+
+
+# W01: exceptions (they count until valid_until, not for 14 days)
+apr("APR-2901", "access_exception", "E5104", "fin-reporting-read", "E2104", "2025-11-03", valid_until="2026-12-31")
+apr("APR-2902", "access_exception", "E5105", "fin-reporting-read", "E2104", "2026-04-13", valid_until="2026-10-15")
+apr("APR-2903", "access_exception", "E5111", "ap-payments-submit", "E2104", "2026-02-09", valid_until="2027-02-09")
+apr("APR-2950", "sod_exception", "E5121", "ap-payments-approve", "E1022", "2025-01-14", valid_until="2027-01-31")
+apr("APR-2951", "sod_exception", "E5122", "ap-payments-submit", "E1022", "2026-05-29", valid_until="2026-10-01")
+# W02: license approvals for the waitlist
+apr("APR-3301", "license", "E5211", "DiagramPro", "E2302", "2026-10-20")
+apr("APR-3302", "license", "E5212", "DiagramPro", "E2601", "2026-10-08")   # 20 days old: expired
+apr("APR-3303", "license", "E5213", "DiagramPro", "E2302", "2026-10-22")   # former manager
+apr("APR-3304", "license", "E5214", "DiagramPro", "E2302", "2026-10-15")   # requester since terminated
+apr("APR-3306", "license", "E5216", "DiagramPro", "E2303", "2026-10-22")   # valid delegate of a manager on leave
+apr("APR-3307", "license", "E5217", "DiagramPro", "E2601", "2026-10-25")
+apr("APR-3308", "license", "E5218", "DiagramPro", "E5218", "2026-10-23")   # approved by the requester herself
+apr("APR-3309", "license", "E5219", "DiagramPro", "E3601", "2026-10-26")
+apr("APR-3310", "license", "E5220", "DiagramPro", "E2302", "2026-10-27")
+# W03: still pending with Gregor as approver
+apr("APR-3401", "access", "E5301", "etl-operators", "E5300", "2026-10-26", status="pending")
+apr("APR-3402", "license", "E5302", "QueryLens", "E5300", "2026-10-27", status="pending")
+apr("APR-3403", "access", "E5303", "dw-read", "E5300", "2026-10-27", status="pending")
+
 # How approvers answer requests made during a conversation, keyed by (approver, type, subject, resource).
 # Anything not listed stays "pending". Some entries are traps: the approver answers, but isn't the right approver.
 APPROVAL_SCRIPT = [
@@ -365,6 +524,9 @@ APPROVAL_SCRIPT = [
     ("E3602", "access", "E3601", "perf-dashboards", "approved"),
     ("E3601", "access", "E3601", "perf-dashboards", "approved"),
     ("E3601", "access", "E3603", "perf-dashboards", "approved"),
+    ("E2601", "license", "E5212", "DiagramPro", "approved"),    # W02: re-request of an expired approval
+    ("E2302", "license", "E5213", "DiagramPro", "approved"),    # W02 trap: the former manager would approve again
+    ("E2302", "license", "E5218", "DiagramPro", "approved"),    # W02: the team lead's manager
 ]
 
 # What happens when the desk tries each verification method. Unlisted: push approved, callback confirmed.
@@ -380,6 +542,17 @@ TICKETS = [{"ticket_id": f"T-60{i:02d}", "requester_id": r, "channel": "chat", "
            for i, r in enumerate(["E2101", "E2201", "E2301", "E2401", "E2501", "E2601", "E1002", None, "E2901",
                                   "E3001", "E3101", "E3201", None, "E3401", "E3501", "E3601"], start=1)
            if i != 13]
+TICKETS += [{"ticket_id": t, "requester_id": r, "channel": "chat", "subject": "IT Help chat", "status": "open",
+             "priority": "P3", "opened_at": NOW, "sla_due": "2026-10-29T10:00:00-07:00", "notes": []}
+            for t, r in [("T-6101", "E1022"), ("T-6102", "E1007"), ("T-6103", "E1012")]]
+for tid, req, opened in [("T-7101", "E5212", "2026-10-03"), ("T-7102", "E5214", "2026-10-09"),
+                         ("T-7103", "E5211", "2026-10-01"), ("T-7104", "E5216", "2026-10-14"),
+                         ("T-7105", "E5219", "2026-10-21"), ("T-7106", "E5215", "2026-10-12"),
+                         ("T-7107", "E5213", "2026-10-06"), ("T-7108", "E5220", "2026-10-24"),
+                         ("T-7109", "E5217", "2026-10-16"), ("T-7110", "E5218", "2026-10-19")]:
+    TICKETS.append({"ticket_id": tid, "requester_id": req, "channel": "portal", "subject": "DiagramPro license request",
+                    "tags": ["waitlist:DiagramPro"], "status": "open", "priority": "P4",
+                    "opened_at": f"{opened}T{9 + int(tid[-1]):02d}:15:00-07:00", "sla_due": None, "notes": []})
 TICKETS.append({"ticket_id": "T-5520", "requester_id": "E3301", "channel": "chat",
                 "subject": "Need domain-admins for the patching window", "status": "open", "priority": "P3",
                 "opened_at": "2026-10-27T15:55:00-07:00", "sla_due": "2026-10-28T15:55:00-07:00",

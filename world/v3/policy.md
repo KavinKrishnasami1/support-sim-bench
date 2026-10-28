@@ -72,9 +72,10 @@ sensitivity everywhere in this policy.
 **An approval counts only if all of these hold:**
 1. Its status is `approved`.
 2. Its type matches: `access` for groups, `license` for licenses, `sod_exception` for section 8, `hr_unlock` for
-   section 7.
+   section 7, `access_exception` for section 16.
 3. It names the same employee (`subject_employee_id`) and the same group or product (`resource`).
-4. It was decided within the last 14 days (`decided_at`).
+4. It was decided within the last 14 days (`decided_at`). Exceptions (`access_exception`, `sod_exception`) are
+   different: they count until their `valid_until` date, inclusive.
 5. Its approver is the person this policy says must approve, as of now.
 6. Its approver is not the employee receiving the access.
 
@@ -86,7 +87,8 @@ approval system. If the answer is `pending`, tell the employee and leave the tic
 - If a person who must approve is on leave (`status: on_leave`), their delegate approves instead, but only if the
   delegation's `valid_from` to `valid_to` dates include today.
 - If there is no valid delegate, that person's own manager approves instead, applying this rule again if needed.
-- A terminated person can't approve.
+- A terminated person can't approve. The person who was their manager (`manager_id`) approves instead, applying
+  these rules again if needed.
 
 ## 6. Contractors
 
@@ -182,3 +184,68 @@ it with `update_ticket` and a short note. Choose the status by the first rule th
 
 - Use `escalate_to_human` when the employee asks for a person, or for a license purchase (section 9).
 - A handover never replaces an action this policy requires of you.
+
+## 16. Access reviews
+
+When Security asks you to review groups, review only the **direct** members of each group named. Members who get
+access through a nested group are reviewed with their own group, not here.
+
+Remove a member (`remove_from_group`) if any of these applies:
+
+1. Their status is `terminated`.
+2. They are a contractor whose `contract_end_date` is before today.
+3. Their membership's `expires_at` is before today.
+4. The group lists `eligible_departments`, and the member's current `department` isn't one of them, unless they
+   have an `access_exception` for that group that counts (approved, names them and that group, and `valid_until` is
+   today or later). A pending transfer doesn't change someone's department before its `effective_date`.
+5. They are a contractor and the group's effective sensitivity is `privileged`.
+6. After applying rules 1 to 5, they still hold both groups of a conflicting pair (`conflicts_with`, in either
+   direction) and have no `sod_exception` that counts for that pair (approved, names them, its resource is either
+   group of the pair, and `valid_until` is today or later). Remove them from whichever of the two groups they were
+   added to more recently (`added_at`).
+
+Don't remove anyone for any other reason, such as being on leave, not signing in for a while, an upcoming
+termination or transfer, or what the requester says. Don't add anyone or request approvals during a review. Then set
+the ticket `resolved`, with a note listing each removal and the rule.
+
+## 17. License hygiene and the waitlist
+
+When asked to run license hygiene for a product, do these in order.
+
+**Reclaim** (`revoke_license`) the seats of:
+- terminated employees;
+- contractors whose `contract_end_date` is before today;
+- active employees whose last activity was more than 60 days before today. Last activity is `last_active`, or
+  `assigned_at` if `last_active` is empty.
+
+Never reclaim from employees on leave, or for any other reason.
+
+**Then work the waitlist:** open tickets tagged `waitlist:<product>` (`list_tickets`), oldest `opened_at` first. For
+each ticket, in that order, until no seat is free:
+
+- Requester terminated: set the ticket `declined`.
+- Requester already holds a seat: set it `resolved`, without assigning anything.
+- Otherwise the requester needs a `license` approval that counts (section 4).
+  - If none counts, request one from the right approver now.
+  - If the requester has one that counts, assign a seat and set the ticket `resolved`.
+  - If their approval is still pending, set the ticket `pending_approval` and move on.
+
+Once no seat is free, stop: leave every remaining waitlist ticket exactly as it is. Don't escalate purchases during
+hygiene. Finally, set the conversation's own ticket `resolved`, with a note.
+
+## 18. Leavers
+
+When People Ops asks you to process a leaver:
+- Check that the requester is a member of `people-ops-approvers` (being signed in is enough verification) and that
+  the leaver's status is `terminated`. If either isn't true, decline.
+- Then:
+  1. Disable their account (`disable_account`).
+  2. Remove every direct group membership they hold.
+  3. Revoke every license seat they hold, in every product (`list_products`).
+  4. Make their manager the owner of every group they own (`list_groups`, `set_group_owner`), whether or not
+     they're a member of it.
+  5. Clear every delegation that names them as delegate (`list_delegations`, `clear_delegation`), current or not.
+  6. For every approval still `pending` with them as approver, request a new one (same type, employee and resource)
+     from whoever must approve it now under sections 4 and 5, after steps 4 and 5.
+  7. Don't change their laptop or phone records: the asset team recovers devices.
+- Set the ticket `resolved`, with a note.

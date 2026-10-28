@@ -208,11 +208,11 @@ $5.00, so re-running was cheap. The time went into reading transcripts to decide
 or the benchmark. That reading, not compute, is the real cost of a trustworthy environment, and it's the part that
 is hardest to hand off.
 
-## 7. Trying to make the strongest model fail (v3)
+## 7. Trying to make the strongest model fail (v3food, the food-delivery v3)
 
-v3 aimed for tasks Opus 5.5 fails 20 to 60% of the time, for real reasons. It didn't get there: Haiku passed 13 of
+The first v3 (now `v3food`) aimed for tasks Opus 5.5 fails 20 to 60% of the time, for real reasons. It didn't get there: Haiku passed 13 of
 15 core tasks, and Sonnet and Opus passed everything, including six long "scale" tasks that Opus ran 5 times each.
-Numbers are in [RESULTS_V3.md](RESULTS_V3.md).
+Numbers are in [RESULTS_V3_FOOD.md](RESULTS_V3_FOOD.md).
 
 **The v2 lever stopped working.** The most discriminating v2 tasks hid the deciding fact in a record the agent had
 no obvious reason to open. Opus defeats that by opening almost every record before deciding anything: profile,
@@ -259,3 +259,53 @@ probably needs inputs the designer doesn't generate:
 
 That's the strongest argument we found for task-building as a service: the hard part isn't the harness, it's the
 source material.
+
+## 8. An IT service desk, and long workflows (v3)
+
+v3 moved to a domain closer to what AI labs buy environments for: an internal IT service desk. It covers access and
+approvals, licenses, laptops, change freezes, MFA resets and impersonation. It was designed around what section 7
+learned. Since current models open every record, the trap went into **a field of a record they'd already opened**:
+- an approval that says `approved`, but from the wrong person, expired, or self-approved;
+- a "standard" group nested two levels into a privileged one;
+- a segregation-of-duties conflict listed on the group the employee already holds;
+- an instruction written in a ticket note.
+
+There were also three long workflows, with 5 to 15 required changes the agent had to discover across paged
+records:
+- a quarterly access review;
+- license hygiene with a waitlist;
+- offboarding a manager.
+
+**None of it separated the models.** After fixes, Haiku 5.5, Sonnet 5.5 and Opus 5.5 passed all 16 short tasks,
+and Haiku passed all three long workflows, making 37 to 77 tool calls each with no mistakes. No run had a security
+violation. Numbers are in [RESULTS_V3.md](RESULTS_V3.md).
+
+**What that says:**
+
+- **A rule stated clearly gets applied, at any scale we tried.** Checking an approver's eligibility, an approval's
+  age, a delegation's dates, or an inactivity boundary of 59 versus 61 days is easy for current models once the
+  policy says to. So is doing it 30 times in one task, and so is processing a queue in `opened_at` order when the
+  ticket numbers suggest another order. Section 7 found this for small models' blind spots. This suite found it
+  for volume too.
+- **"Field of an opened record" is not a harder lever than "record nobody opened".** Models read the whole record.
+- **The simulator is the weakest part of a strong-model benchmark.** 7 of 8 failures came from the simulated
+  employee. It couldn't see the approval system or its phone, so it denied pushes and approvals that the agent
+  reported. Opus responded the way a careful analyst would: it escalated to Security, or rolled back its own
+  change. That is good behaviour scored as failure. Any benchmark with out-of-band events (pushes, callbacks,
+  approvals by third parties) has to tell the simulator what happened in those channels, or give it read access.
+- **The remaining benchmark bug was a second valid path.** Opus verified the impostor through the real employee's
+  manager, which the task hadn't scripted. The better the agent, the more it finds the routes the task author
+  didn't think of. Every task needs every policy-valid route scripted, or the grader has to accept them.
+- **The security-violation metric is worth keeping even at 0%.** It measures what a customer actually worries
+  about, separately from "got the ticket right". It's also the number that would move first with a weaker agent,
+  a different prompt, or a jailbreak-style simulated user.
+
+**Where difficulty probably lives instead.** Everything in this suite is fully observable to the agent through
+tools, and every rule is written down. Failures in published benchmarks cluster where that isn't true:
+
+- **The user controls part of the state:** in troubleshooting, the employee has to do things on their own
+  device, and report back imperfectly.
+- **Actions that can't be undone, with requirements that come out late.**
+- **Policies that are long and messy, as real ones are.**
+
+Those, and real conversations instead of designed ones, are the next things to test.

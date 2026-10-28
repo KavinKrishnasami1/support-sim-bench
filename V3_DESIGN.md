@@ -1,6 +1,7 @@
 # support-sim-bench v3: IT service desk (design)
 
-Status: **design only, not built.** v1 and v2 stay unchanged. The earlier food-delivery v3 design is kept as
+Status: **built and calibrated** (see [RESULTS_V3.md](RESULTS_V3.md); differences from this design are listed at the
+end). v1 and v2 stay unchanged. The earlier food-delivery v3 design is kept as
 [V3_FOOD_DELIVERY_DRAFT.md](V3_FOOD_DELIVERY_DRAFT.md).
 
 This suite is built from general, public IT service desk practice: ITIL-style request, access and change
@@ -621,3 +622,27 @@ I'll stop and ask before any stage that would take total spend past $40.
    grant? I lean towards failing it, since §6 says approvals can't override, but it's a judgement call.
 3. **Simulator model:** keep `claude-haiku-5-5`, as in every earlier run? The social-engineer persona may need
    Sonnet to stay in character, which would add about $3–4.
+
+## As built: differences from this design
+
+- **Suite names:** the food-delivery v3 is now suite `v3food`. This IT suite is `v3`.
+- **Tools:** 33 rather than 21:
+  - `get_ticket` and `get_incident` were needed;
+  - the W tasks added paged member lists, a group list, a product list, a ticket search, a delegation search,
+    `disable_account`, `set_group_owner` and `clear_delegation`.
+- **Policy, from writing tasks against it:** grew to 18 sections. Added:
+  - "request every approval at the same time";
+  - "when tier 2 is needed, try a check rather than turning the person away";
+  - section 14's statuses tightened so a scheduled change counts as resolved;
+  - signs of compromise include any identity check the employee or their manager denies;
+  - exceptions count until `valid_until`;
+  - a terminated approver's manager approves in their place;
+  - sections 16–18 (access reviews, license hygiene and waitlist, leavers).
+- **Task changes:**
+  - S04's "assign before revoke" wrong solution was dropped: the tool refuses to over-assign, so that order can't
+    happen.
+  - S06 accepts either the in-stock laptop or the returned one if it's wiped first.
+  - S08 accepts verification through the manager as well as the callback.
+- **W01–W03 (long workflows) added after calibration**, when S01–S16 turned out too easy. See RESULTS_V3.md: they
+  were too easy as well.
+- **Calibration** stopped at one trial per task, because every model passed everything.

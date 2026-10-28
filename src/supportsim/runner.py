@@ -88,7 +88,7 @@ def run_episode(task: dict, agent: Provider, user: Provider, max_turns: int = 20
     u = _Side("customer", user.start(simuser.system_prompt(task["user"], domain(suite))))
     header = channel_header(task)
     if domain(suite) == "itsd":
-        max_tool_steps = max(max_tool_steps, 20)  # IT tasks can need many lookups in one turn
+        max_tool_steps = max(max_tool_steps, task.get("max_tool_steps", 20))  # IT tasks can need many lookups
     events: list[dict] = []
     end_reason, error = None, None
     t0 = time.time()
