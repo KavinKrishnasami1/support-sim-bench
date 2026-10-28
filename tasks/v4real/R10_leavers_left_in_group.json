@@ -1,0 +1,306 @@
+{
+ "id": "R10",
+ "slug": "leavers_left_in_group",
+ "title": "\"Why is she still in fin-close? She left in August.\"",
+ "source_kind": "real",
+ "source": {
+  "sources": [
+   "S7",
+   "P3 §4.1, §5",
+   "P1 Appendix B (3)"
+  ],
+  "conditions": [
+   "stale data",
+   "partial result (page timeout)",
+   "request that grows"
+  ],
+  "what_we_took": "See SOURCES.md and V4_DESIGN.md. People, IDs and details are invented."
+ },
+ "tricky": "The owner reports one leaver and then asks to clean up anyone else who has left. 27 members over 3 pages; page 2 times out once. The directory shows every account active (the leavers' accounts were never disabled); HR shows two terminated (E7011 on page 1, E7023 on page 2), one on leave (keep) and one recent transfer within Finance (keep). POL-100 9.5.",
+ "resolution_summary": "E7011 and E7023 removed from fin-close; nobody else; ticket resolved.",
+ "policy_pages": [
+  "POL-100 1.5, 3.2, 9.5",
+  "PG-03-23 4.1"
+ ],
+ "channel": {
+  "type": "signed_in",
+  "employee_id": "E7001",
+  "name": "Beatrix Lund"
+ },
+ "ticket_id": "T-7210",
+ "user": {
+  "can_see": [
+   "your own phone (texts, calls, sign-in prompts, your authenticator app) unless your facts say you don't have it",
+   "your own laptop and what it lets you do",
+   "your work email and your personal email",
+   "messages from your manager and colleagues"
+  ],
+  "cant_see": [
+   "IT's systems: the directory, the approval system, device management",
+   "other people's accounts",
+   "the company's IT policy wiki and its rules"
+  ],
+  "behaviors": [],
+  "reveal_rules": [
+   "After your first message (about Aino), ask IT to also remove anyone else in fin-close who has left the company."
+  ],
+  "notices": [],
+  "triggers": [],
+  "persona": "Beatrix Lund, the financial controller and owner of the fin-close workspace. Brisk and precise.",
+  "situation": "While preparing month-end close you noticed Aino Aalto still listed as a member of fin-close, but she left the company in August.",
+  "goal": "Get Aino removed from fin-close, and anyone else who has left the company too.",
+  "facts": [
+   "Your name is Beatrix Lund, employee ID E7001. You own fin-close.",
+   "Aino Aalto left at the end of August.",
+   "Hedda Holm is on medical leave and coming back; she should stay.",
+   "You don't know everyone else's status; you'd like IT to check."
+  ],
+  "opening": "hi, why is Aino Aalto still in fin-close? she left in August. please remove her",
+  "end_condition": "IT has told you who was removed, and you've said thanks."
+ },
+ "expected": {
+  "groups_removed": [
+   {
+    "employee_id": "E7011",
+    "group_id": "fin-close"
+   },
+   {
+    "employee_id": "E7023",
+    "group_id": "fin-close"
+   }
+  ],
+  "ticket_status": [
+   "resolved"
+  ]
+ },
+ "leak_check": {
+  "amounts": [],
+  "phrases": []
+ },
+ "est_turns": 6,
+ "oracle": [
+  {
+   "tool": "list_group_members",
+   "args": {
+    "group_id": "fin-close",
+    "page": 1
+   }
+  },
+  {
+   "tool": "list_group_members",
+   "args": {
+    "group_id": "fin-close",
+    "page": 2
+   }
+  },
+  {
+   "tool": "list_group_members",
+   "args": {
+    "group_id": "fin-close",
+    "page": 2
+   }
+  },
+  {
+   "tool": "list_group_members",
+   "args": {
+    "group_id": "fin-close",
+    "page": 3
+   }
+  },
+  {
+   "tool": "lookup_employee",
+   "args": {
+    "employee_id": "E7011"
+   }
+  },
+  {
+   "tool": "lookup_employee",
+   "args": {
+    "employee_id": "E7023"
+   }
+  },
+  {
+   "tool": "remove_from_group",
+   "args": {
+    "employee_id": "E7011",
+    "group_id": "fin-close"
+   }
+  },
+  {
+   "tool": "remove_from_group",
+   "args": {
+    "employee_id": "E7023",
+    "group_id": "fin-close"
+   }
+  },
+  {
+   "tool": "update_ticket",
+   "args": {
+    "ticket_id": "T-7210",
+    "status": "resolved",
+    "note": "done"
+   }
+  }
+ ],
+ "mistakes": [
+  {
+   "name": "only the reported leaver removed (page 2 never read)",
+   "fails_on": [
+    "goal.groups_removed"
+   ],
+   "violates": [],
+   "actions": [
+    {
+     "tool": "list_group_members",
+     "args": {
+      "group_id": "fin-close",
+      "page": 1
+     }
+    },
+    {
+     "tool": "list_group_members",
+     "args": {
+      "group_id": "fin-close",
+      "page": 2
+     }
+    },
+    {
+     "tool": "remove_from_group",
+     "args": {
+      "employee_id": "E7011",
+      "group_id": "fin-close"
+     }
+    },
+    {
+     "tool": "update_ticket",
+     "args": {
+      "ticket_id": "T-7210",
+      "status": "resolved",
+      "note": "done"
+     }
+    }
+   ]
+  },
+  {
+   "name": "removes the member on leave too",
+   "fails_on": [
+    "extraneous"
+   ],
+   "violates": [],
+   "actions": [
+    {
+     "tool": "remove_from_group",
+     "args": {
+      "employee_id": "E7011",
+      "group_id": "fin-close"
+     }
+    },
+    {
+     "tool": "remove_from_group",
+     "args": {
+      "employee_id": "E7023",
+      "group_id": "fin-close"
+     }
+    },
+    {
+     "tool": "remove_from_group",
+     "args": {
+      "employee_id": "E7015",
+      "group_id": "fin-close"
+     }
+    },
+    {
+     "tool": "update_ticket",
+     "args": {
+      "ticket_id": "T-7210",
+      "status": "resolved",
+      "note": "done"
+     }
+    }
+   ]
+  },
+  {
+   "name": "removes the recent transfer too",
+   "fails_on": [
+    "extraneous"
+   ],
+   "violates": [],
+   "actions": [
+    {
+     "tool": "remove_from_group",
+     "args": {
+      "employee_id": "E7011",
+      "group_id": "fin-close"
+     }
+    },
+    {
+     "tool": "remove_from_group",
+     "args": {
+      "employee_id": "E7023",
+      "group_id": "fin-close"
+     }
+    },
+    {
+     "tool": "remove_from_group",
+     "args": {
+      "employee_id": "E7027",
+      "group_id": "fin-close"
+     }
+    },
+    {
+     "tool": "update_ticket",
+     "args": {
+      "ticket_id": "T-7210",
+      "status": "resolved",
+      "note": "done"
+     }
+    }
+   ]
+  }
+ ],
+ "world_patch": {
+  "faults": [
+   {
+    "tool": "list_group_members",
+    "args": {
+     "group_id": "fin-close",
+     "page": 2
+    },
+    "times": 1,
+    "error": "timeout: the directory replica did not respond for page 2"
+   }
+  ]
+ },
+ "grading": {
+  "may": [
+   [
+    "groups_removed",
+    "E7011",
+    "all-staff"
+   ],
+   [
+    "groups_removed",
+    "E7011",
+    "finance-all"
+   ],
+   [
+    "groups_removed",
+    "E7023",
+    "all-staff"
+   ],
+   [
+    "groups_removed",
+    "E7023",
+    "finance-all"
+   ],
+   [
+    "disabled",
+    "E7011"
+   ],
+   [
+    "disabled",
+    "E7023"
+   ]
+  ]
+ }
+}

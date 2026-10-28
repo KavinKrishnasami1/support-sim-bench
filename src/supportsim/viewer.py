@@ -58,6 +58,8 @@ def _run_html(r: dict, user_label: str = "customer") -> str:
         if ev["role"] in ("customer", "agent"):
             who = user_label if ev["role"] == "customer" else ev["role"]
             parts.append(f'<div class="msg {ev["role"]}"><div class="who">{who}</div>{_e(ev["text"])}</div>')
+        elif ev["role"] == "observation":  # v4real: what the simulated employee was told it noticed
+            parts.append(f'<div class="tool">{_e(ev["text"])}</div>')
         else:
             parts.append(f'<div class="tool{" err" if ev["is_error"] else ""}">{_e(ev["name"])}('
                          f'{_e(json.dumps(ev["args"]))})\n→ {_e(json.dumps(ev["result"])[:1200])}</div>')

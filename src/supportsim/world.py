@@ -27,6 +27,10 @@ SUITES = {
     # superseded older versions, and the agent has to look it up.
     "v3kb": {"world": ROOT / "world" / "v3" / "base.json", "policy": ROOT / "world" / "v3" / "policy.md",
              "tasks": ROOT / "tasks" / "v3", "domain": "itsd", "policy_mode": "kb"},
+    # v4real: real, messy source material. The policy is a wiki adapted from public IT policies (SOURCES.md);
+    # the agent reads it through search_wiki / get_wiki_page.
+    "v4real": {"world": ROOT / "world" / "v4real" / "base.json", "policy": ROOT / "world" / "v4real" / "wiki" / "INDEX.md",
+               "tasks": ROOT / "tasks" / "v4real", "domain": "itsd", "policy_mode": "wiki"},
 }
 
 

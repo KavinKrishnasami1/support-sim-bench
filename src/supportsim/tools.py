@@ -134,6 +134,10 @@ WRITE_TOOLS = {"issue_refund", "issue_credit", "update_order", "escalate_to_huma
 
 
 def tool_specs(suite: str = "v1") -> list[dict]:
+    if suite == "v4real":
+        from .itsd.v4tools import tool_specs as v4_specs
+
+        return v4_specs()
     if suite in ("v3", "v3kb"):
         from .itsd.tools import TOOL_SPECS
 

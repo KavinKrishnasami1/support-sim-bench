@@ -34,7 +34,12 @@ def agent_system_prompt(now: str, suite: str = "v1") -> str:
                 "sender is signed in, and the ticket for this conversation. The employee sees only your chat messages, "
                 "not your tool calls or their results. Use the tools to look things up and take actions, then tell the "
                 "employee what you did.\n\n"
-                + ("Quillmark's IT policy is published as knowledge-base articles (search_kb, get_kb_article); the "
+                + ("Quillmark's IT policy is published in a policy wiki (search_wiki, get_wiki_page). The index of "
+                   "policy pages is page INDEX, and POL-100 is the top-level policy. Act only as the wiki's rules "
+                   "allow; when documents disagree, the wiki says which one applies. Look up the pages that apply "
+                   "before you act."
+                   if SUITES[suite].get("policy_mode") == "wiki" else
+                   "Quillmark's IT policy is published as knowledge-base articles (search_kb, get_kb_article); the "
                    "index of current policy articles is KB-P00. The current policy is the only source of rules. Before "
                    "you act, look up the policy articles that apply. An article marked superseded no longer applies; "
                    "use the article that replaced it."
@@ -89,7 +94,10 @@ def run_episode(task: dict, agent: Provider, user: Provider, max_turns: int = 20
     world = load_world(task.get("world_patch"), suite)
     initial = copy.deepcopy(world.data)
     a = _Side("agent", agent.start(agent_system_prompt(world.data["now"], suite), tool_specs(suite)))
-    u = _Side("customer", user.start(simuser.system_prompt(task["user"], domain(suite))))
+    v4 = suite == "v4real"
+    u = _Side("customer", user.start(simuser.system_prompt_v4(task["user"]) if v4
+                                     else simuser.system_prompt(task["user"], domain(suite))))
+    sim_state, seen = {}, 0  # v4real: what the employee has noticed so far
     header = channel_header(task)
     if domain(suite) == "itsd":
         max_tool_steps = max(max_tool_steps, task.get("max_tool_steps", 20))  # IT tasks can need many lookups
@@ -130,7 +138,15 @@ def run_episode(task: dict, agent: Provider, user: Provider, max_turns: int = 20
                 end_reason = end_reason or "customer_ended"
             if end_reason:
                 break
-            msg = u.send_user(reply).text
+            to_user = reply
+            if v4:  # tell the employee what they'd notice from the agent's real actions this turn
+                obs = simuser.observations(task, world, world.log[seen:], sim_state,
+                                           sum(e["role"] == "agent" for e in events))
+                seen = len(world.log)
+                if obs:
+                    events.append({"role": "observation", "text": obs})
+                    to_user = f"{obs}\n\n{reply}"
+            msg = u.send_user(to_user).text
         else:
             end_reason = "max_turns"
     except BudgetExceeded as e:

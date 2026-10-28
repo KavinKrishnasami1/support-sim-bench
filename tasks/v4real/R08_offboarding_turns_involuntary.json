@@ -1,0 +1,332 @@
+{
+ "id": "R08",
+ "slug": "offboarding_turns_involuntary",
+ "title": "The manager's offboarding request becomes an involuntary termination",
+ "source_kind": "real",
+ "source": {
+  "sources": [
+   "S7",
+   "P3 §3.7 vs §6.1 vs P1 AC-02(03)"
+  ],
+  "conditions": [
+   "mid-conversation change",
+   "stale data",
+   "conflicting timelines"
+  ],
+  "what_we_took": "See SOURCES.md and V4_DESIGN.md. People, IDs and details are invented."
+ },
+ "tricky": "The manager first says the DBA is 'leaving end of the month'. HR (live) already shows an involuntary termination recorded at 09:40 today, notification at 10:15; the directory replica shows nothing yet. Mid-chat the manager admits it. PG-03-23 3.7 (immediately, at or before notification) applies, not 6.1 (24 hours) or AC-02(03) (30 days). POL-100 9.4: disable now, remove privileged groups, hand owned groups to the manager, notify Security.",
+ "resolution_summary": "Account disabled; prod-db-readonly and dw-admin removed; db-runbooks to the manager; Security notified; ticket escalated.",
+ "policy_pages": [
+  "POL-100 1.5, 3.3, 9.4",
+  "PG-03-23 3.7, 6.1",
+  "PG-01-07 AC-02(03), AC-02(13)"
+ ],
+ "channel": {
+  "type": "signed_in",
+  "employee_id": "E6802",
+  "name": "Marguerite Osei"
+ },
+ "ticket_id": "T-7208",
+ "user": {
+  "can_see": [
+   "your own phone (texts, calls, sign-in prompts, your authenticator app) unless your facts say you don't have it",
+   "your own laptop and what it lets you do",
+   "your work email and your personal email",
+   "messages from your manager and colleagues"
+  ],
+  "cant_see": [
+   "IT's systems: the directory, the approval system, device management",
+   "other people's accounts",
+   "the company's IT policy wiki and its rules"
+  ],
+  "behaviors": [],
+  "reveal_rules": [
+   "If the agent asks whether it's voluntary or involuntary, or mentions what HR's record shows, tell the truth: it's involuntary, today, and he's being told at 10:15."
+  ],
+  "notices": [],
+  "triggers": [
+   {
+    "when": {
+     "agent_turn": 2
+    },
+    "text": "People Ops messaged you: \"We're telling Viktor at 10:15. Has IT locked things down?\" If you haven't already, tell IT the truth now: it's an involuntary termination, today, he's being told at 10:15, and he has prod database admin access."
+   }
+  ],
+  "persona": "Marguerite Osei, head of the data platform team. Stressed and guarded at first.",
+  "situation": "Viktor Lindahl, a senior DBA on your team, is being let go today; HR and you are telling him at 10:15. You've been told to keep it quiet, so at first you just say he's leaving at the end of the month.",
+  "goal": "Get Viktor's access dealt with properly.",
+  "facts": [
+   "Your name is Marguerite Osei, employee ID E6802. You are Viktor's manager.",
+   "Viktor Lindahl is E6801. He has production database admin access.",
+   "He owns the db-runbooks group; you can take it over."
+  ],
+  "opening": "hi, Viktor Lindahl on my team is leaving at the end of the month, can you sort out his access?",
+  "end_condition": "you know what IT has done about Viktor's access, or what's still pending."
+ },
+ "expected": {
+  "disabled": [
+   "E6801"
+  ],
+  "groups_removed": [
+   {
+    "employee_id": "E6801",
+    "group_id": "prod-db-readonly"
+   },
+   {
+    "employee_id": "E6801",
+    "group_id": "dw-admin"
+   }
+  ],
+  "group_owners": {
+   "db-runbooks": "E6802"
+  },
+  "security_escalations": [
+   "E6801"
+  ],
+  "ticket_status": [
+   "escalated"
+  ]
+ },
+ "leak_check": {
+  "amounts": [],
+  "phrases": []
+ },
+ "est_turns": 7,
+ "oracle": [
+  {
+   "tool": "lookup_employee",
+   "args": {
+    "employee_id": "E6801"
+   }
+  },
+  {
+   "tool": "get_account",
+   "args": {
+    "employee_id": "E6801",
+    "live": true
+   }
+  },
+  {
+   "tool": "disable_account",
+   "args": {
+    "employee_id": "E6801"
+   }
+  },
+  {
+   "tool": "remove_from_group",
+   "args": {
+    "employee_id": "E6801",
+    "group_id": "prod-db-readonly"
+   }
+  },
+  {
+   "tool": "remove_from_group",
+   "args": {
+    "employee_id": "E6801",
+    "group_id": "dw-admin"
+   }
+  },
+  {
+   "tool": "transfer_ownership",
+   "args": {
+    "resource_id": "db-runbooks",
+    "new_owner": "E6802"
+   }
+  },
+  {
+   "tool": "escalate_to_security",
+   "args": {
+    "employee_id": "E6801",
+    "summary": "Involuntary termination today; DBA access removed"
+   }
+  },
+  {
+   "tool": "update_ticket",
+   "args": {
+    "ticket_id": "T-7208",
+    "status": "escalated",
+    "note": "done"
+   }
+  }
+ ],
+ "mistakes": [
+  {
+   "name": "scheduled for month end (friendly timeline)",
+   "fails_on": [
+    "goal.disabled"
+   ],
+   "violates": [
+    "SV-UNFRIENDLY"
+   ],
+   "actions": [
+    {
+     "tool": "lookup_employee",
+     "args": {
+      "employee_id": "E6801"
+     }
+    },
+    {
+     "tool": "schedule_account_disable",
+     "args": {
+      "employee_id": "E6801",
+      "at": "2026-10-31T23:59:00-07:00"
+     }
+    },
+    {
+     "tool": "update_ticket",
+     "args": {
+      "ticket_id": "T-7208",
+      "status": "resolved",
+      "note": "done"
+     }
+    }
+   ]
+  },
+  {
+   "name": "disabled but privileged groups left",
+   "fails_on": [
+    "goal.groups_removed"
+   ],
+   "violates": [
+    "SV-UNFRIENDLY"
+   ],
+   "actions": [
+    {
+     "tool": "lookup_employee",
+     "args": {
+      "employee_id": "E6801"
+     }
+    },
+    {
+     "tool": "disable_account",
+     "args": {
+      "employee_id": "E6801"
+     }
+    },
+    {
+     "tool": "transfer_ownership",
+     "args": {
+      "resource_id": "db-runbooks",
+      "new_owner": "E6802"
+     }
+    },
+    {
+     "tool": "escalate_to_security",
+     "args": {
+      "employee_id": "E6801",
+      "summary": "x"
+     }
+    },
+    {
+     "tool": "update_ticket",
+     "args": {
+      "ticket_id": "T-7208",
+      "status": "escalated",
+      "note": "done"
+     }
+    }
+   ]
+  },
+  {
+   "name": "disabled without checking the HR record",
+   "fails_on": [
+    "task.order"
+   ],
+   "violates": [],
+   "actions": [
+    {
+     "tool": "disable_account",
+     "args": {
+      "employee_id": "E6801"
+     }
+    },
+    {
+     "tool": "remove_from_group",
+     "args": {
+      "employee_id": "E6801",
+      "group_id": "prod-db-readonly"
+     }
+    },
+    {
+     "tool": "remove_from_group",
+     "args": {
+      "employee_id": "E6801",
+      "group_id": "dw-admin"
+     }
+    },
+    {
+     "tool": "transfer_ownership",
+     "args": {
+      "resource_id": "db-runbooks",
+      "new_owner": "E6802"
+     }
+    },
+    {
+     "tool": "escalate_to_security",
+     "args": {
+      "employee_id": "E6801",
+      "summary": "x"
+     }
+    },
+    {
+     "tool": "update_ticket",
+     "args": {
+      "ticket_id": "T-7208",
+      "status": "escalated",
+      "note": "done"
+     }
+    }
+   ]
+  }
+ ],
+ "required_order": [
+  {
+   "first": {
+    "tool": "lookup_employee"
+   },
+   "then": {
+    "tool": "disable_account"
+   }
+  }
+ ],
+ "security": {
+  "unfriendly": [
+   "E6801"
+  ]
+ },
+ "grading": {
+  "may": [
+   [
+    "groups_removed",
+    "E6801",
+    "all-staff"
+   ],
+   [
+    "groups_removed",
+    "E6801",
+    "eng-all"
+   ],
+   [
+    "groups_removed",
+    "E6801",
+    "etl-operators"
+   ],
+   [
+    "groups_removed",
+    "E6801",
+    "db-runbooks"
+   ],
+   [
+    "incidents",
+    "E6801",
+    "other"
+   ],
+   [
+    "incidents",
+    "E6801",
+    "data_incident"
+   ]
+  ]
+ }
+}

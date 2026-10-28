@@ -17,7 +17,7 @@ from .world import SUITES, load_world
 
 def load_tasks(ids: list[str] | None = None, suite: str = "v1") -> list[dict]:
     tasks = [{**json.loads(p.read_text()), "suite": suite}
-             for p in sorted(SUITES[suite]["tasks"].glob("[TVXSW][0-9]*.json"))]
+             for p in sorted(SUITES[suite]["tasks"].glob("[TVXSWR][0-9]*.json"))]
     if ids:
         want = {i.upper() for i in ids}
         tasks = [t for t in tasks if t["id"] in want]

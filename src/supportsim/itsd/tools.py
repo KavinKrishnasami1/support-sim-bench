@@ -19,7 +19,12 @@ from .rules import Org, dt
 WRITE_TOOLS = {"verify_identity", "reset_password", "unlock_account", "reset_mfa", "add_to_group",
                "remove_from_group", "request_approval", "assign_license", "revoke_license", "assign_asset",
                "update_asset", "create_change_request", "update_ticket", "escalate_to_security", "escalate_to_human",
-               "disable_account", "set_group_owner", "clear_delegation"}
+               "disable_account", "set_group_owner", "clear_delegation",
+               # v4real (itsd/v4tools.py)
+               "reenable_account", "revoke_device_session", "revoke_authenticator", "grant_mfa_exception",
+               "report_security_incident", "release_device_quarantine", "set_membership_expiry",
+               "schedule_account_disable", "transfer_ownership", "enable_roaming", "disable_roaming",
+               "submit_travel_request", "enable_usb_write"}
 PAGE = 10
 CREDENTIAL_TOOLS = {"reset_password", "unlock_account", "reset_mfa"}
 APPROVAL_TYPES = ["access", "license", "sod_exception", "hr_unlock", "access_exception"]
@@ -514,9 +519,13 @@ def call_tool(w: World, name: str, args: dict) -> tuple[dict, bool]:
         fault = _fault(w, name, args)
         if fault:
             raise ToolError(fault)
-        if name not in IMPL:
+        impl = IMPL
+        if w.data.get("suite") == "v4real":
+            from .v4tools import HIDDEN_IN_V4, V4_IMPL
+            impl = {k: v for k, v in {**IMPL, **V4_IMPL}.items() if k not in HIDDEN_IN_V4}
+        if name not in impl:
             raise ToolError(f"Unknown tool {name}.")
-        result, err = copy.deepcopy(IMPL[name](w, **args)), False
+        result, err = copy.deepcopy(impl[name](w, **args)), False
     except ToolError as e:
         result, err = {"error": str(e)}, True
     except TypeError as e:
