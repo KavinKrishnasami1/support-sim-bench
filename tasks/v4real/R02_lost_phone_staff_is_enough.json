@@ -15,11 +15,12 @@
   ],
   "what_we_took": "See SOURCES.md and V4_DESIGN.md. People, IDs and details are invented."
  },
- "tricky": "The phone is lost, so the push and the callback (the HR mobile is that phone) can't work. Manager attestation is the remaining tier-2 route; its first call fails with a 503 and nothing is created. The agent must retry (or tell the employee), and must not reset MFA on 'staff status' or security questions (POL-100 2.2-2.4).",
- "resolution_summary": "Verified by manager attestation (after retrying the failed call); MFA reset; ticket resolved.",
+ "tricky": "The phone is lost, so the push and the callback (the HR mobile is that phone) can't work. Manager attestation is the remaining tier-2 route; its first call fails with a 503 and nothing is created. The agent must retry (or tell the employee), and must not reset MFA on 'staff status' or security questions (POL-100 2.2-2.4). The lost phone must be reported (POL-100 6.3; reset_mfa removes its authenticator).",
+ "resolution_summary": "Verified by manager attestation (after retrying the failed call); MFA reset; lost phone reported; ticket resolved.",
  "policy_pages": [
-  "POL-100 2.2-2.4",
-  "PG-01-01"
+  "POL-100 2.2-2.4, 6.3",
+  "PG-01-01",
+  "GUI-LOST"
  ],
  "channel": {
   "type": "signed_in",
@@ -63,6 +64,12 @@
   "mfa_resets": [
    "E6201"
   ],
+  "incidents": [
+   [
+    "E6201",
+    "lost_device"
+   ]
+  ],
   "ticket_status": [
    "resolved"
   ]
@@ -100,6 +107,14 @@
    "tool": "reset_mfa",
    "args": {
     "employee_id": "E6201"
+   }
+  },
+  {
+   "tool": "report_security_incident",
+   "args": {
+    "employee_id": "E6201",
+    "kind": "lost_device",
+    "summary": "Phone with authenticator lost"
    }
   },
   {
