@@ -64,6 +64,24 @@ def summarize(run_dir: Path) -> dict:
     overall["security_violation_rate"] = (sum(bool(_svs(r)) for r in done) / len(done)) if done else None
     overall["security_violation_ci95"] = wilson(sum(bool(_svs(r)) for r in done), len(done))
     overall["security_violations_by_code"] = dict(Counter(v["code"] for r in done for v in _svs(r)).most_common())
+    # Grader v2 (IT suites): say-do, extraneous writes, silent failures, and the 0-1 process score.
+    v2 = [r for r in done if (r.get("grade") or {}).get("grader") == "itsd-v2"]
+    if v2:
+        overall["say_do_failure_rate"] = sum(bool(r["grade"]["say_do"]) for r in v2) / len(v2)
+        overall["extraneous_rate"] = sum(bool(r["grade"]["extraneous"]) for r in v2) / len(v2)
+        overall["silent_failure_rate"] = sum(bool(r["grade"]["silent_failures"]) for r in v2) / len(v2)
+        overall["process_score_mean"] = round(sum(r["grade"]["process"]["score"] for r in v2) / len(v2), 3)
+        for tid, rs in by_task.items():
+            g = [r["grade"]["process"]["score"] for r in rs if r["completed"] and r.get("grade", {}).get("process")]
+            tasks[tid]["process_score_mean"] = round(sum(g) / len(g), 3) if g else None
+    # v4real: tasks built on a real public thread vs "synthetic" ones (real policy text, invented request shape).
+    kinds = {r["task_id"]: r.get("source_kind") for r in runs if r.get("source_kind")}
+    if kinds:
+        for kind in sorted(set(kinds.values())):
+            ks = [r for r in done if kinds.get(r["task_id"]) == kind]
+            overall[f"pass_rate_{kind}"] = sum(r["passed"] for r in ks) / len(ks) if ks else None
+            overall[f"pass_rate_{kind}_ci95"] = wilson(sum(r["passed"] for r in ks), len(ks))
+            overall[f"runs_{kind}"] = len(ks)
     summary = {
         "config": config, "k": k, "tasks": tasks, "overall": overall,
         "runs": len(runs), "graded_runs": sum(r["completed"] for r in runs),
@@ -83,7 +101,7 @@ def _pct(x) -> str:
 
 def summary_table(s: dict) -> str:
     k = s["k"]
-    sv = s["config"].get("suite") in ("v3", "v3kb")
+    sv = s["config"].get("suite") in ("v3", "v3kb", "v4real")
     head = ("| Task | Trials | Passed | " + " | ".join(f"pass^{j}" for j in range(1, k + 1))
             + (" | Security violations" if sv else "") + " | Flagged | Most common failed check |")
     rows = [head, "|" + "|".join(["---"] * (5 + k + sv)) + "|"]
@@ -108,8 +126,16 @@ def print_summary(s: dict) -> None:
     if o.get("pass_rate_ci95"):
         lo, hi = o["pass_rate_ci95"]
         print(f"pass rate {_pct(o['pass_rate'])} (95% CI {_pct(lo)}-{_pct(hi)})")
-    if c.get("suite") in ("v3", "v3kb") and o.get("security_violation_rate") is not None:
+    if c.get("suite") in ("v3", "v3kb", "v4real") and o.get("security_violation_rate") is not None:
         lo, hi = o["security_violation_ci95"]
         print(f"security-violation rate {_pct(o['security_violation_rate'])} of graded runs "
               f"(95% CI {_pct(lo)}-{_pct(hi)}); by code: {o['security_violations_by_code'] or 'none'}")
+    if o.get("process_score_mean") is not None:
+        print(f"process score {o['process_score_mean']:.2f}; say-do failures {_pct(o['say_do_failure_rate'])}, "
+              f"extraneous writes {_pct(o['extraneous_rate'])}, silent failures {_pct(o['silent_failure_rate'])}")
+    for kind in ("real", "synthetic"):
+        if o.get(f"runs_{kind}"):
+            lo, hi = o[f"pass_rate_{kind}_ci95"]
+            print(f"{kind}-source tasks: pass rate {_pct(o[f'pass_rate_{kind}'])} over {o[f'runs_{kind}']} runs "
+                  f"(95% CI {_pct(lo)}-{_pct(hi)})")
     print(f"end reasons: {s['end_reasons']}; flags: {s['flag_types'] or 'none'}")

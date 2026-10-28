@@ -56,8 +56,12 @@ def main() -> None:
     load_dotenv()
     ap = argparse.ArgumentParser(prog="supportsim", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    for name in ("tasks", "check"):
-        sub.add_parser(name).add_argument("--suite", default="v1", choices=SUITE_NAMES)
+    sub.add_parser("tasks").add_argument("--suite", default="v1", choices=SUITE_NAMES)
+    ck = sub.add_parser("check")
+    ck.add_argument("--suite", default="v1", choices=SUITE_NAMES)
+    ck.add_argument("--extract", action="store_true",
+                    help="IT suites: call claude-haiku-5-5 to extract claims missing from data/claims_cache.json")
+    ck.add_argument("--max-cost", type=float, default=0.5)
     _models(sub.add_parser("estimate"))
     r = sub.add_parser("run")
     _models(r)
@@ -87,7 +91,13 @@ def main() -> None:
             print(f"{t['id']}  {t['title']}\n      {t['tricky']}")
     elif a.cmd == "check":
         tasks = load_tasks(suite=a.suite)
-        problems = [p for t in tasks for p in check_task(t)]
+        cp = None
+        if a.extract:
+            from .providers import AnthropicProvider, Budget
+            cp = AnthropicProvider("claude-haiku-5-5", Budget(a.max_cost))
+        problems = [p for t in tasks for p in check_task(t, cp)]
+        if cp:
+            print(f"claim extraction spent ${cp.budget.spent:.4f}")
         n_mistakes = sum(len(t.get("mistakes", [])) for t in tasks)
         print(f"{len(tasks)} oracles and {n_mistakes} known mistakes replayed through the grader")
         for p in problems:

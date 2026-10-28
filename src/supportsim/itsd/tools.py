@@ -491,10 +491,29 @@ IMPL = {f.__name__: f for f in (
     clear_delegation, get_kb_article)}
 
 
+def _fault(w: World, name: str, args: dict) -> str | None:
+    """Injected failure for this call, if the world's fault script has one left.
+
+    `faults` (in a task's world_patch): [{"tool", "args" (subset to match, case-insensitive), "times", "error"}].
+    A faulted call changes nothing, like a real timeout before the write reached the system."""
+    for i, f in enumerate(w.data.get("faults", [])):
+        if f["tool"] != name or any(str(args.get(k, "")).strip().lower() != str(v).strip().lower()
+                                    for k, v in f.get("args", {}).items()):
+            continue
+        used = w.data.setdefault("_fault_hits", {}).get(str(i), 0)
+        if used < f.get("times", 1):
+            w.data["_fault_hits"][str(i)] = used + 1
+            return f.get("error", "timeout: the upstream system did not respond; nothing was changed")
+    return None
+
+
 def call_tool(w: World, name: str, args: dict) -> tuple[dict, bool]:
     """Run a tool and log it. Returns (result, is_error)."""
     entry = {"tool": name, "args": args}
     try:
+        fault = _fault(w, name, args)
+        if fault:
+            raise ToolError(fault)
         if name not in IMPL:
             raise ToolError(f"Unknown tool {name}.")
         result, err = copy.deepcopy(IMPL[name](w, **args)), False

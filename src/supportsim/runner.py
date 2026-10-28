@@ -84,7 +84,7 @@ def channel_header(task: dict) -> str | None:
 
 
 def run_episode(task: dict, agent: Provider, user: Provider, max_turns: int = 20,
-                max_tool_steps: int = 12) -> dict:
+                max_tool_steps: int = 12, claims_provider: Provider | None = None) -> dict:
     suite = task.get("suite", "v1")
     world = load_world(task.get("world_patch"), suite)
     initial = copy.deepcopy(world.data)
@@ -140,14 +140,14 @@ def run_episode(task: dict, agent: Provider, user: Provider, max_turns: int = 20
     except Exception as e:  # API errors, malformed output: the run is not gradeable
         end_reason, error = "error", "".join(traceback.format_exception_only(e)).strip()
     result = {
-        "task_id": task["id"], "end_reason": end_reason, "error": error, "seconds": round(time.time() - t0, 1),
+        "task_id": task["id"], "source_kind": task.get("source_kind"), "end_reason": end_reason, "error": error, "seconds": round(time.time() - t0, 1),
         "events": events, "tool_log": world.log,
         "usage": {"agent": vars(a.usage), "customer": vars(u.usage)},
         "cost_usd": round(a.usage.cost(agent.model) + u.usage.cost(user.model), 5),
         "customer_turns": sum(e["role"] == "customer" for e in events),
     }
     result["completed"] = end_reason in COMPLETED
-    result["grade"] = grade(task, initial, world) if result["completed"] else None
+    result["grade"] = grade(task, initial, world, events, claims_provider) if result["completed"] else None
     result["passed"] = bool(result["grade"] and result["grade"]["passed"])
     result["flags"] = rule_flags(task, events)
     return result
@@ -209,7 +209,7 @@ def run_batch(tasks: list[dict], k: int, agent: Provider, user: Provider, judge:
     def job(t, trial):
         if stop_all:
             return None
-        r = run_episode(t, agent, user)
+        r = run_episode(t, agent, user, claims_provider=judge)
         r["trial"] = trial
         if judge and r["completed"]:
             try:

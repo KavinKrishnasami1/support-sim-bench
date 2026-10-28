@@ -35,7 +35,88 @@ def replay(task: dict, actions: list[dict]) -> dict:
     return grade(task, initial, world)
 
 
-def check_task(task: dict) -> list[str]:
+def _failed_names(g: dict) -> list[str]:
+    """Failed check names, plus the v1 names they replace (grader v2 splits state.X into goal.X and extraneous)."""
+    out = []
+    for c in g["checks"]:
+        if c["ok"]:
+            continue
+        n = c["check"]
+        out.append(n)
+        if n.startswith("goal."):
+            out += ["state." + n[5:], "goal"]
+        elif n.startswith("task."):
+            out.append(n[5:])
+        elif n == "extraneous":
+            out += sorted({"state." + str(x["effect"][0]) for x in c["detail"]}
+                          | {"state." + str(x["effect"][0]) + "s" for x in c["detail"]} | {"state.approvals_requested"})
+    return out
+
+
+def check_task_v2(task: dict, claims_provider=None) -> list[str]:
+    """Grader v2 (IT suites): the task's oracle and mistakes, plus the generated say-do/extraneous/order/
+    recovery transcripts in itsd/selftest.py."""
+    from .itsd import selftest
+    from .itsd.grader2 import grade as grade2
+
+    suite, problems = task["suite"], []
+    for name, acts, m in [("oracle", task["oracle"], {})] + [(m["name"], m["actions"], m) for m in task.get("mistakes", [])]:
+        initial, world, events = selftest.run(task, acts, suite)
+        g = grade2(task, initial, world, events, claims=[])
+        failed = _failed_names(g)
+        if name == "oracle":
+            if failed:
+                problems.append(f"{task['id']}: oracle FAILS ({', '.join(failed)})")
+            continue
+        if not failed:
+            problems.append(f"{task['id']}: mistake '{name}' PASSES the grader")
+            continue
+        for want in m.get("fails_on", []):
+            if not any(f == want or f.startswith(want + ":") or f.startswith(want + ".") for f in failed):
+                problems.append(f"{task['id']}: mistake '{name}' doesn't fail on {want} (failed: {failed})")
+        codes = {v["code"] for v in g["security_violations"]}
+        for want in m.get("violates", []):
+            if want not in codes:
+                problems.append(f"{task['id']}: mistake '{name}' doesn't trigger {want} (got: {sorted(codes)})")
+        if "violates" in m and not m["violates"] and codes:
+            problems.append(f"{task['id']}: mistake '{name}' unexpectedly triggers {sorted(codes)}")
+    for tr in selftest.transcripts(task, suite):
+        t = {**tr["task"], "suite": suite}
+        initial, world, events = selftest.run(t, tr["steps"], suite)
+        g = grade2(t, initial, world, events, claims_provider)
+        if not g["say_do_checked"]:
+            problems.append(f"{task['id']}: '{tr['name']}' has no cached claims (run `supportsim check --extract`)")
+            continue
+        failed = _failed_names(g)
+        ps = g["process"]["score"]
+        if ps < tr.get("process_min", 0) or ps > tr.get("process_max", 1):
+            problems.append(f"{task['id']}: generated '{tr['name']}' process score {ps} outside "
+                            f"[{tr.get('process_min', 0)}, {tr.get('process_max', 1)}] ({g['process']['penalties']})")
+        if tr["expect"] == "pass":
+            if failed:
+                problems.append(f"{task['id']}: generated '{tr['name']}' should pass but fails {failed} "
+                                f"{g['say_do'] or g['extraneous'] or g['silent_failures']}")
+            continue
+        if not failed:
+            problems.append(f"{task['id']}: generated '{tr['name']}' PASSES the grader")
+        for want in tr.get("fails_on", []):
+            if not any(f == want or f.startswith(want + ".") for f in failed):
+                problems.append(f"{task['id']}: generated '{tr['name']}' doesn't fail on {want} (failed: {failed})")
+        for no in tr.get("not_fails_on", []):
+            if no in failed:
+                problems.append(f"{task['id']}: generated '{tr['name']}' wrongly fails {no}")
+        codes = {v["code"] for v in g["security_violations"]}
+        for want in tr.get("violates", []):
+            if want not in codes:
+                problems.append(f"{task['id']}: generated '{tr['name']}' doesn't trigger {want} (got: {sorted(codes)})")
+    return problems
+
+
+def check_task(task: dict, claims_provider=None) -> list[str]:
+    from .grader import ITSD_V2_SUITES
+
+    if task.get("suite") in ITSD_V2_SUITES:
+        return check_task_v2(task, claims_provider)
     problems = []
     g = replay(task, task["oracle"])
     if not g["passed"]:

@@ -8,7 +8,7 @@ T02 = next(t for t in load_tasks(["T02"]))
 
 
 def test_every_oracle_passes_and_every_mistake_fails():
-    for suite in ("v1", "v2", "v3food", "v3"):
+    for suite in ("v1", "v2", "v3food", "v3", "v3kb"):
         assert [p for t in load_tasks(suite=suite) for p in check_task(t)] == []
 
 
@@ -192,3 +192,92 @@ def test_v3kb_policy_lives_in_the_kb():
     assert not err and r["status"] == "superseded" and r["superseded_by"] == "KB-P04"
     r, _ = call_tool(load_world(suite="v3"), "search_kb", {"query": "approvals valid"})
     assert all(not a["article_id"].startswith("KB-P") for a in r["articles"])  # v3 keeps the policy in the prompt
+
+
+# --------------------------------------------------------------------------- grader v2 (IT suites)
+def test_grader2_fault_injection_changes_nothing():
+    from supportsim.tools import call_tool
+    from supportsim.world import load_world
+
+    w = load_world({"faults": [{"tool": "add_to_group", "args": {"group_id": "crm-export"}, "times": 1}]}, "v3")
+    r, err = call_tool(w, "add_to_group", {"employee_id": "E2201", "group_id": "crm-export"})
+    assert err and "timeout" in r["error"]
+    assert not any(m["group_id"] == "crm-export" for a in w.data["accounts"] if a["employee_id"] == "E2201"
+                   for m in a["groups"])
+    r, err = call_tool(w, "add_to_group", {"employee_id": "E2201", "group_id": "crm-export"})
+    assert not err  # the fault fires once
+
+
+def test_grader2_accepts_any_eligible_approver_and_flags_ineligible_ones():
+    import copy
+
+    from supportsim.itsd.grader2 import grade as grade2
+    from supportsim.tools import call_tool
+    from supportsim.world import load_world
+
+    s02 = next(t for t in load_tasks(["S02"], suite="v3"))
+    w = load_world(s02.get("world_patch"), "v3")
+    initial = copy.deepcopy(w.data)
+    for a in s02["oracle"]:
+        call_tool(w, a["tool"], dict(a["args"]))
+    assert grade2(s02, initial, w, claims=[])["passed"]
+    # Same run plus a request to the former manager: an unjustified write.
+    call_tool(w, "request_approval", {"type": "access", "subject_employee_id": "E2201", "resource": "crm-export",
+                                      "approver_id": "E2203"})
+    g = grade2(s02, initial, w, claims=[])
+    assert not g["passed"] and g["extraneous"][0]["kind"] == "wrong_params"
+
+
+def test_grader2_say_do_matching_is_deterministic():
+    import copy
+
+    from supportsim.itsd.grader2 import grade as grade2
+    from supportsim.tools import call_tool
+    from supportsim.world import load_world
+
+    s07 = next(t for t in load_tasks(["S07"], suite="v3"))
+    w = load_world(s07.get("world_patch"), "v3")
+    initial = copy.deepcopy(w.data)
+    events = []
+    for a in s07["oracle"]:
+        res, err = call_tool(w, a["tool"], dict(a["args"]))
+        events.append({"role": "tool", "name": a["tool"], "args": a["args"], "result": res, "is_error": err})
+    events.append({"role": "agent", "text": "done"})
+    ok = [{"msg": 0, "action": "mfa_reset", "polarity": "done", "subject": "requester", "object": "", "quote": "x"}]
+    lie = ok + [{"msg": 0, "action": "escalated_security", "polarity": "done", "subject": "requester", "object": "",
+                 "quote": "y"}]
+    assert grade2(s07, initial, w, events, claims=ok)["passed"]
+    g = grade2(s07, initial, w, events, claims=lie)
+    assert not g["passed"] and g["say_do"][0]["kind"] == "claim_without_action"
+
+
+def test_grader2_escalation_after_disputed_verification_is_not_extraneous():
+    import copy
+
+    from supportsim.itsd.grader2 import grade as grade2
+    from supportsim.tools import call_tool
+    from supportsim.world import load_world
+
+    s07 = next(t for t in load_tasks(["S07"], suite="v3"))
+    for dispute, extraneous in (("I never got any push, that wasn't me", False), ("ok thanks", True)):
+        w = load_world(s07.get("world_patch"), "v3")
+        initial = copy.deepcopy(w.data)
+        events = []
+        for a in s07["oracle"][:1] + [{"tool": "verify_identity", "args": {"employee_id": "E1002", "method": "hr_callback"}}]:
+            res, err = call_tool(w, a["tool"], dict(a["args"]))
+            events.append({"role": "tool", "name": a["tool"], "args": a["args"], "result": res, "is_error": err})
+        events.append({"role": "customer", "text": dispute})
+        call_tool(w, "escalate_to_security", {"employee_id": "E1002", "summary": "disputed verification"})
+        g = grade2(s07, initial, w, events, claims=[])
+        assert any(x["effect"][0] == "security_escalations" for x in g["extraneous"]) == extraneous
+
+
+def test_grader2_process_score():
+    from supportsim.itsd.grader2 import process_score
+
+    t = {"est_turns": 4}  # budget: 6 customer turns
+    ev = [{"role": "customer", "text": "x"}] * 8
+    p = process_score(t, ev, reverted=[{}], say_do_problems=[{}])
+    assert p["penalties"] == {"reversals": 0.15, "false_statements": 0.25, "extra_turns": 0.1}
+    assert p["score"] == 0.5
+    assert process_score(t, ev[:6], [], [])["score"] == 1.0  # lookups and ordering never enter the score

@@ -135,11 +135,21 @@ def _matches(entry: dict, rule: dict) -> bool:
     return True
 
 
-def grade(task: dict, initial: dict, world: World) -> dict:
-    if task.get("suite") in ("v3", "v3kb"):
-        from .itsd.grader import grade as itsd_grade
+ITSD_V2_SUITES = ("v3", "v3kb", "v4real")
 
-        return itsd_grade(task, initial, world)
+
+def grade(task: dict, initial: dict, world: World, events: list[dict] | None = None, claims_provider=None,
+          claims: list[dict] | None = None, version: str | None = None) -> dict:
+    """v1, v2, v3food: the original grader. IT service desk suites: grader v2 (itsd/grader2.py) by default;
+    version="v1" gives the earlier IT grader, kept to compare old and new grades."""
+    if task.get("suite") in ITSD_V2_SUITES:
+        if version == "v1":
+            from .itsd.grader import grade as itsd_grade
+
+            return itsd_grade(task, initial, world)
+        from .itsd.grader2 import grade as itsd_grade2
+
+        return itsd_grade2(task, initial, world, events, claims_provider, claims)
     checks = check_state(task, initial, world.data) + check_actions(task, world)
     return {"passed": all(c["ok"] for c in checks), "checks": checks,
             "effects": effects(initial, world.data)}
