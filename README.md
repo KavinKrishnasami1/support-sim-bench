@@ -32,6 +32,8 @@ uv run supportsim run -k 3 --max-cost 2 --agent-model claude-haiku-5-5 --tasks T
 uv run supportsim run --suite v2 -k 3 --max-cost 4 --agent-model claude-sonnet-5-5
 uv run supportsim regrade results/<run folder>   # re-grade saved runs with the current grader, no model calls
 open results/<run folder>/view.html     # every transcript, tool call and grader check
+uv run supportsim demo --run <run json> --run <run json> --results <run folder> ... --out demo
+                                        # static pages for chosen runs + an index (open demo/index.html)
 ```
 
 `run` prints a cost estimate and asks for confirmation before any API call. `--max-cost` is required: once total

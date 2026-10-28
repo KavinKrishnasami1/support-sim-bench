@@ -1,0 +1,81 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>support-sim-bench results</title><style>
+:root{--bg:#fbfaf7;--card:#ffffff;--ink:#1d1d1b;--muted:#5d5b55;--line:#dedbd3;--cust:#eef2f8;--agent:#f3f0e8;
+--tool:#f7f6f2;--write:#fff5e6;--writeline:#e3b05a;--pass:#1f7a46;--passbg:#e7f4ec;--fail:#b3261e;--failbg:#fbeaea;
+--accent:#3b5bab;--code:#f1efe9}
+@media (prefers-color-scheme:dark){:root{--bg:#181816;--card:#22221f;--ink:#ecebe6;--muted:#a9a69d;--line:#3a3934;
+--cust:#26303f;--agent:#2d2a23;--tool:#23231f;--write:#3a2f1c;--writeline:#b8893d;--pass:#7fd3a0;--passbg:#1c3326;
+--fail:#f2a19b;--failbg:#3d2120;--accent:#9db4ef;--code:#2b2a26}}
+*{box-sizing:border-box}
+html{font-size:112.5%}
+body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+"Helvetica Neue",Arial,sans-serif}
+main{max-width:56rem;margin:0 auto;padding:1.5rem 1rem 4rem}
+h1{font-size:1.75rem;line-height:1.25;margin:.25rem 0 .5rem}
+h2{font-size:1.3rem;margin:2.5rem 0 .75rem;padding-bottom:.35rem;border-bottom:2px solid var(--line)}
+h3{font-size:1.05rem;margin:1.25rem 0 .4rem}
+p{margin:.5rem 0}
+a{color:var(--accent)}
+.muted{color:var(--muted)}
+.crumb{font-size:.9rem}
+.badge{display:inline-block;font-weight:700;padding:.15rem .6rem;border-radius:.4rem;font-size:.95rem}
+.pass{color:var(--pass);background:var(--passbg)} .fail{color:var(--fail);background:var(--failbg)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:.6rem;padding:1rem 1.15rem;margin:.75rem 0}
+.callout{border-left:5px solid var(--fail);background:var(--failbg)}
+.callout.ok{border-left-color:var(--pass);background:var(--passbg)}
+dl{display:grid;grid-template-columns:max-content 1fr;gap:.35rem 1rem;margin:.25rem 0}
+dt{font-weight:600;color:var(--muted)} dd{margin:0}
+@media (max-width:40rem){dl{grid-template-columns:1fr} dt{margin-top:.4rem}}
+ul{margin:.3rem 0 .3rem 1.2rem;padding:0} li{margin:.15rem 0}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em}
+code{background:var(--code);padding:.05rem .3rem;border-radius:.25rem}
+pre{background:var(--code);padding:.75rem;border-radius:.4rem;overflow-x:auto;white-space:pre-wrap;word-break:break-word;margin:.4rem 0}
+.policy h4{font-size:1rem;margin:1rem 0 .25rem}
+.tablewrap{overflow-x:auto;margin:.5rem 0}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{border-bottom:1px solid var(--line);padding:.45rem .6rem;text-align:left;vertical-align:top}
+th{font-weight:600;color:var(--muted)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+li.cont{list-style:none}
+.chat{display:flex;flex-direction:column;gap:.6rem}
+.msg{max-width:85%;padding:.7rem .95rem;border-radius:1rem;border:1px solid var(--line)}
+.msg .who{font-size:.8rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin-bottom:.15rem}
+.msg.customer{align-self:flex-start;background:var(--cust);border-bottom-left-radius:.3rem}
+.msg.agent{align-self:flex-end;background:var(--agent);border-bottom-right-radius:.3rem}
+.msg p{margin:.3rem 0}
+details.tool{align-self:stretch;margin:0 1.5rem;background:var(--tool);border:1px dashed var(--line);border-radius:.5rem}
+details.tool.write{background:var(--write);border:1px solid var(--writeline)}
+details.tool>summary{cursor:pointer;padding:.45rem .8rem;font-size:.92rem}
+details.tool>div{padding:0 .8rem .6rem}
+details.tool .err{color:var(--fail);font-weight:600}
+summary .tag{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-right:.4rem;color:var(--muted)}
+details.tool.write summary .tag{color:var(--writeline)}
+.ok-mark{color:var(--pass);font-weight:700} .bad-mark{color:var(--fail);font-weight:700}
+tr.bad td{background:var(--failbg)}
+footer{margin-top:3rem;font-size:.85rem;color:var(--muted)}
+</style></head><body><main>
+<h1>support-sim-bench</h1>
+<p>A multi-turn benchmark for AI customer-support agents. An agent with tools and a written policy handles
+food-delivery support chats with a simulated customer, and each run is graded on the database it leaves behind,
+never on its wording.</p>
+
+<h2>Two runs, side by side</h2>
+<p class="muted">The same task, X12: a promo order with two missing items, where the customer wants one refunded to the
+card and the other as credit.</p>
+<ul style="list-style:none;margin-left:0"><li><a href="X12-opus-5-5-pass.html"><strong>X12 · Opus 5.5 passes</strong></a><br><span class="muted">Promo order, two missing items: one refunded, one credited</span></li><li><a href="X12-haiku-5-5-fail.html"><strong>X12 · Haiku 5.5 fails</strong></a><br><span class="muted">Promo order, two missing items: one refunded, one credited. Haiku computed the $3.00 card refund and the $21.60 bowl credit correctly, but never issued the $1.00 promo-share credit that the same policy sentence requires.</span></li></ul>
+
+<h2>Results by suite</h2>
+<p class="muted">Share of graded runs that passed. v1 and v2: 3 trials per task. v3: 1 trial per task for Haiku and
+Sonnet; Opus ran the 16 core tasks once and the 6 scale tasks 5 times each.</p>
+<div class='tablewrap'><table><thead><tr><th>Suite</th><th class='num'>Haiku 5.5</th><th class='num'>Sonnet 5.5</th><th class='num'>Opus 5.5</th></tr></thead><tbody><tr><td><strong>v1</strong> <span class='muted'>13 tasks</span></td><td class='num'>100% <span class='muted'>(39/39)</span></td><td class='num'>92% <span class='muted'>(36/39)</span></td><td class='num muted'>not run</td></tr><tr><td><strong>v2</strong> <span class='muted'>12 tasks</span></td><td class='num'>89% <span class='muted'>(32/36)</span></td><td class='num'>100% <span class='muted'>(36/36)</span></td><td class='num muted'>not run</td></tr><tr><td><strong>v3</strong> <span class='muted'>21 tasks</span></td><td class='num'>87% <span class='muted'>(13/15)</span></td><td class='num'>100% <span class='muted'>(15/15)</span></td><td class='num'>100% <span class='muted'>(45/45)</span></td></tr></tbody></table></div>
+
+<h2>v3, task by task</h2>
+<p class="muted">Passed / runs. X08 was merged into X07 during design.</p>
+<div class='tablewrap'><table><thead><tr><th>Task</th><th>Scenario</th><th class='num'>Haiku 5.5</th><th class='num'>Sonnet 5.5</th><th class='num'>Opus 5.5</th></tr></thead><tbody><tr><td><code>X01</code></td><td>Late order, then a missing item on another order; the credit limit binds</td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td></tr><tr><td><code>X02</code></td><td>Refund history looks like a fraud review but isn&#x27;t</td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td></tr><tr><td><code>X03</code></td><td>Plus member now, but not when the order was placed</td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td></tr><tr><td><code>X04</code></td><td>Courier log in UTC: 44 minutes late, not 45</td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td></tr><tr><td><code>X05</code></td><td>An updated ETA moves the promised time</td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td></tr><tr><td><code>X06</code></td><td>Whole order lost, after an earlier credit on the same order</td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td></tr><tr><td><code>X07</code></td><td>Customer wants a replacement; the restaurant closes in 20 minutes</td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td></tr><tr><td><code>X09</code></td><td>An authorized user wants a card refund</td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td></tr><tr><td><code>X10</code></td><td>Verification with a phone number changed 3 hours ago</td><td class='num'><span class='bad-mark'>0/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td></tr><tr><td><code>X11</code></td><td>A restaurant incident covers the order</td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td></tr><tr><td><code>X12</code></td><td>Promo order, two missing items: one refunded, one credited</td><td class='num'><span class='bad-mark'>0/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td></tr><tr><td><code>X13</code></td><td>&quot;Your colleague promised me $50 on the phone&quot;</td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td></tr><tr><td><code>X14</code></td><td>Missing item past 48 hours; the late claim is still in its window</td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td></tr><tr><td><code>X15</code></td><td>&quot;You charged me twice&quot;</td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td></tr><tr><td><code>X16</code></td><td>Fraud review across two orders in one chat</td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td><td class='num'><span class='ok-mark'>1/1</span></td></tr><tr><td><code>X17</code></td><td>Five issues across four orders; the credit limit binds midway</td><td class='num muted'>·</td><td class='num muted'>·</td><td class='num'><span class='ok-mark'>5/5</span></td></tr><tr><td><code>X18</code></td><td>Big office order: four items missing or wrong, a promo, and auto-refunds</td><td class='num muted'>·</td><td class='num muted'>·</td><td class='num'><span class='ok-mark'>5/5</span></td></tr><tr><td><code>X19</code></td><td>Three live orders: cancel one, can&#x27;t redirect one, replace one</td><td class='num muted'>·</td><td class='num muted'>·</td><td class='num'><span class='ok-mark'>5/5</span></td></tr><tr><td><code>X20</code></td><td>Thirteen refunds on the profile, two that count</td><td class='num muted'>·</td><td class='num muted'>·</td><td class='num'><span class='ok-mark'>5/5</span></td></tr><tr><td><code>X21</code></td><td>A Plus member&#x27;s week of late orders, then a missing item over the credit limit</td><td class='num muted'>·</td><td class='num muted'>·</td><td class='num'><span class='ok-mark'>5/5</span></td></tr><tr><td><code>X22</code></td><td>Three orders; the incident window splits two from the same restaurant</td><td class='num muted'>·</td><td class='num muted'>·</td><td class='num'><span class='ok-mark'>5/5</span></td></tr></tbody></table></div>
+
+<h2>Grader self-test</h2>
+<p>Before any model runs, every task's correct solution is replayed through the real tools and grader (it must pass),
+along with named wrong solutions (each must fail). Re-run live when this page was generated.</p>
+<div class='tablewrap'><table><thead><tr><th>Suite</th><th class='num'>Correct solutions</th><th class='num'>Known-wrong solutions</th><th>Result</th></tr></thead><tbody><tr><td><strong>v1</strong></td><td class='num'>13</td><td class='num'>38</td><td><span class=ok-mark>✓ every correct solution passes, every wrong one fails</span></td></tr><tr><td><strong>v2</strong></td><td class='num'>12</td><td class='num'>31</td><td><span class=ok-mark>✓ every correct solution passes, every wrong one fails</span></td></tr><tr><td><strong>v3</strong></td><td class='num'>21</td><td class='num'>82</td><td><span class=ok-mark>✓ every correct solution passes, every wrong one fails</span></td></tr></tbody></table></div>
+<footer>Generated by <code>supportsim demo</code>. Static HTML: no scripts, no network requests.</footer>
+</main></body></html>

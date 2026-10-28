@@ -8,6 +8,8 @@
   supportsim show <run json>            print one transcript to the terminal
   supportsim compare <dir> [<dir>...]   markdown table comparing run folders
   supportsim regrade <dir>              re-grade saved runs with the current grader and tasks (no model calls)
+  supportsim demo --run <json> ... --results <dir> ... --out <dir>
+                                        static demo pages for chosen runs, plus an index
 """
 from __future__ import annotations
 
@@ -70,6 +72,11 @@ def main() -> None:
     g.add_argument("dir")
     c = sub.add_parser("compare")
     c.add_argument("dirs", nargs="+")
+    dm = sub.add_parser("demo")
+    dm.add_argument("--run", action="append", required=True, help="a run JSON; repeat for each page")
+    dm.add_argument("--note", action="append", default=[], help="RUN_INDEX=text: one-line explanation for a page")
+    dm.add_argument("--results", action="append", default=[], help="run folder for the index tables; later wins")
+    dm.add_argument("--out", default="demo")
     a = ap.parse_args()
 
     from .tasks import check_task, load_tasks
@@ -129,6 +136,13 @@ def main() -> None:
         summ["config"]["actual_spend_usd"] = round(budget.spent, 4)
         (out / "config.json").write_text(json.dumps(summ["config"], indent=2) + "\n")
         print(f"transcripts: {render(out)}")
+    elif a.cmd == "demo":
+        from .demo import build
+
+        notes = dict(n.split("=", 1) for n in a.note)
+        specs = [(Path(r), notes.get(str(i))) for i, r in enumerate(a.run)]
+        for f in build(specs, [Path(d) for d in a.results], Path(a.out)):
+            print(f)
     elif a.cmd == "view":
         from .viewer import render
 

@@ -107,3 +107,16 @@ def test_v1_and_v2_tools_unchanged_by_v3():
     assert r == {"verified": True, "customer_id": "D201"}
     r, err = call_tool(w, "update_order", {"order_id": "Q-7102", "status": "not_delivered"})
     assert err
+
+
+def test_demo_pages_are_static(tmp_path):
+    import glob
+    from pathlib import Path
+
+    from supportsim.demo import build
+
+    runs = sorted(glob.glob("results/2026*/runs/X12_trial0.json"))[:2]
+    dirs = sorted({Path(r).parent.parent for r in runs})
+    for f in build([(Path(r), None) for r in runs], dirs, tmp_path):
+        text = f.read_text()
+        assert "<script" not in text and "http://" not in text and "https://" not in text
