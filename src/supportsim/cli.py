@@ -20,7 +20,7 @@ from pathlib import Path
 
 DEFAULT_AGENT = "claude-opus-5-5"
 DEFAULT_USER = "claude-haiku-5-5"  # the simulated customer: a cheap model
-SUITE_NAMES = ["v1", "v2", "v3food", "v3"]
+SUITE_NAMES = ["v1", "v2", "v3food", "v3", "v3kb"]
 
 
 def _models(ap: argparse.ArgumentParser) -> None:

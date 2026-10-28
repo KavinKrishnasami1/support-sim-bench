@@ -208,11 +208,26 @@ def get_ticket(w: World, ticket_id) -> dict:
     return t
 
 
+def _kb_articles(w: World) -> list[dict]:
+    return w.data["kb"] + (w.data["policy_kb"] if w.data.get("policy_mode") == "kb" else [])
+
+
 def search_kb(w: World, query) -> dict:
     words = set(re.findall(r"[a-z]+", _s(query).lower())) - {"a", "the", "to", "my", "how", "i", "of", "and", "for"}
     scored = sorted(((len(words & set(re.findall(r"[a-z]+", (k["title"] + " " + k["body"]).lower()))), k)
-                     for k in w.data["kb"]), key=lambda x: -x[0])
-    return {"articles": [k for s, k in scored[:3] if s]}
+                     for k in _kb_articles(w)), key=lambda x: -x[0])
+    if w.data.get("policy_mode") != "kb":
+        return {"articles": [k for s, k in scored[:3] if s]}
+    return {"articles": [{"article_id": k["article_id"], "title": k["title"], "status": k.get("status", "current"),
+                          "effective_date": k.get("effective_date"), "snippet": k["body"][:160]}
+                         for s, k in scored[:6] if s]}
+
+
+def get_kb_article(w: World, article_id) -> dict:
+    a = next((k for k in _kb_articles(w) if k["article_id"].lower() == _s(article_id).lower()), None)
+    if not a:
+        raise ToolError(f"No article {article_id}.")
+    return a
 
 
 # --------------------------------------------------------------------------- write tools
@@ -473,7 +488,7 @@ IMPL = {f.__name__: f for f in (
     reset_mfa, add_to_group, remove_from_group, request_approval, assign_license, revoke_license, assign_asset,
     update_asset, create_change_request, update_ticket, escalate_to_security, escalate_to_human,
     list_group_members, list_groups, list_products, list_tickets, list_delegations, disable_account, set_group_owner,
-    clear_delegation)}
+    clear_delegation, get_kb_article)}
 
 
 def call_tool(w: World, name: str, args: dict) -> tuple[dict, bool]:
@@ -556,6 +571,8 @@ TOOL_SPECS = [
      "input_schema": _obj({"ticket_id": S}, ["ticket_id"])},
     {"name": "search_kb", "description": "Search IT knowledge-base articles.",
      "input_schema": _obj({"query": S}, ["query"])},
+    {"name": "get_kb_article", "description": "The full text of a knowledge-base article.",
+     "input_schema": _obj({"article_id": S}, ["article_id"])},
     {"name": "verify_identity",
      "description": "Run one identity check. mfa_push: push to the account's registered MFA devices; result "
                     "approved, denied or no_response. hr_callback: call the mobile number on the HR record; result "

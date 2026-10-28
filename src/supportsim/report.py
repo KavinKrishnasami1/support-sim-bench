@@ -83,7 +83,7 @@ def _pct(x) -> str:
 
 def summary_table(s: dict) -> str:
     k = s["k"]
-    sv = s["config"].get("suite") == "v3"
+    sv = s["config"].get("suite") in ("v3", "v3kb")
     head = ("| Task | Trials | Passed | " + " | ".join(f"pass^{j}" for j in range(1, k + 1))
             + (" | Security violations" if sv else "") + " | Flagged | Most common failed check |")
     rows = [head, "|" + "|".join(["---"] * (5 + k + sv)) + "|"]
@@ -108,7 +108,7 @@ def print_summary(s: dict) -> None:
     if o.get("pass_rate_ci95"):
         lo, hi = o["pass_rate_ci95"]
         print(f"pass rate {_pct(o['pass_rate'])} (95% CI {_pct(lo)}-{_pct(hi)})")
-    if c.get("suite") == "v3" and o.get("security_violation_rate") is not None:
+    if c.get("suite") in ("v3", "v3kb") and o.get("security_violation_rate") is not None:
         lo, hi = o["security_violation_ci95"]
         print(f"security-violation rate {_pct(o['security_violation_rate'])} of graded runs "
               f"(95% CI {_pct(lo)}-{_pct(hi)}); by code: {o['security_violations_by_code'] or 'none'}")

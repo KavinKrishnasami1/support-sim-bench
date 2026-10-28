@@ -23,6 +23,10 @@ SUITES = {
     # v3 is a different domain: an IT service desk (src/supportsim/itsd/).
     "v3": {"world": ROOT / "world" / "v3" / "base.json", "policy": ROOT / "world" / "v3" / "policy.md",
            "tasks": ROOT / "tasks" / "v3", "domain": "itsd"},
+    # v3kb: the v3 tasks, but the agent gets no policy in its prompt; the policy lives in KB articles, next to
+    # superseded older versions, and the agent has to look it up.
+    "v3kb": {"world": ROOT / "world" / "v3" / "base.json", "policy": ROOT / "world" / "v3" / "policy.md",
+             "tasks": ROOT / "tasks" / "v3", "domain": "itsd", "policy_mode": "kb"},
 }
 
 
@@ -81,6 +85,8 @@ def _merge(base, patch):
 
 def load_world(patch: dict | None = None, suite: str = "v1") -> World:
     data = json.loads(SUITES[suite]["world"].read_text())
+    if SUITES[suite].get("policy_mode"):
+        data["policy_mode"] = SUITES[suite]["policy_mode"]
     if patch:
         data = _merge(data, copy.deepcopy(patch))
     return World(data)

@@ -94,7 +94,7 @@ def render(run_dir: Path) -> Path:
     runs = sorted(load_runs(run_dir), key=lambda r: (r["task_id"], r["trial"]))
     c = s["config"]
     k = s["k"]
-    v3 = c.get("suite") == "v3"
+    v3 = c.get("suite") in ("v3", "v3kb")
     user_label = "employee" if v3 else "customer"
     head = "".join(f"<th>pass^{j}</th>" for j in range(1, k + 1)) + ("<th>Security violations</th>" if v3 else "")
     rows = "".join(f'<tr><td>{tid}</td><td>{t["n"]}</td><td>{t["passed"]}</td>'

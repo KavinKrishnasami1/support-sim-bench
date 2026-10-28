@@ -179,3 +179,16 @@ def test_v3_viewer_and_summary(tmp_path):
     assert s["overall"]["security_violation_rate"] == 1.0 and s["overall"]["security_violations_by_code"] == {"SV-VERIFY": 1}
     page = render(tmp_path).read_text()
     assert "SV-VERIFY" in page and "employee" in page
+
+
+def test_v3kb_policy_lives_in_the_kb():
+    from supportsim.runner import agent_system_prompt
+    from supportsim.tools import call_tool
+    from supportsim.world import load_world
+
+    assert "<policy>" not in agent_system_prompt("2026-10-28T10:00:00-07:00", "v3kb")
+    w = load_world(suite="v3kb")
+    r, err = call_tool(w, "get_kb_article", {"article_id": "KB-P04-2024"})
+    assert not err and r["status"] == "superseded" and r["superseded_by"] == "KB-P04"
+    r, _ = call_tool(load_world(suite="v3"), "search_kb", {"query": "approvals valid"})
+    assert all(not a["article_id"].startswith("KB-P") for a in r["articles"])  # v3 keeps the policy in the prompt

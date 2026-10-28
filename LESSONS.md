@@ -309,3 +309,12 @@ tools, and every rule is written down. Failures in published benchmarks cluster 
 - **Policies that are long and messy, as real ones are.**
 
 Those, and real conversations instead of designed ones, are the next things to test.
+
+**First test: policy kept in a knowledge base, with outdated versions alongside.** The policy was moved out of the
+prompt into KB articles, with superseded versions next to the current ones.
+- **Haiku** failed 4 of 19 tasks, all for real reasons, and all the same way: it never looked up the article that
+  governed a step (segregation of duties, transfers, ticket statuses).
+- **The stale articles didn't trap anyone.**
+- **Opus** looked everything up and failed nothing.
+
+So "find the rule yourself" separates small models from large ones. It doesn't make the strongest model fail.

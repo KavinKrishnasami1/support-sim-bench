@@ -136,7 +136,7 @@ def _matches(entry: dict, rule: dict) -> bool:
 
 
 def grade(task: dict, initial: dict, world: World) -> dict:
-    if task.get("suite") == "v3":
+    if task.get("suite") in ("v3", "v3kb"):
         from .itsd.grader import grade as itsd_grade
 
         return itsd_grade(task, initial, world)

@@ -20,7 +20,7 @@ from .flags import judge_flags, rule_flags
 from .grader import grade
 from .providers import BudgetExceeded, ModelRefused, Provider, Usage
 from .tools import call_tool, tool_specs
-from .world import ROOT, domain, load_world, policy_text
+from .world import ROOT, SUITES, domain, load_world, policy_text
 
 RESULTS = ROOT / "results"
 COMPLETED = {"customer_ended", "max_turns", "agent_tool_loop", "agent_refused"}
@@ -34,7 +34,11 @@ def agent_system_prompt(now: str, suite: str = "v1") -> str:
                 "sender is signed in, and the ticket for this conversation. The employee sees only your chat messages, "
                 "not your tool calls or their results. Use the tools to look things up and take actions, then tell the "
                 "employee what you did.\n\n"
-                f"<policy>\n{policy_text(suite)}\n</policy>")
+                + ("Quillmark's IT policy is published as knowledge-base articles (search_kb, get_kb_article); the "
+                   "index of current policy articles is KB-P00. The current policy is the only source of rules. Before "
+                   "you act, look up the policy articles that apply. An article marked superseded no longer applies; "
+                   "use the article that replaced it."
+                   if SUITES[suite].get("policy_mode") == "kb" else f"<policy>\n{policy_text(suite)}\n</policy>"))
     return (f"You are a customer support agent for Forkful, a food-delivery app, chatting live with a customer.\n"
             f"The current date and time is {now}.\n"
             "The customer sees only your chat messages, not your tool calls or their results. Use the tools to look "
