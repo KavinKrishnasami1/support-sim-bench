@@ -100,6 +100,7 @@ uv run supportsim regrade results/<run folder>    # re-grade saved runs, no mode
   - Request shapes came from public Wikimedia Phabricator and Server Fault threads (CC BY-SA). Only the shape was taken; no text, names or identifiers.
   - Every source, its license and its checksum are listed in [SOURCES.md](SOURCES.md).
 - **Raw source files are not stored in the repo.** `scripts/download_abcd.sh` and `scripts/fetch_v4_sources.sh` fetch pinned, checksummed versions.
+- **License:** MIT ([LICENSE](LICENSE)). Content adapted from the Ministry of Justice guidance keeps its own MIT notice, reproduced in each adapted wiki page. The GSA material is public domain.
 
 ## Layout
 
