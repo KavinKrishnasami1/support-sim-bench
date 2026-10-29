@@ -108,6 +108,9 @@ def run_episode(task: dict, agent: Provider, user: Provider, max_turns: int = 20
         msg = u.send_user(simuser.OPENING_CUE).text
         for _ in range(max_turns):
             stop = simuser.STOP_TOKEN in msg
+            if v4 and stop and simuser.unfired_triggers(task, sim_state):
+                # A scheduled change hasn't happened yet: keep the chat going and fire it on the next turn.
+                stop, sim_state["force"] = False, True
             text = msg.replace(simuser.STOP_TOKEN, "").strip()
             if text and header:  # v3: the chat system's line goes on the employee's first message
                 text, header = f"{header}\n{text}", None

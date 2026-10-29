@@ -1,4 +1,4 @@
-"""Re-grade saved IT runs (v3, v3kb) with grader v2, without touching the run files.
+"""Re-grade saved IT runs (v3, v3kb, v4real) with grader v2, without touching the run files.
 
 Each run's tool calls are replayed against a fresh world (tools are deterministic), then graded by grader v2 with
 the saved chat. Claims are extracted once with claude-haiku-5-5 and cached in data/claims_cache.json.
@@ -61,7 +61,7 @@ def main():
     rows = []
     for d in a.dirs:
         d = Path(d)
-        if json.loads((d / "config.json").read_text()).get("suite") in ("v3", "v3kb"):
+        if json.loads((d / "config.json").read_text()).get("suite") in ("v3", "v3kb", "v4real"):
             rows += regrade(d, prov)
     flips = [x for x in rows if x["old_passed"] and not x["new_passed"]]
     print(f"{len(rows)} runs re-graded; claim extraction spent ${prov.budget.spent:.4f}")

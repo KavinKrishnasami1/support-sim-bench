@@ -60,14 +60,25 @@ def emp(eid, name, title, dept, loc, mgr, since="2023-04-03", etype="full_time",
                            "personal_email": f"{first}.{last}{n}@mailbox.example"}, **extra}
 
 
+LAST_SIGN_IN = {  # people whose last sign-in isn't "yesterday at work"
+    "E6301": ("2026-10-09T17:05:00-05:00", "Austin"),     # Marta: on holiday for two weeks
+    "E6501": ("2026-05-22T16:40:00-07:00", "Portland"),   # Selma: on leave from late May
+    "E7011": ("2026-08-28T17:10:00-07:00", "Portland"),   # leavers: last sign-in before they left
+    "E7023": ("2026-09-14T16:55:00-07:00", "Portland"),
+    "E7015": ("2026-09-30T17:00:00-07:00", "Portland"),   # on leave since Oct 1
+}
+AUSTIN = {"E6201", "E6202", "E6301", "E6302", "E6801", "E6802", "E6901", "E6902"}
+
+
 def acct(eid, groups, status="active", devices=None, **extra):
     username = None
+    when, city = LAST_SIGN_IN.get(eid, ("2026-10-27T08:40:00-05:00" if eid in AUSTIN else "2026-10-27T08:40:00-07:00",
+                                        "Austin" if eid in AUSTIN else "Portland"))
     return {"employee_id": eid, "username": username, "status": status, "lock_reason": None,
             "last_password_reset": "2026-07-01T09:00:00-07:00",
             "mfa_devices": [{"device_id": f"MD-{eid[1:]}-1", "type": "authenticator_app", "label": "Phone",
                              "registered_at": "2025-01-10T09:00:00-08:00", "registered_by": "self-service"}],
-            "recent_sign_ins": [{"time": "2026-10-27T08:40:00-07:00", "city": "Portland", "country": "US",
-                                 "result": "success"}],
+            "recent_sign_ins": [{"time": when, "city": city, "country": "US", "result": "success"}],
             "groups": [{"group_id": g, "added_at": "2025-01-10T09:00:00-08:00", "expires_at": None} for g in groups],
             "devices": devices or [], "authenticators": [], **extra}
 

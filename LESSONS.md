@@ -318,3 +318,70 @@ prompt into KB articles, with superseded versions next to the current ones.
 - **Opus** looked everything up and failed nothing.
 
 So "find the rule yourself" separates small models from large ones. It doesn't make the strongest model fail.
+
+## 9. Real, messy source material, and a stricter grader (v4real)
+
+v4real tested the levers section 8 ended on. The policy became a 12-page wiki adapted from real public IT policies
+(US GSA procedural guides and UK Ministry of Justice guidance), keeping their cross-references, overlapping
+deadlines and stale appendices. Request shapes came from real public support threads (Wikimedia Phabricator,
+Server Fault). Tools could time out, the directory lagged HR, some facts only the employee knew, and requests changed
+mid-chat. Numbers are in [RESULTS_V4.md](RESULTS_V4.md). The grader upgrade (say-do, extraneous writes, order,
+parameters, recovery, process score) is in [GRADER_V2.md](GRADER_V2.md).
+
+**Opus still passed everything: 36/36**, or 33/36 if one policy ambiguity is counted strictly. Sonnet passed 30/36
+and Haiku 21/36, all for real reasons.
+
+**What that says:**
+
+- **Messy documents don't stop a model that reads all of them.** Stale appendices contradicting the current policy,
+  an undefined region resolved on another page, timelines that disagree across three documents: nobody fell for a
+  stale appendix, and Opus resolved every conflict through the precedence rule.
+- **What did separate Sonnet from Opus was urgency plus a procedure change mid-chat.** In R08 (from a real
+  offboarding thread) the manager first says "end of the month", then admits it's an involuntary termination
+  today. Sonnet did the urgent part (disable, remove privileged access) in all 3 runs but never notified Security or
+  set the ticket to `escalated`. Opus did all of it every time.
+- **The real thread shapes were harder than my invented ones for Sonnet:** 15/21 on real-source tasks vs 15/15 on
+  synthetic ones. Its other failure (R01) was the real shape "ask for the group named in the error message", where
+  only the employee knows they just need to view a dashboard.
+- **Haiku's main weakness is the last step, not the hard part.** 9 of its 15 failures were a wrong or missing ticket
+  status after otherwise correct work (both leavers found despite a page timeout; the right exception granted). The
+  ticket rule sits at the end of a long policy.
+- **When every frontier run makes the same debatable call, look at the policy first.** All 6 Opus and Sonnet runs
+  granted a one-day MFA exception that my adapted wiki arguably didn't cover. That came from my adaptation leaving
+  the exemption's scope ambiguous. Genuinely ambiguous policy may be a real lever, but it has to be deliberate and
+  documented, or it's just a benchmark bug.
+
+**On the stricter grader:**
+
+- **Say-do checking is valuable, and noisy.** It caught one genuine false statement ("removed from all groups" when
+  one membership remained). It also produced about 30 false positives across the runs before its matching rules
+  matured. Most came from **denials of a variant**: "not the admin account", "not the 30 days you asked for", "I
+  haven't unlocked it *again*", "I won't hand it over *until*…". A claim extractor reduces a sentence to an action and
+  an object and drops the qualifier. Every say-do failure has to be read by a person until the false-positive rate is
+  known to be low.
+- **"No unexpected changes" needs to know what the employee asked for mid-chat.** It correctly caught an
+  unrequested MFA reset. It also flagged a replacement phone the employee said "yes please" to, and a cautious
+  password reset after re-enabling. Per-task allowances fixed those cases. A general fix would read the request from
+  the conversation.
+- **Error recovery never fired.** Every model noticed the 503 and the page timeout and retried. Transient tool
+  failures, as built here, are not hard for current models.
+
+**On building it:**
+
+- **Most first-run failures were mine again:** 28 of 52 were grader false positives, and 15 were on tasks I had to
+  rerun after fixing the environment.
+- **World generators leak signals.** One helper gave every account "a successful sign-in from Portland yesterday",
+  including an Austin employee on holiday. The simulated employee said "that wasn't me", and Opus correctly
+  escalated instead of resetting. Every field the agent can see is a potential clue, so generated background data
+  needs the same review as the hand-written records.
+- **Scheduled mid-thread changes need a guarantee.** A strong agent can finish in one turn, before a change
+  scheduled for turn 2 fires. The harness now refuses to end the chat while a scheduled change is pending.
+- **The events channel fixed most simulator disputes.** In v3, the simulator caused 9 of 15 non-passes. Here it
+  caused 1 of 21 final non-passes, though it still occasionally ignored its own observations or invented a detail.
+
+**Where this leaves the search for hard tasks.** Five suites in, written-down rules don't make Opus fail, however
+they're arranged. The remaining candidates are the things none of these suites has:
+- real conversations at scale (not shapes rewritten into scripted personas);
+- state the employee controls and reports imperfectly;
+- irreversible actions with requirements that come out late;
+- deliberately ambiguous policy with an adjudicated answer.

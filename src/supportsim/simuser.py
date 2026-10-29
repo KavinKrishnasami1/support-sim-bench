@@ -199,7 +199,7 @@ def observations(task: dict, w, new_entries: list[dict], state: dict, agent_turn
         if i in state.setdefault("fired", set()):
             continue
         when = trig["when"]
-        hit = ("agent_turn" in when and agent_turn >= when["agent_turn"]) or \
+        hit = state.get("force") or ("agent_turn" in when and agent_turn >= when["agent_turn"]) or \
               ("tool" in when and any(_match(when, e) for e in state.setdefault("log_seen", []) + new_entries))
         if hit:
             state["fired"].add(i)
@@ -210,3 +210,7 @@ def observations(task: dict, w, new_entries: list[dict], state: dict, agent_turn
     done = state.get("for_you", [])
     recap = ("\nEverything IT has visibly done for you so far:\n" + "\n".join(f"- {x}" for x in done)) if done else ""
     return "[What you noticed]\n" + "\n".join(f"- {x}" for x in lines) + recap + "\n[End of what you noticed]"
+
+
+def unfired_triggers(task: dict, state: dict) -> bool:
+    return len(state.get("fired", set())) < len(task["user"].get("triggers", []))
