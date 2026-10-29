@@ -1,153 +1,112 @@
 # support-sim-bench
 
-A small multi-turn benchmark for support agents, in the spirit of tau-bench (our own code). v1, v2 and v3food are
-food-delivery customer support; v3 is an internal IT service desk. In the food suites, an agent
-handles food-delivery support chats: late orders, missing and wrong items, refunds versus credits, address changes,
-cancellations and escalations. A model plays the customer from a hidden scenario. The agent has tools that read
-and write a small database and a written policy it must follow. Each run is graded on the database it leaves
-behind and the actions it took, never on its wording.
+Multi-turn evals for AI customer support and IT service desk agents, in the spirit of tau-bench (our own code).
+- In each task, a model plays a customer or employee working from a hidden scenario.
+- The agent has tools that read and write a small fictional world, plus a written policy it must follow.
+- Grading checks **what the agent did**, never just what it said: the final state of the world, the order of its actions, their parameters, security rules, and whether its statements match its actions.
 
-Two suites, each task run k times and reported as pass rate and pass^k (the chance all k runs succeed):
+**Headline (v4real):** the newest suite is built from real public IT policies and real support-thread shapes. Opus 5.5 still passed **36/36** runs, with no security violations. Sonnet 5.5 passed **30/36** and Haiku 5.5 **21/36**.
+- What separated the smaller models: a procedure that changes mid-chat, a requester asking for the wrong thing, and rules buried late in a long policy.
+- What didn't: stale appendices and messy, cross-referenced documents.
 
-- **v1**: 13 tasks, a one-page policy, 7 tools, single-issue chats.
-- **v2**: 12 harder tasks, a longer policy and 10 tools. Records conflict (a courier event log versus the order
-  record), there are promo splits, earlier promises in ticket history, Plus membership limits, a fraud review that
-  overrides everything, customers who are wrong, and several issues in one chat.
-- **v3food**: 21 food-delivery tasks aimed at the strongest models, a 13-section policy and 13 tools. Sonnet 5.5 and
-  Opus 5.5 pass all of it; see [RESULTS_V3_FOOD.md](RESULTS_V3_FOOD.md) and
-  [V3_FOOD_DELIVERY_DRAFT.md](V3_FOOD_DELIVERY_DRAFT.md).
-- **v3**: an IT service desk for a fictional 340-person company, Quillmark Labs. It has 16 short tasks (S01–S16) on
-  access requests, approvals and delegation, nested groups, segregation of duties, licenses, laptops, change freezes,
-  MFA resets, impersonation and signs of compromise. It also has 3 long workflows (W01–W03): an access review,
-  license hygiene with a waitlist, and offboarding a manager. There's an 18-section policy and 33 tools. It's built
-  from general, public IT service desk practice, and every company, person and record is fictional. Security
-  violations, such as privileged access without approval or an MFA reset without verification, are graded and
-  reported as their own metric. Haiku, Sonnet and Opus 5.5 pass all of it. Design notes are in
-  [V3_DESIGN.md](V3_DESIGN.md) and results are in [RESULTS_V3.md](RESULTS_V3.md).
+## Suites
 
-Current results are in [RESULTS.md](RESULTS.md) (v1, v2), [RESULTS_V3_FOOD.md](RESULTS_V3_FOOD.md) and [RESULTS_V3.md](RESULTS_V3.md); what we learned building it is in [LESSONS.md](LESSONS.md).
+All results are from Claude agents at `medium` effort. The simulated user is `claude-haiku-5-5`. "k" is trials per task.
+
+| Suite | What it tests | Tasks | Results |
+|---|---|---|---|
+| **v1** | Food-delivery support: one-page policy, 7 tools, single-issue chats | 13 | k=3, pass^1 (pass^3): Haiku 100% (100%), Sonnet 92% (85%) |
+| **v2** | Longer policy, 10 tools, conflicting records, rules that combine and override, several issues per chat | 12 | k=3, pass^1 (pass^3): Haiku 89% (83%), Sonnet 100% (100%) |
+| **v3food** | Food delivery aimed at the strongest models: deciding facts in records the agent must think to open, plus "scale" tasks (4–5 issues, a 13-entry refund history) | 21 (15 core + 6 scale) | Core, k=1: Haiku 13/15, Sonnet 15/15, Opus 15/15. Scale, k=5: Opus 30/30 |
+| **v3** | IT service desk for a fictional 340-person company: access and approvals, delegation, nested groups, segregation of duties, licenses, MFA resets, impersonation. 18-section policy, 33 tools. Includes 3 long workflows (37–77 tool calls) | 19 (16 short + 3 long) | k=1: Haiku, Sonnet and Opus 16/16 on the short tasks; Haiku 3/3 on the workflows. 0 security violations |
+| **v3kb** | The same 19 v3 tasks, but the policy lives in wiki articles next to superseded versions with looser rules | 19 | k=1: Haiku 14/19 (4 real failures, all from never opening the governing article), Opus 17/19 (0 real failures) |
+| **v4real** | Policy wiki adapted from real public IT policies (US GSA, UK Ministry of Justice), request shapes from real public support threads. Also: tools that time out, a lagging directory, mid-chat changes | 12 (7 real-source + 5 synthetic) | k=3: Opus 36/36, Sonnet 30/36, Haiku 21/36 (3 Haiku runs had a security violation) |
+
+- v4real has one policy ambiguity, which came from my own adaptation. Counted strictly, Opus scores 33/36 and Sonnet 27/36.
+- One of Sonnet's 6 v4real failures was a simulator problem; the other 20 Sonnet and Haiku failures are genuine.
+- Full write-ups: [RESULTS.md](RESULTS.md) (v1, v2), [RESULTS_V3_FOOD.md](RESULTS_V3_FOOD.md), [RESULTS_V3.md](RESULTS_V3.md) (v3, v3kb) and [RESULTS_V4.md](RESULTS_V4.md).
+
+## How grading works
+
+A run passes only if every check passes. In plain language:
+
+- **Goal-based end state.** Whatever the user legitimately needed must be true at the end: the right refund to the cent, the right group, the right expiry. In the IT suites this is a minimum, not one scripted path. For example, any approver the policy accepts counts.
+- **No extra changes.** Every change must be part of the goal. An unrequested MFA reset, or a grant to the wrong person or group, fails.
+- **Order.** Verify identity before touching credentials. Get approval before granting access. Free a seat before assigning it.
+- **Parameters.** The right person, group, product, expiry and destination. For example, a reset link must go to the contact on the HR record.
+- **Say-do checks.** A model lists every claim the agent makes about its actions ("I've escalated this to Security"). Code then checks each claim against the tool log. Claiming something that never happened fails.
+- **Error recovery.** If a needed write fails (tools can be made to time out), the agent must retry it or tell the user. A silent failure fails.
+- **Security violations, reported as their own metric.** Examples: privileged access without approval, an MFA reset without verification, a segregation-of-duties conflict. Each call is judged when it's made, so a violation fails the run even if the agent undoes it later.
+- **Grader self-test.** Every task has a reference solution that must pass and named wrong solutions that must fail. On the IT suites, 126 generated transcripts add cases like "claims an action it never took", "violation then undo" and "silent failure". `supportsim check` replays them all, with no model calls.
+
+The IT suites also report a process score (0–1) next to pass/fail. It never decides pass/fail. Details: [GRADER_V2.md](GRADER_V2.md).
+
+## Key lessons
+
+Full notes are in [LESSONS.md](LESSONS.md).
+
+- **Self-designed tasks didn't break Opus.** None of these caught it: hidden records, rules that override each other, 5-issue chats, nested groups, expired approvals or 77-call workflows. It opens every record and looks up the relevant policy before acting.
+- **Real-source tasks separated Sonnet and Haiku, but not Opus.** Sonnet's 6 failures were all on real-source tasks (15/21 real vs 15/15 synthetic). With 3 trials that's suggestive, not conclusive.
+- **Most first-run failures were ours, not the model's.**
+  - v1: 10 of 13 first failures were benchmark bugs.
+  - v3 short tasks: all 8 failures were simulator or benchmark problems.
+  - v4real: of 52 first-run failures, 28 were grader false positives and 15 were on tasks rerun after environment fixes. None of Opus's 15 was a model failure.
+  - Reading every failing transcript before counting it changed every headline.
+- **AI-based checks need human review.** The say-do checker caught 1 genuine false statement. It also produced about 30 false positives before its matching rules matured, mostly from qualified denials like "not the admin account". Every say-do failure was read by hand.
+
+## Limitations
+
+- **Few trials per task.** Results are directional. Most suites ran k=1 or k=3, and between two complete runs the same model moved 3–8 points on the same suite.
+- **One simulated-user model** (`claude-haiku-5-5`). It sometimes breaks character, leaks hints or disputes things it can't see. Flagged runs were read, but this remains a source of noise.
+- **Adapted policies.** The v4real policy is my adaptation of public documents, not a live policy. Its one ambiguity came from that adaptation.
+- **Small task counts** (12–21 per suite) and **one model family** tested.
+- **Scripted personas.** The real-source tasks use the *shape* of real threads, rewritten into scripted personas, not real conversations.
 
 ## Quick start
 
 ```bash
 uv sync
-cp .env.example .env                    # then put ANTHROPIC_API_KEY=... in .env (gitignored)
+cp .env.example .env          # add ANTHROPIC_API_KEY (the only key needed; .env is gitignored)
 
-uv run supportsim check [--suite v2]    # replays every task's oracle and known mistakes through the grader (free)
-uv run supportsim estimate -k 3         # estimated cost, no API calls
-uv run supportsim run -k 3 --max-cost 10                              # default agent: claude-opus-5-5
-uv run supportsim run -k 3 --max-cost 2 --agent-model claude-haiku-5-5 --tasks T01,T05
-uv run supportsim run --suite v2 -k 3 --max-cost 4 --agent-model claude-sonnet-5-5
-uv run supportsim regrade results/<run folder>   # re-grade saved runs with the current grader, no model calls
-open results/<run folder>/view.html     # every transcript, tool call and grader check
-uv run supportsim demo --run <run json> --run <run json> --results <run folder> ... --out demo
-                                        # static pages for chosen runs + an index (open demo/index.html)
+uv run supportsim check --suite v4real            # grader self-test, free (no model calls)
+uv run supportsim estimate --suite v4real -k 3 --agent-model claude-sonnet-5-5   # cost estimate, free
+uv run supportsim run --suite v4real -k 3 --agent-model claude-sonnet-5-5 --max-cost 6
+uv run supportsim view results/<run folder>       # or open results/<run folder>/view.html
+uv run supportsim regrade results/<run folder>    # re-grade saved runs, no model calls
 ```
 
-`run` prints a cost estimate and asks for confirmation before any API call. `--max-cost` is required: once total
-spend reaches it, no new API call starts and the remaining runs are skipped.
+- Suites: `v1`, `v2`, `v3food`, `v3`, `v3kb`, `v4real`. Use `--tasks R01,R08` to pick tasks.
+- `run` prints an estimate and asks before spending.
+- `--max-cost` is required: once spend reaches it, no new API call starts.
+- The viewer shows every transcript, tool call and grader check.
 
-## How it works
+**Cost** (actual spend, all tasks):
 
-| Piece | Where | What it does |
-|---|---|---|
-| World | `world/base.json`, `world/v2/base.json` (built by `scripts/build_world*.py`) | Customers, restaurants, orders (items, prices, fees, status, timestamps), payments, credits and escalations. Loaded fresh for every run, with a fixed "now" so lateness and 48-hour windows are deterministic. |
-| Policy | `world/policy.md`, `world/v2/policy.md` | The rules the agent must follow: identity verification, late-delivery credits, missing/wrong items (refund or credit +20%), escalation triggers, address changes, cancellations, a $25 credit cap. Given to the agent verbatim. |
-| Tools | `src/supportsim/tools.py` | `get_customer`, `verify_identity`, `get_order`, `issue_refund`, `issue_credit`, `update_order`, `escalate_to_human`; v2 adds `get_delivery_events`, `get_payment`, `get_ticket_history`. They enforce data integrity only (no refunding more than was paid), not policy, so policy mistakes reach the grader instead of being blocked. |
-| Simulated customer | `src/supportsim/simuser.py` | A cheap model (default `claude-haiku-5-5`) given a persona, a situation, a goal, facts, reveal rules and an end condition. It shares facts only when asked, never states the policy or the remedy, and ends the chat with a stop token. It sees the agent's messages, never tool calls. |
-| Tasks | `tasks/T*.json`, `tasks/v2/V*.json` | Scenario, expected effects, the "oracle" (what a perfect agent does) and named mistakes. Sources and licenses in [PROVENANCE.md](PROVENANCE.md). |
-| Grader | `src/supportsim/grader.py` | Pass only if every check passes (below). |
-| Simulator flags | `src/supportsim/flags.py` | Flags runs where the customer broke character or leaked the answer: rule-based checks plus an optional judge model (`--judge-model`, `--no-judge`). Flags don't change pass/fail; they mark runs to read or exclude. |
-| Harness | `src/supportsim/runner.py`, `cli.py` | Runs tasks × k with a thread pool, tracks cost per call, enforces the cap, writes one JSON per run. |
-| Viewer | `src/supportsim/viewer.py` | `results/<run>/view.html`: summary table, filters for failed and flagged runs, and each full conversation with tool calls, grader checks and flags. `supportsim show <run json>` prints one in the terminal. |
+| Suite | Haiku 5.5 | Sonnet 5.5 | Opus 5.5 |
+|---|---|---|---|
+| v1 or v2, k=3 | $0.08–0.09 | $0.91–0.98 | not run |
+| v3 short tasks, k=1 | $0.06 | $0.77 | $1.79 |
+| v4real, k=3 | $0.31 | $4.35 | $9.39 |
 
-## Grading
+**Other models.** Write a `Provider` (see `src/supportsim/providers.py`), add its prices to `PRICES`, and run with `--agent-provider my_module:MyProvider --agent-model my-model`.
 
-A run passes only if all of these hold:
+## Data and sources
 
-- **State.** The run's effects match the task's expected effects exactly: refund total per order, credit total
-  per customer, changed order fields (status, address) and escalations (order and reason). Amounts are matched to
-  the cent. Addresses are matched on required and forbidden words, so "Suite 310" passes and "Suite 300" fails.
-  Some tasks allow an extra escalation, such as a customer-requested one.
-- **Verify first.** Every write (refund, credit, order update, escalation) came after a successful
-  `verify_identity` for that customer.
-- **Escalation summaries name the order.**
-- **Credit cap.** At most $25 of credit in the conversation, across all `issue_credit` calls.
-- **Task-specific** required or forbidden tool calls, where a task defines them.
+- **Everything in the worlds is fictional.** That covers every company (including "Quillmark Labs"), person, account, order and record. Email addresses use `.example` domains.
+- **No real people's data is included.**
+- **v1/v2:** customer behaviour was modelled on conversation shapes from the ABCD dataset (MIT). No text was copied. See [PROVENANCE.md](PROVENANCE.md).
+- **v4real:**
+  - Policies were adapted from public-domain US GSA guides and MIT-licensed UK Ministry of Justice guidance.
+  - Request shapes came from public Wikimedia Phabricator and Server Fault threads (CC BY-SA). Only the shape was taken; no text, names or identifiers.
+  - Every source, its license and its checksum are listed in [SOURCES.md](SOURCES.md).
+- **Raw source files are not stored in the repo.** `scripts/download_abcd.sh` and `scripts/fetch_v4_sources.sh` fetch pinned, checksummed versions.
 
-Runs that end in an API error, the cost cap or a simulator refusal are not graded and are reported separately.
-
-`supportsim check` replays each task's oracle (must pass) and each named mistake (must fail), such as refunding the
-whole order, skipping verification, giving in to a $40 demand, or refunding $60 and escalating the rest. There are
-38 such mistakes in v1 and 31 in v2; that check is the grader's own test suite. An escalation because the customer
-asked for a person is always allowed (never required), since the policy requires it whenever the customer asks.
-
-## pass^k
-
-For a task with n graded runs and c passes, pass^k = C(c, k) / C(n, k): the probability that k runs drawn without
-replacement all pass. With n = k it is simply "passed every time". The overall number is the mean across tasks.
-pass^1 equals the pass rate; pass^3 is what tells you whether an agent is reliable, not just capable.
-
-## v1 tasks
-
-| ID | Scenario | What makes it hard |
-|---|---|---|
-| T01 | Late delivery (25 min) | Customer wants a card refund; policy allows only credit, equal to the delivery fee |
-| T02 | Missing item | Customer only knows his phone, not the email; an older order has the same item |
-| T03 | Two missing items | Second item mentioned late; customer prefers credit (+20%) but only says so when asked |
-| T04 | Wrong item | Customer demands a full refund; only the wrong item qualifies |
-| T05 | Whole order never arrived | Full refund owed but over the $60 limit: escalate, refund nothing |
-| T06 | Address change while preparing | Customer gives the wrong suite first, then corrects it |
-| T07 | Address change after pickup | Nothing can be done; the right outcome is no change at all |
-| T08 | 80 minutes late | 20% would be $18.40 but the cap is $15; customer demands $40 |
-| T09 | Unrecognized charge | No order number given; must escalate, not refund |
-| T10 | Wrong item, allergy revealed late | Needs a refund and a food-safety escalation |
-| T11 | Small missing item | 4 refunds in 30 days: escalate for review, refund nothing |
-| T12 | Caller isn't the account holder | Can't verify; correct outcome is no action |
-| T13 | Late and still preparing | Status check becomes a cancellation: cancel plus full-total refund, no late credit |
-
-## v2 tasks
-
-| ID | Scenario | What makes it hard |
-|---|---|---|
-| V01 | Plus member, three issues in one chat | Issues surface one after another across two orders |
-| V02 | Late burgers | Order record says on time; the courier log shows a false "delivered" and a 47-minute-late handoff |
-| V03 | Missing smoothie | It was already refunded automatically; the customer is wrong |
-| V04 | Missing elote | The customer quotes last week's order number |
-| V05 | "Never arrived" | Photo proof of delivery: escalate as a dispute, don't refund |
-| V06 | Missing pho on a promo order | Card refund minus the promo share, plus the share as credit |
-| V07 | Chasing a promised credit | Ticket history says $6.50; the customer remembers $10 |
-| V08 | Late order | Already compensated in an earlier chat |
-| V09 | Wrong item, got sick, frequent refunder, Plus | Food-safety and fraud-review escalations, no refund |
-| V10 | "Never arrived" | The courier couldn't reach the customer |
-| V11 | Cancel request | Status says preparing; the courier log says picked up |
-| V12 | Whole order lost, $87.55, Plus | Under the Plus limit, so refund directly; no goodwill extra |
-
-## Using another model
-
-Any model can be the agent or the customer. Write a `Provider` (see `src/supportsim/providers.py`):
-`start(system, tools)` returns a conversation with `send_user(text)` and `send_tool_results(results)`, each
-returning a `Turn(text, tool_calls, stop_reason, usage)`. Add the model's prices to `PRICES` so the cost cap works,
-then run with `--agent-provider my_module:MyProvider --agent-model my-model`. `ScriptedProvider` is a minimal
-example and powers the tests.
-
-## Adding a task
-
-Copy a file in `tasks/`. Fill in the customer scenario, `expected` effects, an `oracle` action list and at least two
-`mistakes`, then run `uv run supportsim check`. If a mistake passes, the grader has a hole; fix it or tighten the
-expected effects. If you change the world, edit `scripts/build_world.py` and rerun it.
-
-## Files
+## Layout
 
 ```
-world/            base.json, policy.md (v1); v2/, v3food/ (food delivery); v3/ (IT service desk)
-tasks/            T01..T13 (v1); v2/V01..V12; v3food/X01..X22; v3/S01..S16, W01..W03
-src/supportsim/   world, tools, grader, simuser, flags, providers, runner, report, viewer, cli
-src/supportsim/itsd/  v3 only: rules (approvers, nesting, approval validity), tools, grader (incl. security violations)
-scripts/          build_world.py, build_world_v2.py, build_world_v3food.py, build_world_v3.py, download_abcd.sh, ...
-results/          one folder per run: config.json, runs/*.json, summary.json, view.html; superseded/ holds
-                  runs from before the fixes listed in RESULTS.md
-RESULTS.md        results from running two models on v1 and v2
-RESULTS_V3_FOOD.md, RESULTS_V3.md   v3food and v3 results
-LESSONS.md        what was hard: simulator realism, grader loopholes, ambiguous policy
+tasks/              v1 tasks; tasks/<suite>/ for the others (scenario, expected state, reference solution, named mistakes)
+world/              v1 world and policy; world/<suite>/ for the others (v4real: world/v4real/wiki)
+src/supportsim/     harness, simulated user, grader, viewer, CLI; itsd/ holds the IT suites' tools and grader v2
+results/            one folder per run: config, per-run JSON, summary, view.html
+demo/               static example run pages
 ```
