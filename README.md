@@ -68,25 +68,14 @@ Full notes are in [LESSONS.md](LESSONS.md).
 uv sync
 cp .env.example .env          # add ANTHROPIC_API_KEY (the only key needed; .env is gitignored)
 
-uv run supportsim check --suite v4real            # grader self-test, free (no model calls)
-uv run supportsim estimate --suite v4real -k 3 --agent-model claude-sonnet-5-5   # cost estimate, free
+uv run supportsim check --suite v4real            # grader self-test, no model calls
 uv run supportsim run --suite v4real -k 3 --agent-model claude-sonnet-5-5 --max-cost 6
 uv run supportsim view results/<run folder>       # or open results/<run folder>/view.html
 uv run supportsim regrade results/<run folder>    # re-grade saved runs, no model calls
 ```
 
 - Suites: `v1`, `v2`, `v3food`, `v3`, `v3kb`, `v4real`. Use `--tasks R01,R08` to pick tasks.
-- `run` prints an estimate and asks before spending.
-- `--max-cost` is required: once spend reaches it, no new API call starts.
 - The viewer shows every transcript, tool call and grader check.
-
-**Cost** (actual spend, all tasks):
-
-| Suite | Haiku 5.5 | Sonnet 5.5 | Opus 5.5 |
-|---|---|---|---|
-| v1 or v2, k=3 | $0.08–0.09 | $0.91–0.98 | not run |
-| v3 short tasks, k=1 | $0.06 | $0.77 | $1.79 |
-| v4real, k=3 | $0.31 | $4.35 | $9.39 |
 
 **Other models.** Write a `Provider` (see `src/supportsim/providers.py`), add its prices to `PRICES`, and run with `--agent-provider my_module:MyProvider --agent-model my-model`.
 
